@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Computing services: Converters: idl2matlab</title>
+  </head>
+  <body>
+    <iframe src="../../Layout/header.html" name="header" width="100%"
+      height="100"></iframe> <br>
+    <h1 align="center">idl2matlab<i>: IDL to Matlab/Scilab translator</i></h1>
+    <div align="center"><i><i>version 1.6.1</i><i> - Sept 2015 (c) ILL</i></i><br>
+    </div>
+    <hr size="2" width="100%"> <a
+      href="http://www.exelisvis.com/ProductsServices/IDL.aspx">IDL</a>
+    and <a href="http://www.mathworks.com/">Matlab</a> are two major
+    numerical languages for scientists. Additionally, <a
+      href="http://www.scilab.org/">Scilab</a> is a free Matlab-like
+    software, which integrates a high compatibility (syntax, functions,
+    graphics, user interfaces). <br>
+    Many IDL programs have been developed in large facilities studying
+    astrophysics, geology,medicine, particle and nuclear physics. <br>
+    On the other hand, Matlab is widely used in smaller laboratories
+    (universities, national scientific agencies, ...). <br>
+    In order to extend the portability of such IDL programs, we have
+    developed an automatic translator from IDL to Matlab and Scilab, <b>idl2matlab</b>.<i><br>
+      <br>
+    </i>
+    <table border="1" cellpadding="2" cellspacing="2" width="100%">
+      <tbody>
+        <tr>
+          <td bgcolor="#ffcc99" valign="top"><b>INPUT: idl2matlab</b><b><br>
+            </b></td>
+          <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
+            </b></td>
+        </tr>
+        <tr>
+          <td valign="top">An IDL code (file *.pro)<br>
+          </td>
+          <td valign="top">The corresponding Matlab/Scilab code.</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <br>
+    <form action="/cgi-bin/converter_idl2matlab.pl" method="post"
+      enctype="multipart/form-data">
+      <p><b><font color="#3366ff">1- Indicate the IDL source code to
+            convert (e.g. a *.pro file, max 5Mb). </font><input
+            name="source" type="file"></b> <br>
+        <i>The maximum allowed content is limited to 5 Mb.</i> You can
+        get IDL example code <a
+href="http://www.eg.bucknell.edu/physics/ASTR201/IDLTutorial/tutorial_03.html">here</a>.
+        <br>
+      </p>
+      <p align="left"> <font color="#3366ff"><b>2- Select the target
+            language</b></font>:
+        <select name="target">
+          <option value="matlab">Matlab </option>
+          <option value="scilab">Scilab </option>
+        </select>
+      </p>
+      <p align="left"> <font color="#3366ff"><b>3- Indicate if your
+            code is a program/function or a script:</b></font>
+        <select name="type">
+          <option value="program">Program/function </option>
+          <option value="script">Script (list of commands)</option>
+        </select>
+        <br>
+        <i>In a </i>Program/function<i> code, the file must contain the
+          keywords PROGRAM or FUNCTION. A script is a simple list of IDL
+          commands.</i><br>
+      </p>
+      <p align="center"> <b><input value="CONVERT !" type="SUBMIT"></b>
+      </p>
+    </form>
+    The result will be proposed as a ZIP archive holding the translated
+    code. To run it you will need to install our <i>idl2matlab</i>
+    library and initialise it with a call to '<i>i2m_init</i>' (for
+    Matlab), or '<i>i2s_init</i>' (for Scilab). <a
+      href="../../Downloads/idl2matlab-lib.zip">Get idl2matlab-lib.</a>
+    <hr size="2" width="100%">
+    <h2>Availability and Credits</h2>
+    If you use this software, please acknowledge:<br>
+    <ul>
+      <li>Didier Richard, Emmanuel Farhi, BENZAGHIOUA Adbeslam, GARDON
+        Lucien, SYLVESTRE Nadege, AZZI MAURIER Karim, BOURTEMBOURG
+        Reynald, CORTINA Stephane, SZCZUCZAK Nadege (c) ILL Computing
+        for Science (2009. </li>
+    </ul>
+    This software source code is freely available <a
+      href="http://idl2matlab.sourceforge.net/">http://idl2matlab.sourceforge.net/</a>
+    and <a href="https://github.com/farhi/idl2matlab">GitHub idl2matlab</a>.
+    You can install it on your own computer. The compilation requires an
+    old GCC version (GCC 3.x), which is more tolerant wrt memory
+    handling.<br>
+    A Debian package <a
+href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/idl2matlab_1.6.1_amd64.deb">idl2matlab</a>
+    installer exists for e.g. Ubuntu/Mint at <a
+      href="http://packages.mccode.org">packages.mccode.org</a>.
+    <h2>Limitations</h2>
+    The translator is not perfect, and may fail for unsupported IDL
+    grammar. Some functions are not translated. The translation does NOT
+    support objects and complex plotting routines.
+    <h2>How it works</h2>
+    The IDL code is sent to the <i>idl2matlab</i> executable which is
+    built using a LeX/Yacc grammar analyser. The code is then written
+    into a target language (here Matlab or Scilab). No information is
+    kept on the server, files are deleted after the conversion.<br>
+    <br>
+    <iframe src="../../Layout/footer.html" name="header" width="100%"
+      height="100"></iframe> <br>
+  </body>
+</html>

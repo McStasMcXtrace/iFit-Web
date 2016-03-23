@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="content-type">
+    <title>Computing services: Converters: cif2hkl</title>
+  </head>
+  <body>
+    <iframe src="../../Layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
+    <h1 class="csc-firstHeader" align="center"><i>cif2hkl: CIF to
+        F2(HKL) calculator</i></h1>
+    <div align="center"><i>version 1.2</i><i> - March 2016 (c) ILL</i><br>
+    </div>
+    <hr size="2" width="100%">
+    <p class="bodytext">The <a
+        href="http://ifit.mccode.org/Models.html#mozTocId344379"><b>CIF2HKL</b></a>
+      tool allows to compute the structure factors of powders and single
+      crystal materials. It requires as input a crystallographic
+      information, and provides a list of F²(HKL) to be used for e.g. <a
+        href="http://www.mcstas.org">McStas</a> and <a
+        href="http://mcxtrace.org/">McXtrace</a> components such as <a
+href="http://www.mcstas.org/download/components/samples/PowderN.html">PowderN</a>,
+      <a
+href="http://www.mcstas.org/download/components/samples/Single_crystal.html">Single_crystal</a>
+      and <a
+href="http://www.mcstas.org/download/components/samples/Isotropic_Sqw.html">Isotropic_Sqw</a>.</p>
+    <table width="100%" border="1" cellpadding="2" cellspacing="2">
+      <tbody>
+        <tr>
+          <td valign="top" bgcolor="#ffcc99"><b>INPUT: cif2hkl</b><b><br>
+            </b></td>
+          <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+            </b></td>
+        </tr>
+        <tr>
+          <td valign="top">A CIF/ShelX/FullProf file<br>
+          </td>
+          <td valign="top">A file with the F²(HKL) reflection list for
+            use with e.g.&nbsp; <a href="http://www.mcstas.org">McStas</a>
+            and <a href="http://mcxtrace.org/">McXtrace</a> (Laz/Lau)<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <ul>
+    </ul>
+    <p> </p>
+    <form action="/cgi-bin/converter_cif2hkl.pl" method="post"
+      enctype="multipart/form-data">
+      <p align="left"> <font color="#3366ff"><b>1- File to Upload (max
+            5Mb):</b></font> <input name="source" type="file"> </p>
+      <p> Supported formats: </p>
+      <ul>
+        <li><a
+            href="https://fr.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>
+          (.CIF) from e.g. the <a
+            href="http://icsd.ill.fr/icsd/index.php">Inorganic Crystal
+            Structure Database</a> (ICSD) and <a
+            href="http://www.crystallography.net/browse.html">The
+            Crystallography data base</a> </li>
+        <li>FullProf (.CFL) for instance the <a
+            href="http://ifit.mccode.org/Data/Na2Ca3Al2F14.cfl">Na2Ca3Al2F14</a>.
+        </li>
+        <li>FullProf (.PCR) </li>
+        <li>ShelX (.SHX) </li>
+        <li>ShelX (.INS) </li>
+        <li>ShelX (.RES) </li>
+      </ul>
+      <p align="left"> <font color="#3366ff"><b>2- Indicate the probe
+            to compute the structure factors for:</b></font>
+        <select name="probe">
+          <option value="NUC">Neutrons</option>
+          <option value="XRA">X-rays</option>
+          <option value="ELE">Electrons</option>
+        </select>
+      </p>
+      <p align="left"> <font color="#3366ff"><b>3- Indicate the
+            crystalline phase:</b></font>
+        <select name="phase">
+          <option value="powder">Powder (unique reflections)</option>
+          <option value="xtal">Single crystal (all reflections)</option>
+        </select>
+      </p>
+      <p align="center"> <input value="COMPUTE !" type="SUBMIT"> </p>
+    </form>
+    You will get a ZIP archive containing the initial information, the
+    computation log, and the generated F²(HKL) file.<br>
+    <hr size="2" width="100%">
+    <h2>Availability and Credits</h2>
+    <p class="bodytext">If you use this software, please acknowledge:<img
+        alt="iFit" title="iFit"
+src="file:///home/farhi/dev/Web/html/Computing/sqw_phonons/images/iFit-logo.png"
+        height="64" width="116" align="right"> </p>
+    <ul>
+      <li>CrysFML by Juan Rodriguez-Carvajal and Javier Gonzalez-Platas,
+        ILL and ULL, Tenerife, Spain (LGPL 3.0)</li>
+      <li> Commission on Crystallographic Computing, <a
+href="http://www.iucr.org/resources/commissions/crystallographic-computing/newsletters/1/crysfml">IUCr
+
+
+
+
+
+
+
+          Newsletter No.1, pp 50-58, January 2003</a><br>
+      </li>
+      <li>E. Farhi, Y. Debab and P. Willendrup, <span
+          style="font-style: italic;">J. Neut. Res</span>., <span
+          style="font-weight: bold;">17</span> (2013) 5. <a
+href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
+
+
+
+
+          10.3233/JNR-130001 </a></li>
+    </ul>
+    When using the generated powder/single crystal reflection list for <a
+      href="http://www.mcstas.org">McStas</a>, cite:<br>
+    <ul>
+      <li>K. Lefmann and K. Nielsen, <i>Neutron News</i> <b>10</b>,
+        20, (1999)<br>
+      </li>
+      <li>P. Willendrup, E. Farhi and K. Lefmann, <i>Physica B</i>, <b>350</b>
+        (2004) 735</li>
+      <li>Willendrup P, Filges U, Keller L, Farhi E, Lefmann K, <i>Physica
+
+
+
+
+
+
+          B-Cond Matt </i><b>385</b> (2006) 1032 (when using <a
+          href="http://www.mcstas.org/download/components/samples/PowderN.html">PowderN</a>)<br>
+      </li>
+      <li>E. Farhi, V. Hugouvieux, M.R. Johnson, and W. Kob, <i>Journal
+          of Computational Physics</i> <b>228</b> (2009) 5251-5261
+        (when using <a
+href="http://www.mcstas.org/download/components/samples/Isotropic_Sqw.html">Isotropic_Sqw</a>)</li>
+    </ul>
+    This software source code (<a
+      href="http://ifit.mccode.org/Downloads/cif2hkl.F90">here</a>) is
+    freely available as part of iFit <a href="http://ifit.mccode.org">ifit.mccode.org</a>,
+    and <a href="https://github.com/McStasMcXtrace/iFit">GitHub
+      repository</a>.<br>
+    A Debian package installer exists for e.g. Ubuntu/Mint at <a
+      href="http://packages.mccode.org">packages.mccode.org</a> both for
+    <i>cif2hkl</i> and <i>iFit.</i> <br>
+    <h2>Limitations</h2>
+    It is a good idea to check the Physical parameters pre-computed in
+    the header of the HKL file, especially the cross sections, the
+    density and molar weight.<br>
+    <h2>How it works</h2>
+    The <i>cif2hkl</i> program calls subsequently the
+    ReadN_set_Xtal_Structure, Get_MaxNumRef,&nbsp; Hkl_Uni or
+    Hkl_Gen_SXtal, and Structure_Factors from the <a
+href="https://www.ill.eu/sites/fullprof/php/programs24b7.html?pagina=Crysfml">CrysFML</a>
+    [<a href="http://forge.ill.fr/projects/crysfml">repository</a>]. No
+    information is kept on the server, files are deleted after the
+    conversion.<br>
+    <br>
+    <iframe src="../../Layout/footer.html" name="header" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>

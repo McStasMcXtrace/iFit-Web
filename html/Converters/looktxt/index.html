@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Computing services: Converters: idl2matlab</title>
+  </head>
+  <body>
+    <iframe src="../../Layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
+    <h1 class="csc-firstHeader" align="center"><i>looktxt: Numerical
+        data importer</i></h1>
+    <div align="center"><i>version 1.4</i><i> - Feb 2014 (c) ILL</i> </div>
+    <hr size="2" width="100%"> <br>
+    The <b>looktxt</b> tool, which is part of <a
+      href="http://ifit.mccode.org">iFit</a>, is a tool that reads <b>a</b><b>ny</b>
+    text file, with any formatting, and extracts numerical blocks into
+    Matlab, HDF, XML, Scilab, IDL, YAML, HTML and Octave files.<i><br>
+      <br>
+    </i>
+    <table width="100%" border="1" cellpadding="2" cellspacing="2">
+      <tbody>
+        <tr>
+          <td valign="top" bgcolor="#ffcc99"><b>INPUT: looktxt</b><b><br>
+            </b></td>
+          <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+            </b></td>
+        </tr>
+        <tr>
+          <td valign="top"><b>any</b> text file, with numbers and
+            comments mixed </td>
+          <td valign="top">A data file containing the numerical data in
+            a scientific file format (Matlab, HDF, XML, Scilab, IDL,
+            YAML, HTML and Octave)</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <form action="/cgi-bin/converter_looktxt.pl" method="post"
+      enctype="multipart/form-data">
+      <p align="left"> <font color="#3366ff"><b>1- Text/ASCII file to
+            Upload (max 50Mb):</b></font> <input name="source"
+          type="file"> </p>
+      <p align="left"> <font color="#3366ff"><b>2- Indicate the file
+            format to generate:</b></font>
+        <select name="target">
+          <option value="Matlab">Matlab</option>
+          <option value="NeXus5/HDF5">HDF5/NeXus5</option>
+          <option value="NeXus4/HDF4">HDF4/NeXus4</option>
+          <option value="NeXus/XML">XML/NeXus</option>
+          <option value="Scilab">Scilab</option>
+          <option value="IDL">IDL</option>
+          <option value="XML">XML</option>
+          <option value="YAML">YAML</option>
+          <option value="HTML">HTML</option>
+          <option value="Octave">Octave</option>
+        </select>
+      </p>
+      <ul>
+        <li><b>Matlab: </b>generate a script which, when read, loads
+          the data into <a href="http://www.mathworks.com/">Matlab</a>
+          (c).<br>
+        </li>
+        <li><b>HDF4:</b> The <a href="http://www.hdfgroup.org/">HDF4</a>
+          format is a compact, binary storage format.&nbsp;<span
+            style="font-weight: bold;"></span>Such files can be
+          edited/viewed with e.g <a
+            href="http://www.hdfgroup.org/hdf-java-html/hdfview">hdfview</a>.
+          IDL and Matlab also have dedicated HDF 4 browsers (see <a
+            href="matlab:doc%20hdftool">hdftool</a>). The generated file
+          is <a href="http://nexusformat.org/">NeXus</a> complient.<br>
+        </li>
+        <li><b>HDF5:</b> The <a href="http://www.hdfgroup.org/">HDF5</a>
+          format is a compact, compressed binary storage format. Such
+          files can be edited/viewed with e.g <a
+            href="http://www.hdfgroup.org/hdf-java-html/hdfview">hdfview</a>,
+          <a href="http://www.opendx.org/about.html">OpenDX, </a><a
+            href="http://autoplot.org/">Autoplot</a>. IDL and Matlab
+          also have dedicated HDF browsers (see <a
+            href="matlab:doc%20hdftool">hdftool</a>). The generated file
+          is <a href="http://nexusformat.org/">NeXus</a> compliant.</li>
+        <li><b>XML:</b> The <a href="http://www.w3.org/XML/">XML</a>
+          format, can be made <a href="http://nexusformat.org/">NeXus</a>
+          compliant.</li>
+        <li><b>Scilab: </b>generate a script which, when read, loads
+          the data into <a href="http://www.scilab.org/">Scilab</a>
+          (c).</li>
+        <li><b>IDL: </b>generate a script which, when read, loads the
+          data into <a
+href="http://www.exelisvis.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx">IDL</a>
+          (c).</li>
+        <li><b>YAML:</b> Data serialization format "<a
+            href="http://en.wikipedia.org/wiki/YAML">YAML</a> Ain't <a
+            href="http://en.wikipedia.org/wiki/Markup_language"
+            title="Markup language">Markup Language</a>"</li>
+        <li><b>HTML:</b> a web page<br>
+        </li>
+        <li><b>Octave</b><b>: </b>generate a script which, when read,
+          loads the data into <a
+            href="https://www.gnu.org/software/octave/">Octave</a>.</li>
+      </ul>
+      <p align="left"> <font color="#3366ff"><b>3- Indicate if you wish
+            to generate a binary format when possible (faster to read):</b></font>
+        <select name="binary">
+          <option value="yes">Yes, binary</option>
+          <option value="no">No, full text</option>
+        </select>
+      </p>
+      <p align="center"> <b><input value="CONVERT !" type="SUBMIT"></b>
+      </p>
+    </form>
+    You will get a ZIP archive containing the initial information, the
+    conversion log, and the generated file. <a
+      href="../../Downloads/idl2matlab-lib.zip"></a>
+    <hr size="2" width="100%">
+    <h2>Availability and Credits</h2>
+    If you use this software, please acknowledge:<img alt="iFit"
+      title="iFit"
+src="file:///home/farhi/dev/Web/html/Computing/sqw_phonons/images/iFit-logo.png"
+      height="64" width="116" align="right">
+    <ul>
+      <li>E. Farhi, Y. Debab and P. Willendrup, <span
+          style="font-style: italic;">J. Neut. Res</span>., <span
+          style="font-weight: bold;">17</span> (2013) 5. <a
+href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
+
+
+
+
+          10.3233/JNR-130001 </a></li>
+    </ul>
+    This software source code (<a
+      href="http://ifit.mccode.org/Downloads/looktxt.c">here</a>) is
+    freely available as part of iFit <a href="http://ifit.mccode.org">ifit.mccode.org</a>,
+    and <a href="https://github.com/McStasMcXtrace/iFit">GitHub
+      repository</a>.<br>
+    A Debian package installer <a
+href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/looktxt-1.4-amd64.deb">looktxt</a>
+    exists for e.g. Ubuntu/Mint at <a href="http://packages.mccode.org">packages.mccode.org</a>
+    both for <i>looktxt</i> and <i>iFit.</i>
+    <h2>Limitations</h2>
+    This translator works nicely with text files, but will fail with
+    binary files.<br>
+    <h2>How it works</h2>
+    The initial text file is read as a human being would do, identifying
+    numerical blocks, labeling them with the neighboring comments. The
+    output file is then generated into a scientific data format.<br>
+    <br>
+    <iframe src="../../Layout/footer.html" name="header" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>

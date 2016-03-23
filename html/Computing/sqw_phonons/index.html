@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Computing services: Computing: sqw_phonons</title>
+  </head>
+  <body>
+    <iframe src="../../Layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
+    <h1 class="csc-firstHeader" align="center"><i>sqw_phonons: Phonon
+        dispersions in 4D<br>
+      </i></h1>
+    <div align="center"><i>version 1.4</i><i> - Feb 2014 (c) ILL</i> </div>
+    <hr size="2" width="100%"> <br>
+    The <b>sqw_phonons</b> tool, which is part of <a
+      href="http://ifit.mccode.org">iFit</a>, is a tool to compute the
+    phonon dispersion curves (vibrational modes) in 4D (HKLE) and for
+    any crystalline material. It only requires as input a file
+    describing the material structure, and one can select a few key
+    parameters for the <i>ab-initio</i> DFT codes.<i><br>
+      <br>
+      To try this service, select use <a href="POSCAR_Al">Aluminium</a>,
+      then use the EMT code, which is extremely fast (but very limited),
+      and press the COMPUTE button. You should get something like <a
+        href="example/index.html">this</a>.<br>
+      <br>
+    </i>
+    <table width="100%" border="1" cellpadding="2" cellspacing="2">
+      <tbody>
+        <tr>
+          <td valign="top" bgcolor="#ffcc99"><b>INPUT: sqw_phonons</b><b><br>
+            </b></td>
+          <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+            </b></td>
+        </tr>
+        <tr>
+          <td valign="top">A <a
+              href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
+            <a
+              href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+            <a href="http://www.rcsb.org/pdb/">PDB</a>, ... material
+            structure</td>
+          <td valign="top">Phonon dispersions from the Dynamical matrix,
+            using forces estimated by <i>ab-initio </i>using <a
+              href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
+            selection of DFT codes (EMT, GPAW, ABINIT, Elk, Dacapo,
+            QuantumEspresso). </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <form action="/cgi-bin/computing_sq_phonons.pl" method="post"
+      enctype="multipart/form-data">
+      <p align="left"> <font color="#3366ff"><b>1- Material structure
+            (max 5Mb):</b></font> <input name="source" type="file"><br>
+        Any file format supported by the ASE can be used, such as (<a
+          href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
+        <a
+          href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+        <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, MDL/SDF/XSD,
+        ...). <br>
+        See the full list <a
+          href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
+        We provide a few examples: <a href="POSCAR_Al">Al</a>, <a
+          href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>.<br>
+      </p>
+      <p align="left"> <font color="#3366ff"><b>2- Indicate the
+            calculator to use:</b></font>
+        <select name="calculator">
+          <option value="QuantumEspresso">QuantumEspresso: Plane-wave
+            pseudopotential code</option>
+          <option value="EMT">EMT: Effective Medium Theory</option>
+          <option value="ABINIT">ABINIT: Plane-wave pseudopotential code</option>
+          <option value="GPAW">GPAW: Real-space/plane-wave/LCAO PAW code</option>
+          <option value="Dacapo">Dacapo: Plane-wave ultra-soft
+            pseudopotential code</option>
+          <option value="ELK">ELK: Full Potential LAPW code, similar to
+            Wien2k</option>
+        </select>
+        <br>
+        We recommend <b>QuantumEspresso</b> (or EMT for a try). </p>
+      <ul>
+      </ul>
+      <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td valign="top"><b><font color="#cc33cc">Calculator</font></b><br>
+            </td>
+            <td valign="top"><b>Description</b><br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><b><img alt="qe" title="qe"
+                  src="images/logo_qe.jpg" height="34" width="80"
+                  align="middle"><a
+                  href="http://www.quantum-espresso.org/">QuantumEspresso</a></b></td>
+            <td valign="top">Density-functional theory, plane waves, and
+              pseudopotentials based code for electronic-structure
+              calculations and materials modeling. When using this
+              option through ASE, the input file is converted to POSCAR,
+              and makes use of <a
+                href="http://chianti.geol.ucl.ac.uk/%7Edario">PHON</a>
+              and <a href="http://www.quantum-espresso.org/">Quantum
+                Espresso</a>. Using the <a
+                href="http://materialscloud.org/">SSSP library</a>. <i>Fast
+
+
+                and proven code.</i></td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="emt" title="emt"
+                src="images/emt.png" height="50" width="71"
+                align="middle">&nbsp;<a
+                href="https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html">EMT</a></td>
+            <td valign="top">Effective Medium Theory calculator (<b>only</b>
+              for Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O). <br>
+              <i><b>Very fast, but limited.</b></i><br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><a href="http://www.abinit.org/"><img
+                  alt="abinit" title="abinit" src="images/abinit.png"
+                  height="34" width="80" align="middle" border="0"></a><a
+                href="http://www.abinit.org/">&nbsp;ABINIT</a></td>
+            <td valign="top">Plane-wave pseudopotential code. <i>Fast
+                and proven code.</i><br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><a href="http://wiki.fysik.dtu.dk/gpaw"><img
+                  alt="GPAW" title="GPAW" src="images/logo-gpaw.png"
+                  height="39" width="80" align="middle" border="0"> </a><a
+                href="http://wiki.fysik.dtu.dk/gpaw">GPAW</a><a
+                href="http://wiki.fysik.dtu.dk/gpaw"><br>
+              </a></td>
+            <td valign="top">Real-space/plane-wave/LCAO PAW code. <i>Fast
+
+
+
+                and proven code.</i></td>
+          </tr>
+          <tr>
+            <td valign="top"><a href="https://wiki.fysik.dtu.dk/dacapo/"><img
+                  alt="jacapo" title="jacapo" src="images/jacapo.png"
+                  height="29" width="80" align="middle" border="0"></a><a
+                href="https://wiki.fysik.dtu.dk/dacapo/">&nbsp;Dacapo</a></td>
+            <td valign="top">Plane-wave ultra-soft pseudopotential code</td>
+          </tr>
+          <tr>
+            <td valign="top"><a href="http://elk.sourceforge.net/"><img
+                  alt="elk" title="elk" src="images/elk.png" height="47"
+                  width="81" align="middle" border="0"></a><a
+                href="http://elk.sourceforge.net/">&nbsp;ELK</a></td>
+            <td valign="top">Full Potential, all electrons LAPW code,
+              similar to Wien2k.<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      Quantum Espresso and ABINIT are good choices, with excellent
+      parallelization and accuracy (comparable to VASP). <br>
+      GPAW and Dacapo are about 5 times slower than QuantumEspresso. <br>
+      Elk is about 10 times slower than Quantum Espresso, but is
+      supposed to be very accurate.
+      <p align="left"> <font color="#3366ff"><b>3- Indicate if the
+            material is a conductor or insulator:</b></font>
+        <select name="smearing">
+          <option value="yes">Conductor (smearing 0.27 eV)</option>
+          <option value="perhaps">Perhaps (smearing 0.1 meV)</option>
+          <option value="no">Insulator (no smearing)</option>
+        </select>
+        <br>
+        If you don't know, leave the smearing on, to help convergence. </p>
+      <p align="left"> <font color="#3366ff"><b>4- Indicate the energy
+            cut-off:</b></font>
+        <select name="ecut">
+          <option value="260">260 eV</option>
+          <option value="340">340 eV</option>
+          <option value="500">500 eV</option>
+          <option value="1000">1000 eV</option>
+          <option value="1500">1500 eV</option>
+        </select>
+        <br>
+        Nice people say the cut-off energy should not be lower than 1000
+        eV. <br>
+        However, this results in very long computations. To start you
+        can use 260 or 340 eV. </p>
+      <p align="left"> <font color="#3366ff"><b>5- Indicate the
+            K-points binning:</b></font>
+        <select name="kpoints">
+          <option value="3">3x3x3</option>
+          <option value="4">4x4x4</option>
+          <option value="2">2x2x2 (only for testing, expect bad results)</option>
+        </select>
+        <br>
+        Using a Monkhorst-Pack K-points mesh 3x3x3 is the minimum for
+        sensible results. You can try smaller as a test, but this will
+        probably give you strange results. </p>
+      <p align="left"> <font color="#3366ff"><b>6- Indicate the
+            supercell size:</b></font>
+        <select name="supercell">
+          <option value="3">3x3x3</option>
+          <option value="4">4x4x4</option>
+          <option value="2">2x2x2</option>
+        </select>
+        <br>
+        Using a supercell 3x3x3 is often the minimum for sensible
+        results. For large material structures (containing many atoms),
+        you may try 2x2x2. </p>
+      <p align="left"> <font color="#3366ff"><b>7- Indicate your email
+            address:</b></font> <input name="email" type="text"> <br>
+        Must be valid to start the computation. </p>
+      <p align="center"> <b><input value="COMPUTE !" type="SUBMIT"></b>
+      </p>
+    </form>
+    <b>What will happen</b>
+    <p>The input material description will be processed and sent to the
+      selected DFT code. The atoms will be moved slightly, and the
+      restoring forces will be computed. The dynamical matrix can then
+      be evaluated for any HKL location in the crystal reciprocal space.
+      We then compute the phonon spectrum (vibrational density of
+      states), and the dispersions in a full HKL cube, as example. You
+      will be able to evaluate the Model anywhere yourself. </p>
+    In addition:
+    <ul>
+      <li>You will be notified by email when the computation starts and
+        ends. </li>
+      <li>A full report will be sent to you upon completion as a ZIP
+        file. Open the 'index.html' document there-in.</li>
+      <li>An example of such a report using QuantumEspresso with
+        Aluminium is available <a href="example/index.html">here</a>.<br>
+      </li>
+      <li>The archive contains input data files, log files, images (PNG,
+        VTK, MRC, FIG/MAT, ...).</li>
+      <li>The Model is provided as a Matlab object, to be used within <a
+          href="http://ifit.mccode.org">iFit</a>, which evaluation is
+        very fast, without the need to restart the DFT.</li>
+      <li>You can read and analyze the results with <a
+          href="http://ifit.mccode.org">iFit</a>.</li>
+    </ul>
+    <hr size="2" width="100%">
+    <h2>Availability and Credits</h2>
+    If you use this software, please acknowledge:<br>
+    <ul>
+      <li>E. Farhi, Y. Debab and P. Willendrup, <span
+          style="font-style: italic;">J. Neut. Res</span>., <span
+          style="font-weight: bold;">17</span> (2013) 5. <a
+href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
+
+          10.3233/JNR-130001 </a></li>
+      <li>S. R. Bahn and K. W. Jacobsen, Comput. Sci. Eng., Vol. 4,
+        56-66, 2002.</li>
+      <li>Other references are indicated in the report sent when the
+        computation completes.</li>
+    </ul>
+    This software source code (<a
+      href="http://ifit.mccode.org/Downloads/">here</a>) is freely
+    available as part of iFit <a href="http://ifit.mccode.org">ifit.mccode.org</a>,
+    and <a href="https://github.com/McStasMcXtrace/iFit">GitHub
+      repository</a>.<img alt="iFit" title="iFit"
+      src="images/iFit-logo.png" height="64" width="116" align="right"><img
+      alt="ase" title="ase" src="images/ase256.png" height="64"
+      width="64" align="right"><br>
+    A Debian package installer <a
+href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/ifit-phonons_1.8_amd64.deb">ifit-phonons</a>
+    exists for e.g. Ubuntu/Mint at <a href="http://packages.mccode.org">packages.mccode.org</a>
+    <h2>Limitations</h2>
+    There is no guaranty that the phonon dispersions that will be
+    computed are exact. The validity depends on the material, the DFT
+    code, and the peudo-potentials in use. In practice, if you get zero
+    phonon energy outside Bragg locations, this may be an indication
+    that the Model is not satisfactory. You should then increase the the
+    supercell size, the k-points mesh, and last the cut-off energy. <br>
+    <br>
+    Currently, this service <b>only</b> computes the vibrational modes
+    energy, <b>not</b> their intensity and polarisation vectors.<br>
+    <br>
+    <iframe src="../../Layout/footer.html" name="footer" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>

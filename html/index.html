@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>e-Computing services for e-neutrons</title>
+  </head>
+  <body>
+    <iframe src="Layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
+    <h1 align="center">e-Computing services for e-neutrons</h1>
+    <div align="center"><i>E. Farhi, March 2016</i><br>
+      <br>
+      <div align="left">We provide a set of web infrastructure tools to
+        :<br>
+        <ul>
+          <li> convert file within formats of use for neutron scattering</li>
+          <li> compute phonon dispersions in 4D</li>
+          <li>compute neutron scattering cross sections</li>
+        </ul>
+        <h2>Converters</h2>
+        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
+              </td>
+              <td valign="top" bgcolor="#ffcc99"><b>INPUT</b><b> =&gt;<br>
+                </b></td>
+              <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+                </b></td>
+            </tr>
+            <tr>
+              <td valign="top"><b><a
+                    href="Converters/cif2hkl/index.html">cif2hkl</a></b><b><br>
+                </b> </td>
+              <td valign="top">A CIF/ShelX/FullProf file<br>
+              </td>
+              <td valign="top">A file with the F²(HKL) reflection list
+                for use with e.g.&nbsp; <a href="http://www.mcstas.org">McStas</a>
+                and <a href="http://mcxtrace.org/">McXtrace</a>
+                (Laz/Lau)<br>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top"><b><a
+                    href="Converters/idl2matlab/index.html">idl2matlab</a></b><b><br>
+                </b> </td>
+              <td valign="top">An IDL code (file *.pro)</td>
+              <td valign="top">The corresponding Matlab/Scilab code.</td>
+            </tr>
+            <tr>
+              <td valign="top"><b><a
+                    href="Converters/looktxt/index.html">looktxt</a></b><b><br>
+                </b> </td>
+              <td valign="top"><b>any</b> text file, with numbers and
+                comments mixed </td>
+              <td valign="top">A data file containing the numerical data
+                in a scientific file format (Matlab, HDF, XML, Scilab,
+                IDL, YAML, HTML and Octave)</td>
+            </tr>
+          </tbody>
+        </table>
+        <h2>Computations</h2>
+        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
+              </td>
+              <td valign="top" bgcolor="#ffcc99"><b>INPUT</b><b> =&gt;<br>
+                </b></td>
+              <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+                </b></td>
+            </tr>
+            <tr>
+              <td valign="top"><b><a
+                    href="Computing/sqw_phonons/index.html">sqw_phonons</a></b><b><br>
+                </b> </td>
+              <td valign="top">A <a
+                  href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
+                <a
+                  href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+                <a href="http://www.rcsb.org/pdb/">PDB</a>, ... </td>
+              <td valign="top">Phonon dispersions from the Dynamical
+                matrix, using forces estimated by <i>ab-initio </i>using
+
+
+                <a href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
+                selection of DFT codes (EMT, GPAW, ABINIT, Elk, Dacapo,
+                NWChem,QuantumEspresso). </td>
+            </tr>
+            <tr>
+              <td valign="top"><b>sqw_moldyn</b><b><br>
+                </b></td>
+              <td valign="top">A <a
+                  href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
+                <a
+                  href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+                <a href="http://www.rcsb.org/pdb/">PDB</a>, ...</td>
+              <td valign="top">Molecular dynamics using DFT and
+                classical codes. Provides a trajectory from which one
+                can use the <b>sqw_neutrons</b> tool below.<br>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top"><b>sqw_neutrons</b><b><br>
+                </b></td>
+              <td valign="top">A molecular dynamics trajectory<br>
+              </td>
+              <td valign="top">The dynamical structure factor for
+                neutrons and the scattering cross sections (using
+                MDANSE).<br>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top"><b>powder diffractometer</b><br>
+              </td>
+              <td valign="top">A&nbsp; <a
+                  href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+                SHELX or CFL<br>
+              </td>
+              <td valign="top">The powder diffractogram obtained from
+                neutron scattering<br>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top"><b>small angle scattering</b><br>
+              </td>
+              <td valign="top">A <a href="http://www.rcsb.org/pdb/">PDB</a>
+                <br>
+              </td>
+              <td valign="top">The small angle neutron scattering from
+                e.g. proteins, colloids and polymers<br>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top"><b>total neutron scattering cross section</b><br>
+              </td>
+              <td valign="top">an S(q,w)<br>
+              </td>
+              <td valign="top">The total scattering cross section vs.
+                incoming neutron energy<br>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <h2>Availability and Credits</h2>
+    If you use any of these services, please acknowledge:<br>
+    <ul>
+      <li>E. Farhi, Y. Debab and P. Willendrup, <span
+          style="font-style: italic;">J. Neut. Res</span>., <span
+          style="font-weight: bold;">17</span> (2013) 5. <a
+href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
+
+
+
+
+
+          10.3233/JNR-130001 </a></li>
+    </ul>
+    All this software can also be installed on your own computer or on a
+    cluster, to be used as web services, or as commands. Refer to the <a
+      href="Installation.html">Installation</a> page for more.<br>
+    <h2>Limitations</h2>
+    These tools are provided "as is", and should be considered
+    experimental. If this works for you, that's good. If it fails,
+    please report to the email address indicated in the footer below.<br>
+    <h2>How it works</h2>
+    All these services are simple scripts that get parameters from web
+    pages, execute dedicated commands, and return information upon
+    completion. Most of this work is derived from the <a
+      href="http://ifit.mccode.org">iFit</a> infrastructure.<br>
+    <br>
+    <br>
+    <iframe src="Layout/footer.html" name="header" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>

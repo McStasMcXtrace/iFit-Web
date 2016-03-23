@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>sqw_phonons: /home/farhi/dev/iFit/Objects/@iData/../../Data/POSCAR_Al with EMT</title>
+<script type="text/javascript">
+function update_Phonons3D_frame(options) {
+document.getElementById("Phonons3D_frame").contentWindow.document.location.href=options;
+document.getElementById("Phonons3D_ext").href=options;
+}
+</script>
+</head>
+<body><div style="text-align: center;">
+<a href="http://ifit.mccode.org"><img title="ifit.mccode.org" src="iFit-logo.png" align="middle" height=100></a>
+<a href="https://wiki.fysik.dtu.dk/ase" title="wiki.fysik.dtu.dk/ase"><img src="ase256.png" align="middle" height=100></a></br>
+<h1>sqw_phonons: /home/farhi/dev/iFit/Objects/@iData/../../Data/POSCAR_Al with EMT</h1></div>
+Start Date: 18-Mar-2016 16:02:48.<br>
+Computer: GLNXA64.<br>
+Stored in: <a href="/tmp/tp95c90d0f_995c_45bc_93e5_f24a386c9c9c">/tmp/tp95c90d0f_995c_45bc_93e5_f24a386c9c9c</a><br>
+<ul><li><a href="#atom">Crystallographic information</a></li>
+<li><a href="#calc">Calculator configuration</a></li>
+<li><a href="#results">Results</a><ul>
+<li><a href="#model">The Phonon Model</a></li>
+<li><a href="#dos">The phonon spectrum (vDOS)</a></li>
+<li><a href="#grid4d">The Model evaluated onto a 4D grid</a></li>
+<li><a href="#grid3d">The Model evaluated onto a 3D grid (QH~0)</a></li></ul></li>
+<li><a href="#zip">Download</a></li>
+</ul><hr>
+<p>This page presents the results of the estimate of phonon dispersions in a single crystal, using a DFT code (the "calculator") in the background. From the initial atomic configuration (geometry), each atom in the lattice cell is displaced by a small quantity. The displaced atom then sustains a, so called Hellmann-Feynman, restoring force to come back to the stable structure. The dynamical matrix is obtained from these forces, and its eigen-values are the energies of the vibrational modes in the crystal.</p>
+<p>This computational resource is provided by <a href="http://ifit.mccode.org">iFit</a>, with the <a href="http://ifit.mccmode.org/Models.html#mozTocId990577"<b>sqw_phonon</b> Model</a>, which itself makes use of the <a href="https://wiki.fysik.dtu.dk/ase">Atomistic Simulation Environment (ASE)</a>.
+<p>This report summarizes the initial crystal geometry and the calculator configuration. When the simulation ends successfully, the lower part presents the dispersion curves as plots and data sets, the model used (as a Matlab object), and the density of states. These results correspond to the coherent inelastic vibrational modes.</p>
+<p><b>Limitations:</b> These results only display the vibrational mode energies, and does not compute the actual intensity. The accuracy of the model depends on the parameters used for the computation, e.g. energy cut-off, k-points grid, smearing, ...</p>
+<h2><a name="atom"></a>Atom/molecule configuration</h2>
+<p>In this section, we present the crystallographic lattice cell used for the computation, both as plots and structure files for use with other software.</p>
+Initial description: /home/farhi/dev/iFit/Objects/@iData/../../Data/POSCAR_Al<br>
+<p>
+<div style="text-align:center"><iframe src="configuration.html" onload="this.style.height=this.contentDocument.body.scrollHeight +'px';" align="middle"></iframe><br> You can rotate the model (left mouse button), zoom (right mouse button), and translate (middle mouse button). (<a href="configuration.html" target=_blank>open in external window</a>)<br></div><br>
+<div style="text-align:center"><img src="configuration.png" align="middle" title="configuration.png"></div><br>In addition we provide the atoms/molecule configuration as:<br><ul>
+<li>[ <a href="configuration.cif">configuration.cif</a> ]  Crystallographic Information File (<a href="https://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>) which you can view with <a href="http://jmol.sourceforge.net/">JMol</a>, <a href="http://www.ks.uiuc.edu/Research/vmd/"VMD</a>, <a href="http://www.cgl.ucsf.edu/chimera/">Chimera</a>, <a href="http://rasmol.org/">RasMol</a>, ...</li>
+<li>[ <a href="configuration.pdb">configuration.pdb</a> ]  Protein Data Bank (<a href="http://www.rcsb.org/pdb/">PDB</a>) which you can view with <a href="http://jmol.sourceforge.net/">JMol</a>, <a href="http://www.ks.uiuc.edu/Research/vmd/"VMD</a>, <a href="http://www.cgl.ucsf.edu/chimera/">Chimera</a>, <a href="http://rasmol.org/">RasMol</a>, ...</li>
+<li>[ <a href="configuration.etsf">configuration.etsf</a> ]  <a href="http://www.etsf.eu/fileformats">European Theoretical Spectroscopy Facility</a> file format for DFT codes</li>
+<li>[ <a href="configuration_SHELX.res">configuration_SHELX.res</a> ]  <a href="http://shelx.uni-ac.gwdg.de/SHELX/">ShelX</a> file format</li>
+<li>[ <a href="configuration_VASP">configuration_VASP</a> ]  POSCAR geometry file for <a href="https://www.vasp.at/">VASP</a></li>
+<li>[ <a href="configuration.eps">configuration.eps</a> ]  Encapsulated postscript</li>
+<li>[ <a href="configuration.pov">configuration.pov</a> ]  Scene for <a href="http://www.povray.org/">Pov-Ray</a></li>
+<li>[ <a href="configuration.x3d">configuration.x3d</a> ]  Scene for <a href="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</a>, <a href="http://www.instantreality.org/">InstantPlayer</a>, <a href="http://freewrl.sourceforge.net/">FreeWRL</a></li>
+</ul></p>
+<h2><a name="calc"></a>Calculator configuration</h2>
+This is a quick desription of the calculator used to compute the lattice energy and forces.<br>
+We are using the calculator: <a href="https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html"><img src="emt.png" height="80" align="middle"><b>EMT</b></a> (<a href="https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html">https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html</a>).<br>
+  <ul><li><code>calc  = EMT()</code></li></ul>
+The calculator configuration:<br><div style="margin-left: 40px;"><pre>supercell = [3;3;3];
+supercell = reshape(supercell, [1  3]);
+calculator = 'EMT';
+kpoints = [3;3;3];
+kpoints = reshape(kpoints, [1  3]);
+xc = 'PBE';
+mode = 'fd';
+diagonalization = 'rmm-diis';
+occupations = 0.27;
+nsteps = 100;
+mpi = 4;
+target = '/tmp/tp95c90d0f_995c_45bc_93e5_f24a386c9c9c';
+configuration = '/home/farhi/dev/iFit/Objects/@iData/../../Data/POSCAR_Al';
+</pre></div>
+<b>Computing... (be patient)</b>
+<h2>Computation completed</h2>
+<div style="text-align: center; color:#0000FF"><b>WELL DONE</b></div><br><p>The computation has performed correctly. The forces and dynamical matrix of the lattice vibrations have been determined.</p>
+End Date: 18-Mar-2016 16:02:49.<br>
+Time elapsed: 0.826651 [s]<br>
+Please cite:<br><pre> * Atomic Simulation Environment
+           S. R. Bahn and K. W. Jacobsen, Comput. Sci. Eng., Vol. 4, 56-66, 2002.
+ * iFit:   E. Farhi et al, J. Neut. Res., 17 (2013) 5.
+ * EMT:    K.W. Jacobsen et al, Surf. Sci. 366, 394-402 (1996).
+</pre>
+<h2><a name="results"></a>Results</h2>
+<h3><a name="model"></a>The Phonon dispersion Model</h3>
+<p>The results are stored into a 4D <a href="http://ifit.mccode.org/iFunc.html">iFunc</a> object containing the dynamical matrix. This is a Matlab workspace (MAT-file).<ul><li><a href="Phonons_Model.mat">Phonons_Model.mat</a></li></ul>
+Load the Model under <a href="http://ifit.mccode.org">Matlab/iFit</a> with (this also works with the <a href="http://ifit.mccode.org/Install.html">standalone version of iFit</a> which does <b>not</b> require any Matlab license and installs on most systems): <ul><li>load('<a href="Phonons_Model.mat">Phonons_Model.mat</a>') <i>% creates a "Phonons" iFunc Model</i></li></ul>
+Define axes for the evaluation grid in 4D, for instance:<ul><li>qh=linspace(0.01,.5,50); qk=qh; ql=qh; w=linspace(0.01,50,51);</li></ul>
+Evaluate the Phonons as an <a href="http://ifit.mccode.org/iData.html">iData</a> object under Matlab/iFit with: <ul><li>iData(Phonons_Model, [], qh, qk, ql, w) <i>% evaluates the "Phonons" onto the grid, with default parameters, and return an iData object</i></li></ul></p>
+<h3><a name="grid4d"></a>Evaluated Phonon dispersion Model onto a grid (4D)</h3>
+<p>This 4D Model has been evaluated on the grid (for rendering purposes):<br>
+<ul><li>qh=[0.01:0.5] with 20 values (QH in rlu)</li>
+<li>qk=[0.01:0.5] with 20 values (QK in rlu)</li>
+<li>ql=[0.01:0.5] with 20 values (QL in rlu)</li>
+<li>w=[0.01:100] with 51 values (energy in meV)</li></ul>
+Load the HKLE Data set under <a href="http://ifit.mccode.org">Matlab/iFit</a> with:<br>
+<ul><li>load('<a href="Phonons_HKLE.mat">Phonons_HKLE.mat</a>') <i>% loads the 4D Phonons_HKLE iData object</i></li>
+<li>[ <a href="Phonons_HKLE.dat">Phonons_HKLE.dat</a> ] is a flat text file which contains axes and the 4D data set. You will have to reshape the matrix after reading the contents.</li>
+<li>[ <a href="Phonons_HKLE.h5">Phonons_HKLE.h5</a> ] a NeXus/HDF5 data file to be opened with e.g. <a href="http://www.mantidproject.org/Main_Page">Mantid</a> or <a href="http://www.hdfgroup.org/hdf-java-html/hdfview">hdfview</a> or <a href="http://ifit.mccode.org">iFit</a>.</li></ul></p>
+<h3><a name="grid3d"></a>Evaluated Phonon dispersion Model onto a grid (3D, QH=0.01)</h3>
+<p>In order to view this 4D data set, we represent it on the QH~0 plane as a 3D volume data set. The intensity level is set as log10[S(QH=0.01,QK,QL,w)].<br>
+<ul><li>qh=0.01 (QH in rlu)</li>
+<li>qk=[0.01:0.5] with 20 values (QK in rlu)</li>
+<li>ql=[0.01:0.5] with 20 values (QL in rlu)</li>
+<li>w=[0.01:100] with 51 values (energy in meV, vertical)</li></ul></p>
+<p>The QH=0.01 data set is available in the folowing formats (log10 of the data set):<br>
+<ul><li>[ <a href="Phonons3D.vtk">Phonons3D.vtk</a> ] Visualization Toolkit (VTK) file which can be viewed with <a href="http://www.paraview.org/">ParaView</a>, <a href="http://code.enthought.com/projects/mayavi/">Mayavi2</a>, <a href="https://wci.llnl.gov/simulation/computer-codes/visit/executables">VisIt</a> and <a href="https://www.slicer.org/">Slicer4</a>.</li>
+<li>[ <a href="Phonons3D.mrc">Phonons3D.mrc</a> ] electron density map format (MRC) which can be viewed with PyMol, <a href="http://www.ks.uiuc.edu/Research/vmd/">VMD</a>, <a href="http://www.cgl.ucsf.edu/chimera/">Chimera</a>, <a href="http://www.yasara.org/">Yasara</a>.</li>
+<li>[ <a href="Phonons3D.dat">Phonons3D.dat</a> ] a flat text file which contains axes and the 3D data set. You will have to reshape the matrix after reading the contents.</li>
+<li>[ <a href="Phonons3D.h5">Phonons3D.h5</a> ] a NeXus/HDF5 data file to be opened with e.g. <a href="http://www.mantidproject.org/Main_Page">Mantid</a>, <a href="http://www.hdfgroup.org/hdf-java-html/hdfview">hdfview</a>  or <a href="http://ifit.mccode.org">iFit</a>.</li>
+<li>[ <a href="Phonons3D.fig">Phonons3D.fig</a> ] a Matlab figure for Matlab or <a href="http://ifit.mccode.org">iFit</a>. Use </i>set(gcf,'visible','on')</i> after loading.</li>
+<li>[ <a href="Phonons3D.pdf">Phonons3D.pdf</a> ] an Adobe PDF, to be viewed with <a href="http://get.adobe.com/fr/reader/">Acrobat Reader</a> or <a href="http://projects.gnome.org/evince/">Evince</a>.</li>
+</ul></p>
+Here is a representations of the 3D data set<br>
+<div style="text-align: center;">
+<img src="Phonons3D.png" title="Phonons3D.png" align="middle"><br>
+<iframe ID=Phonons3D_frame src="Phonons_8.xhtml" align="middle" width="700" height="850"></iframe><br>(<a ID=Phonons3D_ext href="Phonons_8.xhtml" target=_blank>open in external window</a>)<br>
+</div><p>Select the iso-surface level (1/13, log scale) in the scale below:</p>
+<div style="background:#F9EECF;border:1px dotted black;text-align:center"><form>[  <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_2.xhtml")>1 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_3.xhtml")>2 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_4.xhtml")>3 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_5.xhtml")>4 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_6.xhtml")>5 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_7.xhtml")>6 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_8.xhtml")>7 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_9.xhtml")>8 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_10.xhtml")>9 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_11.xhtml")>10 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_12.xhtml")>11 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_13.xhtml")>12 <input type="radio" name="isosurface" onclick=update_Phonons3D_frame("Phonons_14.xhtml")>13 ]</form></div><br>
+The blue axis is the Energy (meV), the red axis is QK (rlu), the green axis is QL (rlu).<br>
+You can rotate the model (left mouse button), zoom (right mouse button), and translate (middle mouse button).<br>
+<h2><a name="zip">Download</h2>
+You can download the whole content of this report (data, plots, logs, ...) from<br>
+<ul><li><a href="/tmp/tp95c90d0f_995c_45bc_93e5_f24a386c9c9c.zip">/tmp/tp95c90d0f_995c_45bc_93e5_f24a386c9c9c.zip</a></li></ul>You should then open the "index.html" file therein with a browser (Firefox, Chrome...)<br>
+<hr>Date: 18-Mar-2016 16:02:56.<br>
+Powered by <a href="http://ifit.mccode.org">iFit</a> E. Farhi (c) 2016.
+</body></html>
