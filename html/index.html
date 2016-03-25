@@ -5,8 +5,8 @@
     <title>e-Computing services for e-neutrons</title>
   </head>
   <body>
-    <iframe src="Layout/header.html" name="header" height="100"
-      width="100%"></iframe> <br>
+    <iframe src="Layout/header.html" name="header" width="100%"
+      height="100"></iframe> <br>
     <h1 align="center">e-Computing services for e-neutrons</h1>
     <div align="center"><i>E. Farhi, March 2016</i><br>
       <br>
@@ -18,14 +18,14 @@
           <li>compute neutron scattering cross sections</li>
         </ul>
         <h2>Converters</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
-              <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
+              <td bgcolor="#ffcc99" valign="top"><b>TOOL</b><br>
               </td>
-              <td valign="top" bgcolor="#ffcc99"><b>INPUT</b><b> =&gt;<br>
+              <td bgcolor="#ffcc99" valign="top"><b>INPUT</b><b> =&gt;<br>
                 </b></td>
-              <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+              <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
                 </b></td>
             </tr>
             <tr>
@@ -60,14 +60,14 @@
           </tbody>
         </table>
         <h2>Computations</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
-              <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
+              <td bgcolor="#ffcc99" valign="top"><b>TOOL</b><br>
               </td>
-              <td valign="top" bgcolor="#ffcc99"><b>INPUT</b><b> =&gt;<br>
+              <td bgcolor="#ffcc99" valign="top"><b>INPUT</b><b> =&gt;<br>
                 </b></td>
-              <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+              <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
                 </b></td>
             </tr>
             <tr>
@@ -81,6 +81,7 @@
                 <a href="http://www.rcsb.org/pdb/">PDB</a>, ... </td>
               <td valign="top">Phonon dispersions from the Dynamical
                 matrix, using forces estimated by <i>ab-initio </i>using
+
 
 
                 <a href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
@@ -107,11 +108,11 @@
               </td>
               <td valign="top">The dynamical structure factor for
                 neutrons and the scattering cross sections (using
-                MDANSE).<br>
-              </td>
+                MDANSE), <i>S(|q|,w)</i>. One can then use the <b>total
+                  neutron scattering cross section</b> tool below. </td>
             </tr>
             <tr>
-              <td valign="top"><b>powder diffractometer</b><br>
+              <td valign="top"><b>neutron powder diffractometer</b><br>
               </td>
               <td valign="top">A&nbsp; <a
                   href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
@@ -122,7 +123,7 @@
               </td>
             </tr>
             <tr>
-              <td valign="top"><b>small angle scattering</b><br>
+              <td valign="top"><b>small angle neutron scattering</b><br>
               </td>
               <td valign="top">A <a href="http://www.rcsb.org/pdb/">PDB</a>
                 <br>
@@ -132,12 +133,21 @@
               </td>
             </tr>
             <tr>
-              <td valign="top"><b>total neutron scattering cross section</b><br>
+              <td valign="top"><b>sqw_scatt_xs</b><br>
               </td>
-              <td valign="top">an S(q,w)<br>
+              <td valign="top">an <i>S(|q|,w)</i><br>
               </td>
               <td valign="top">The total scattering cross section vs.
                 incoming neutron energy<br>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top"><b>sqw_gDOS</b><br>
+              </td>
+              <td valign="top">an <i>S(|q|,w)</i></td>
+              <td valign="top">The generalised density of states, as
+                well as the structure factor, characteristic
+                frequencies, and sound velocities.<br>
               </td>
             </tr>
           </tbody>
@@ -145,12 +155,15 @@
       </div>
     </div>
     <h2>Availability and Credits</h2>
-    If you use any of these services, please acknowledge:<br>
+    If you use any of these services, please acknowledge:<img alt="iFit"
+      title="iFit" src="Computing/sqw_phonons/images/iFit-logo.png"
+      align="right" width="116" height="64"><br>
     <ul>
       <li>E. Farhi, Y. Debab and P. Willendrup, <span
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
 
 
 
@@ -173,7 +186,7 @@ href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">D
       href="http://ifit.mccode.org">iFit</a> infrastructure.<br>
     <br>
     <br>
-    <iframe src="Layout/footer.html" name="header" height="100"
-      width="100%"></iframe> <br>
+    <iframe src="Layout/footer.html" name="header" width="100%"
+      height="100"></iframe> <br>
   </body>
 </html>

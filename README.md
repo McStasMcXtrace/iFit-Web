@@ -9,8 +9,15 @@ sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl
 sudo apt-get install cif2hkl idl2matlab looktxt
 sudo apt-get install ifit-phonons
 sudo a2enmod cgi
+copy the html    directory in e.g. /var/www
+copy the cgi-bin directory in e.g. /usr/lib/cgi-bin
 
+#USAGE
+open a browser and connect to:
 
+   http://localhost/index.html
+
+which can be accessed distantly when the server is on the net.
 
 
 #CREATE LIVE DVD ISO
