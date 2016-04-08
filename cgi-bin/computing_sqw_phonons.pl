@@ -48,7 +48,7 @@ my $supercell      = $q->param('supercell');  # 6- Indicate the supercell size
 my $email          = $q->param('email');      # 7- Indicate your email
 
 
-if ( !$source )
+if ( !$material )
 {
   print $q->header ( );
   print "$service: There was a problem uploading your file (try a smaller file).";
@@ -92,7 +92,7 @@ $dir = tempdir(TEMPLATE => "sqw_phonons_XXXXX", DIR => $upload_dir, CLEANUP => 1
 
 # get a local copy of the input file
 my $upload_filehandle = $q->upload("material");
-open ( UPLOADFILE, ">$dir/$source" ) or die "$!";
+open ( UPLOADFILE, ">$dir/$material" ) or die "$!";
 binmode UPLOADFILE;
 while ( <$upload_filehandle> )
 {
@@ -100,55 +100,61 @@ while ( <$upload_filehandle> )
 }
 close UPLOADFILE;
 
+# test: smearing="yes","perhaps","no"
+if ($smearing ne "metal" and $smearing ne "insulator" and $smearing ne "semiconductor") {
+  $smearing = "metal";
+}
+# test: ecut    =260 340 500 1000 1500
+if ($ecut ne "260" and $ecut ne "340" and $ecut ne "500"  and $ecut ne "1000" and $ecut ne "1500") {
+  $ecut = "340";
+}
+# test: kpoints =2 3 4
+if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4") {
+  $kpoints = "3";
+}
+# test: supercell=2 3 4
+if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4") {
+  $supercell = "3";
+}
+# test: calculator=EMT,QuantumEspresso,ABINIT,GPAW,ELK,VASP
+if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne "ABINIT"  and $calculator ne "GPAW" and $calculator ne "ELK" and $calculator ne "VASP") {
+  $calculator = "QuantumEspresso";
+}
+
 # ------------------------------------------------------------------------------
 # DO the work
 # ------------------------------------------------------------------------------
 
 # assemble command line
-if ($probe ne "NUC" and $probe ne "ELE" and $probe ne "XRA") {
-  $probe = "NUC";
-}
-
-if ($phase ne "powder" and $phase ne "xtal") {
-  $phase = "powder";
-}
+$cmd = "sqw_phonons('$dir/$material','$calculator','occupancies=$smearing';kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;dir=$dir','report');exit";
 
 # launch the command for the service
-# assemble command line
-$res = system("cif2hkl --version > $dir/cif2hkl.log");
-# dump initial CIF file
-$res = system("cat $dir/$source >> $dir/cif2hkl.log");
-$res = system("$service --verbose --$phase --mode $probe --out $dir/reflections.$phase $dir/$source >> $dir/cif2hkl.log");
 
-# now collect the results: compress the output directory
-zip "<$dir/*>" => "$dir.zip", 
-              FilterName => sub { s[^$dir/][] }, 
-              Comment    => "$service $cmd_target $cmd_type $dir/$source $dir"
-            or error("$service: Error compressing '$dir': $ZipError\n");
+# dump initial material file
+$res = system("cat $dir/$source > $dir/ifit.log");
+$res = system("ifit -r\"$cmd\" >> $dir/ifit.log 2>&1");
 
-download("$dir.zip");
-
-# display conversion results: not shown with download which also writes a binary HTML stream
+# display computation results
 print $q->header ( );
 print <<END_HTML;
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>Thanks!</title>
+  <title>$service: Thanks!</title>
   <style type="text/css">
   img {border: none;}
   </style>
   </head>
   <body>
-  <p>Thanks for using our service</p>
-  <p>Command: $service --verbose --$phase --mode $probe --out $dir/reflections.$phase $dir/$source<p>
-  <p>Status: DONE</p>
+  <p>Thanks for using our service $service</p>
+  <p>Command: $cmd<p>
+  <p>Status: STARTED</p>
+  <p>Results will be available on this server at "$dir". You will find a '$dir/index.html' file which you can open to look at the current status of the computation, as well as the "$dir/ifit.log" file.<p>
+  <p>You will receive an email at $email now, and when the computation ends.</p>
   </body>
   </html>
 END_HTML
-
-unlink("$dir.zip");
 
 # -----------------------------------------------------------
  sub download {

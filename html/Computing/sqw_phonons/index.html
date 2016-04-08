@@ -49,10 +49,10 @@
       </tbody>
     </table>
     <br>
-    <form action="/cgi-bin/computing_sq_phonons.pl" method="post"
+    <form action="/cgi-bin/computing_sqw_phonons.pl" method="post"
       enctype="multipart/form-data">
       <p align="left"> <font color="#3366ff"><b>1- Material structure
-            (max 5Mb):</b></font> <input name="source" type="file"><br>
+            (max 5Mb):</b></font> <input name="material" type="file"><br>
         Any file format supported by the ASE can be used, such as (<a
           href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
         <a
@@ -72,10 +72,9 @@
           <option value="EMT">EMT: Effective Medium Theory</option>
           <option value="ABINIT">ABINIT: Plane-wave pseudopotential code</option>
           <option value="GPAW">GPAW: Real-space/plane-wave/LCAO PAW code</option>
-          <option value="Dacapo">Dacapo: Plane-wave ultra-soft
-            pseudopotential code</option>
           <option value="ELK">ELK: Full Potential LAPW code, similar to
             Wien2k</option>
+          <option value="VASP">VASP: Plane-wave PAW code, when installed</option>
         </select>
         <br>
         We recommend <b>QuantumEspresso</b> (or EMT for a try). </p>
@@ -103,8 +102,6 @@
               and <a href="http://www.quantum-espresso.org/">Quantum
                 Espresso</a>. Using the <a
                 href="http://materialscloud.org/">SSSP library</a>. <i>Fast
-
-
                 and proven code.</i></td>
           </tr>
           <tr>
@@ -140,13 +137,6 @@
                 and proven code.</i></td>
           </tr>
           <tr>
-            <td valign="top"><a href="https://wiki.fysik.dtu.dk/dacapo/"><img
-                  alt="jacapo" title="jacapo" src="images/jacapo.png"
-                  height="29" width="80" align="middle" border="0"></a><a
-                href="https://wiki.fysik.dtu.dk/dacapo/">&nbsp;Dacapo</a></td>
-            <td valign="top">Plane-wave ultra-soft pseudopotential code</td>
-          </tr>
-          <tr>
             <td valign="top"><a href="http://elk.sourceforge.net/"><img
                   alt="elk" title="elk" src="images/elk.png" height="47"
                   width="81" align="middle" border="0"></a><a
@@ -160,15 +150,15 @@
       <br>
       Quantum Espresso and ABINIT are good choices, with excellent
       parallelization and accuracy (comparable to VASP). <br>
-      GPAW and Dacapo are about 5 times slower than QuantumEspresso. <br>
-      Elk is about 10 times slower than Quantum Espresso, but is
+      GPAW is usually slower than QuantumEspresso. <br>
+      Elk is often slower than Quantum Espresso, but is
       supposed to be very accurate.
       <p align="left"> <font color="#3366ff"><b>3- Indicate if the
             material is a conductor or insulator:</b></font>
         <select name="smearing">
-          <option value="yes">Conductor (smearing 0.27 eV)</option>
-          <option value="perhaps">Perhaps (smearing 0.1 meV)</option>
-          <option value="no">Insulator (no smearing)</option>
+          <option value="metal">Conductor (e.g. metal, smearing 0.27 eV)</option>
+          <option value="semiconductor">Perhaps (smearing 0.1 meV)</option>
+          <option value="insulator">Insulator (no smearing)</option>
         </select>
         <br>
         If you don't know, leave the smearing on, to help convergence. </p>
@@ -191,7 +181,7 @@
         <select name="kpoints">
           <option value="3">3x3x3</option>
           <option value="4">4x4x4</option>
-          <option value="2">2x2x2 (only for testing, expect bad results)</option>
+          <option value="2">2x2x2 (fast but may fail)</option>
         </select>
         <br>
         Using a Monkhorst-Pack K-points mesh 3x3x3 is the minimum for
@@ -202,7 +192,7 @@
         <select name="supercell">
           <option value="3">3x3x3</option>
           <option value="4">4x4x4</option>
-          <option value="2">2x2x2</option>
+          <option value="2">2x2x2 (fast but may fail)</option>
         </select>
         <br>
         Using a supercell 3x3x3 is often the minimum for sensible
@@ -271,7 +261,7 @@ href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/ifit-phon
     computed are exact. The validity depends on the material, the DFT
     code, and the peudo-potentials in use. In practice, if you get zero
     phonon energy outside Bragg locations, this may be an indication
-    that the Model is not satisfactory. You should then increase the the
+    that the Model is not satisfactory. You should then increase the
     supercell size, the k-points mesh, and last the cut-off energy. <br>
     <br>
     Currently, this service <b>only</b> computes the vibrational modes
