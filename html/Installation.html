@@ -1,11 +1,38 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="content-type">
-  <title>Empty Web Page</title>
-</head>
-<body>
-<br>
-</body>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="content-type">
+    <title>Empty Web Page</title>
+  </head>
+  <body>
+    <iframe src="Layout/header.html" name="header" width="100%"
+      height="100"></iframe> <br>
+    <h1>
+      Installation</h1>
+    <br>
+    This service can be installed on any computer.<br>
+    <br>
+    <h2>Requirements</h2>
+    We recommend to install this service on a computer with e.g. 16 Gb
+    memory, 4-8 cores, and a 1 Tb disk.<br>
+    <br>
+    <h2>Installation</h2>
+    Install a Debian/Ubuntu/Mint system on a computer. You can for
+    instance get the <a
+href="http://releases.ubuntu.com/14.04.4/ubuntu-14.04.4-desktop-amd64.iso">Ubuntu
+      14.04 ISO</a>. The installation of this system can equally be done
+    on a virtual machine, for instance using <a
+      href="https://www.virtualbox.org/">VirtualBox</a>.<br>
+    <br>
+    Once set-up and running, issue the following commands in a terminal.
+    For this you need the super-user (administrator) rights.<br>
+    <blockquote>sudo apt-get install ifit-web-services<br>
+      sudo a2enmod cgi<br>
+    </blockquote>
+    Then you should be able to login at e.g. <a href="localhost/index.html">localhost/index.html</a> or the [machine IP or URL])/index.html address.<br>
+    
+    <iframe src="Layout/footer.html" name="header" width="100%"
+      height="100"></iframe> <br>
+  </body>
 </html>

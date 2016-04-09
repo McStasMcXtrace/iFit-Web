@@ -15,6 +15,7 @@ use File::Temp qw/ tempfile tempdir /;
 use IO::Compress::Zip qw(zip $ZipError) ;
 use IPC::Open3;
 use File::Basename;
+use Sys::Hostname;
 
 # ------------------------------------------------------------------------------
 # GET and CHECK input parameters
@@ -26,7 +27,11 @@ my $q = new CGI;    # create new CGI object
 my $service="sqw_phonons";
 my $safe_filename_characters = "a-zA-Z0-9_.-";
 my $safe_email_characters     = "a-zA-Z0-9_.-@";
-my $upload_dir = "/var/www/html/upload";
+
+my $upload_base= "/var/www/html";
+my $upload_dir = "$upload_base/upload";
+my $host = hostname();
+
 
 # testing/security
 if (my $error = $q->cgi_error()){
@@ -69,13 +74,6 @@ else
   die "$service: Filename contains invalid characters.";
 }
 
-if ( !$email )
-{
-  print $q->header ( );
-  print "$service: There was a problem with your email. Did you specify it ?.";
-  exit;
-}
-
 # check email
 $email =~ s/[^$safe_email_characters]//g;
 if ( $email =~ /^([$safe_email_characters]+)$/ )
@@ -84,11 +82,11 @@ if ( $email =~ /^([$safe_email_characters]+)$/ )
 }
 else
 {
-  die "$service: email contains invalid characters.";
+  $email="";
 }
 
-# use temporary directory to store all results
-$dir = tempdir(TEMPLATE => "sqw_phonons_XXXXX", DIR => $upload_dir, CLEANUP => 1);
+# use directory to store all results
+$dir = tempdir(TEMPLATE => "sqw_phonons_XXXXX", DIR => $upload_dir);
 
 # get a local copy of the input file
 my $upload_filehandle = $q->upload("material");
@@ -100,7 +98,7 @@ while ( <$upload_filehandle> )
 }
 close UPLOADFILE;
 
-# test: smearing="yes","perhaps","no"
+# test: smearing="metal","insulator","semiconductor"
 if ($smearing ne "metal" and $smearing ne "insulator" and $smearing ne "semiconductor") {
   $smearing = "metal";
 }
@@ -114,7 +112,7 @@ if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4") {
 }
 # test: supercell=2 3 4
 if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4") {
-  $supercell = "3";
+  $supercell = "2";
 }
 # test: calculator=EMT,QuantumEspresso,ABINIT,GPAW,ELK,VASP
 if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne "ABINIT"  and $calculator ne "GPAW" and $calculator ne "ELK" and $calculator ne "VASP") {
@@ -126,13 +124,20 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
 # ------------------------------------------------------------------------------
 
 # assemble command line
-$cmd = "sqw_phonons('$dir/$material','$calculator','occupancies=$smearing';kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;dir=$dir','report');exit";
+if ($email ne "") {
+  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupancies=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;target=$dir','report');exit'";
+} else {
+  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupancies=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;target=$dir','report');exit'";
+}
 
 # launch the command for the service
 
 # dump initial material file
 $res = system("cat $dir/$source > $dir/ifit.log");
-$res = system("ifit -r\"$cmd\" >> $dir/ifit.log 2>&1");
+$res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
+
+$dir_short = $dir;
+$dir_short =~ s|$upload_base/||;
 
 # display computation results
 print $q->header ( );
@@ -147,11 +152,29 @@ print <<END_HTML;
   </style>
   </head>
   <body>
-  <p>Thanks for using our service $service</p>
-  <p>Command: $cmd<p>
-  <p>Status: STARTED</p>
-  <p>Results will be available on this server at "$dir". You will find a '$dir/index.html' file which you can open to look at the current status of the computation, as well as the "$dir/ifit.log" file.<p>
-  <p>You will receive an email at $email now, and when the computation ends.</p>
+  <h1>$service: Phonon dispersions in 4D</h1>
+  <p>Thanks for using our service <b>$service</b>
+  <ul>
+  <li>Server: <a href="http://$host/index.html">$host</a></li>
+  <li>Command: $cmd</li>
+  <li>Status: STARTED</li>
+  </ul></p>
+  <p>Results will be available on this server at <a href="http://$host/$dir_short">$dir_short</a>.<br>
+  You will find:<ul>
+  <li>a <a href="http://$host/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
+  <li>the <a href="http://$host/$dir_short/ifit.log">Log file</a>.</li></ul>
+  </p>
+  <p>WARNING: Think about getting your data back upon completion,as soon as possible. There is no guaranty we keep it.</p>
+END_HTML
+
+if ($email ne "") {
+  print <<END_HTML;
+  <p>You should receive an email at $email now, and when the computation ends.</p>
+END_HTML
+}
+print <<END_HTML;
+  <hr>
+  Powered by <a href="http://ifit.mccode.org">iFit</a> E. Farhi (c) 2016.<br>
   </body>
   </html>
 END_HTML
