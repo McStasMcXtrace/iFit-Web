@@ -25,7 +25,7 @@ $CGI::POST_MAX = 1024*5000; # max 5M upload
 my $q = new CGI;    # create new CGI object
 my $service="cif2hkl";
 my $safe_filename_characters = "a-zA-Z0-9_.-";
-my $upload_dir = "/var/www/html/upload";
+my $upload_dir = "/var/www/html/ifit-web-services/upload";
 
 # testing/security
 if (my $error = $q->cgi_error()){

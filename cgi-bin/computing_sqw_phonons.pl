@@ -5,10 +5,10 @@
 
 # ensure all fatals go to browser during debugging and set-up
 # comment this BEGIN block out on production code for security
-#BEGIN {
-#    $|=1;
-#    use CGI::Carp('fatalsToBrowser');
-#}
+BEGIN {
+    $|=1;
+    use CGI::Carp('fatalsToBrowser');
+}
 
 use CGI;            # use CGI.pm
 use File::Temp qw/ tempfile tempdir /;
@@ -29,7 +29,7 @@ my $safe_filename_characters = "a-zA-Z0-9_.-";
 my $safe_email_characters     = "a-zA-Z0-9_.-@";
 
 my $upload_base= "/var/www/html";
-my $upload_dir = "$upload_base/upload";
+my $upload_dir = "$upload_base/ifit-web-services/upload";
 my $host = hostname();
 
 
@@ -139,6 +139,12 @@ $res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
 $dir_short = $dir;
 $dir_short =~ s|$upload_base/||;
 
+$remote_ident=$q->remote_ident();
+$remote_host =$q->remote_host();
+$remote_addr =$q->remote_addr();
+$referer     =$q->referer();
+$user_agent  =$q->user_agent();
+
 # display computation results
 print $q->header ( );
 print <<END_HTML;
@@ -155,9 +161,10 @@ print <<END_HTML;
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
-  <li>Server: <a href="http://$host/index.html">$host</a></li>
+  <li>Service URL: <a href="$referer">$host/ifit-web-services</a></li>
   <li>Command: $cmd</li>
   <li>Status: STARTED</li>
+  <li>From: $remote_addr
   </ul></p>
   <p>Results will be available on this server at <a href="http://$host/$dir_short">$dir_short</a>.<br>
   You will find:<ul>
@@ -170,6 +177,13 @@ END_HTML
 if ($email ne "") {
   print <<END_HTML;
   <p>You should receive an email at $email now, and when the computation ends.</p>
+END_HTML
+} else {
+  print <<END_HTML;
+  <p>Keep the reference <a href="http://$host/$dir_short">http://$host/$dir_short</a> safe 
+  to be able to access yoru data when computation ends, as you will not be informed when it does. 
+  Check regularly. In practice, the computation should not exceed a few hours for 
+  most simple systems, but could be a few days for large ones (e.g. 50-100 atoms).</p>
 END_HTML
 }
 print <<END_HTML;
