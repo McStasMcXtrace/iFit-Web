@@ -127,7 +127,7 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
 if ($email ne "") {
   $cmd = "'sqw_phonons('$dir/$material','$calculator','occupancies=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;target=$dir;optimizer=BFGS','report');exit'";
 } else {
-  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupancies=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;target=$dir;optimizer=BFGS','report');exit'";
+  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;target=$dir;optimizer=BFGS','report');exit'";
 }
 
 # launch the command for the service
