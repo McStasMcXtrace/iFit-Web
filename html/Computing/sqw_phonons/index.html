@@ -10,7 +10,7 @@
     <h1 class="csc-firstHeader" align="center"><i>sqw_phonons: Phonon
         dispersions in 4D<br>
       </i></h1>
-    <div align="center"><i>version 1.8</i><i> - E. Farhi, Apr 2016</i> </div>
+    <div align="center"><i>version 1.8-1</i><i> - E. Farhi, Apr 2016</i> </div>
     <hr size="2" width="100%"> <br>
     The <b>sqw_phonons</b> tool, which is part of <a
       href="http://ifit.mccode.org">iFit</a>, is a tool to compute the
@@ -62,7 +62,9 @@
         See the full list <a
           href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
         We provide a few examples: <a href="POSCAR_Al">Al</a>, <a
-          href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>.<br>
+          href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>, 
+          <a href="POSCAR_Si">Si</a>, <a href="POSCAR_NaCl">NaCl</a>,
+          <a href="POSCAR_SrTiO3">SrTiO3</a>.<br>
       </p>
       <p align="left"> <font color="#3366ff"><b>2- Indicate the
             calculator to use:</b></font>
@@ -220,7 +222,8 @@
     </form>
     <b>What will happen</b>
     <p>The input material description will be processed and sent to the
-      selected DFT code. The atoms will be moved slightly, and the
+      selected DFT code. The structure will first be optimized.
+      Then, the atoms will be moved slightly, and the
       restoring forces will be computed. The dynamical matrix can then
       be evaluated for any HKL location in the crystal reciprocal space.
       We then compute the phonon spectrum (vibrational density of

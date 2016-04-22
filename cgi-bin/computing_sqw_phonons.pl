@@ -125,9 +125,9 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
 
 # assemble command line
 if ($email ne "") {
-  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupancies=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;target=$dir;optimizer=BFGS','report');exit'";
+  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;target=$dir','report');exit'";
 } else {
-  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;target=$dir;optimizer=BFGS','report');exit'";
+  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;target=$dir','report');exit'";
 }
 
 # launch the command for the service
@@ -181,7 +181,7 @@ END_HTML
 } else {
   print <<END_HTML;
   <p>Keep the reference <a href="http://$host/$dir_short">http://$host/$dir_short</a> safe 
-  to be able to access yoru data when computation ends, as you will not be informed when it does. 
+  to be able to access your data when computation ends, as you will not be informed when it does. 
   Check regularly. In practice, the computation should not exceed a few hours for 
   most simple systems, but could be a few days for large ones (e.g. 50-100 atoms).</p>
 END_HTML
