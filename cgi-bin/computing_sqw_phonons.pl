@@ -27,10 +27,12 @@ my $q = new CGI;    # create new CGI object
 my $service="sqw_phonons";
 my $safe_filename_characters = "a-zA-Z0-9_.-";
 my $safe_email_characters     = "a-zA-Z0-9_.-@";
-
-my $upload_base= "/var/www/html";
-my $upload_dir = "$upload_base/ifit-web-services/upload";
 my $host = hostname();
+
+# configuration of the web service
+my $upload_base= "/var/www/html";   # root of the HTML web server area
+my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
+my $mpi        = "4";  # number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
 
 
 # testing/security
@@ -125,9 +127,9 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
 
 # assemble command line
 if ($email ne "") {
-  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;target=$dir','report');exit'";
+  $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;mpi=$mpi;target=$dir','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
 } else {
-  $cmd = "'sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;target=$dir','report');exit'";
+  $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
 }
 
 # launch the command for the service
