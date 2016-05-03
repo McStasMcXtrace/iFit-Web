@@ -16,6 +16,9 @@ use IO::Compress::Zip qw(zip $ZipError) ;
 use IPC::Open3;
 use File::Basename;
 use Sys::Hostname;
+use Sys::CPU;     # libsys-cpu-perl
+use Sys::CpuLoad; # libsys-cpuload-perl
+
 
 # ------------------------------------------------------------------------------
 # GET and CHECK input parameters
@@ -33,6 +36,14 @@ my $host = hostname();
 my $upload_base= "/var/www/html";   # root of the HTML web server area
 my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
 my $mpi        = "4";  # number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
+
+# testing computer load
+$cpuload = Sys::CpuLoad::load();
+$cpunb   = Sys::CPU::cpu_count();
+
+if ($cpuload > $cpunb) { 
+  error("$service: CPU load exceeded. Current=$cpuload. Available=$cpunb. Try later (sorry).");
+}
 
 
 # testing/security
@@ -57,9 +68,7 @@ my $email          = $q->param('email');      # 7- Indicate your email
 
 if ( !$material )
 {
-  print $q->header ( );
-  print "$service: There was a problem uploading your file (try a smaller file).";
-  exit;
+  error("$service: There was a problem uploading your file (try a smaller file).");
 }
 
 # check input file name
@@ -73,7 +82,7 @@ if ( $material =~ /^([$safe_filename_characters]+)$/ )
 }
 else
 {
-  die "$service: Filename contains invalid characters.";
+  error("$service: Filename contains invalid characters. Allowed: '$safe_filename_characters'");
 }
 
 # check email
@@ -92,7 +101,7 @@ $dir = tempdir(TEMPLATE => "sqw_phonons_XXXXX", DIR => $upload_dir);
 
 # get a local copy of the input file
 my $upload_filehandle = $q->upload("material");
-open ( UPLOADFILE, ">$dir/$material" ) or die "$!";
+open ( UPLOADFILE, ">$dir/$material" ) or error("$!");
 binmode UPLOADFILE;
 while ( <$upload_filehandle> )
 {
@@ -222,7 +231,7 @@ END_HTML
  sub error {
    print $q->header(-type=>'text/html'),
          $q->start_html(-title=>'Error'),
-         $q->h3("$service: Error: $_[0]"),
+         $q->h3("ERROR: $_[0]"),
          $q->end_html;
    exit(0);
 }

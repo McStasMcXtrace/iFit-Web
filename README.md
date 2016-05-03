@@ -8,7 +8,7 @@ Web Interface for selected iFit functionalities
 Designed for Debian class Linux systems.
 
 sudo apt-add-repository 'deb http://packages.mccode.org/debian stable main'
-sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl 
+sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl libsys-cpuload-perl libsys-cpu-perl
 sudo apt-get install cif2hkl idl2matlab looktxt
 sudo apt-get install ifit-phonons
 

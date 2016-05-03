@@ -44,9 +44,7 @@ my $binary       = $q->param('binary'); # file format to generate
 
 if ( !$source )
 {
-  print $q->header ( );
-  print "$service: There was a problem uploading your file (try a smaller file).";
-  exit;
+  error("$service: There was a problem uploading your file (try a smaller file).");
 }
 
 my ( $name, $path, $extension ) = fileparse ( $source, '..*' );
@@ -59,7 +57,7 @@ if ( $source =~ /^([$safe_filename_characters]+)$/ )
 }
 else
 {
-  die "$service: Filename contains invalid characters.";
+  error("$service: Filename contains invalid characters.");
 }
 
 # checks on input parameters
@@ -72,7 +70,7 @@ $dir = tempdir(TEMPLATE => "looktxt_XXXXX", DIR => $upload_dir, CLEANUP => 1);
 
 # get a local copy of the input file
 my $upload_filehandle = $q->upload("source");
-open ( UPLOADFILE, ">$dir/$source" ) or die "$!";
+open ( UPLOADFILE, ">$dir/$source" ) or error("$!");
 binmode UPLOADFILE;
 while ( <$upload_filehandle> )
 {
@@ -157,7 +155,7 @@ unlink("$dir.zip");
  sub error {
    print $q->header(-type=>'text/html'),
          $q->start_html(-title=>'Error'),
-         $q->h3("$service: Error: $_[0]"),
+         $q->h3("ERROR: $_[0]"),
          $q->end_html;
    exit(0);
 }
