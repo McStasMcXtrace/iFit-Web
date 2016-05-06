@@ -7,10 +7,8 @@
   <body>
     <iframe src="../../Layout/header.html" name="header" height="100"
       width="100%"></iframe> <br>
-    <h1 class="csc-firstHeader" align="center"><i><img alt="sqw_phonons"
-          title="sqw_phonons" src="images/Models_sqw_ph_ase.png"
-          height="95" width="128" align="middle">&nbsp;sqw_phonons:
-        Phonon dispersions in 4D<br>
+    <h1 class="csc-firstHeader" align="center"><i>powder diffraction
+        (neutron scattering)<br>
       </i></h1>
     <div align="center"><i>version 1.8-1</i><i> - E. Farhi, Apr 2016</i>
     </div>
@@ -40,38 +38,37 @@
             </b></td>
         </tr>
         <tr>
-          <td valign="top">A <a
-              href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
-            <a
-              href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
-            <a href="http://www.rcsb.org/pdb/">PDB</a>, ... material
-            structure</td>
-          <td valign="top">Phonon dispersions from the Dynamical matrix,
-            using forces estimated by <i>ab-initio </i>using <a
-              href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
-            selection of DFT codes (EMT, GPAW, ABINIT, Elk, Dacapo,
-            QuantumEspresso). </td>
+          <td valign="top">A CIF/ShelX/FullProf file</td>
+          <td valign="top">The powder diffractomgram obtained from
+            neutron scattering</td>
         </tr>
       </tbody>
     </table>
     <br>
     <form action="/cgi-bin/computing_sqw_phonons.pl" method="post"
       enctype="multipart/form-data">
+      <p align="left"> </p>
       <p align="left"> <font color="#3366ff"><b>1- Material structure
-            (max 5Mb):</b></font> <input name="material" type="file"><br>
-        Any file format supported by the ASE can be used, such as (<a
-          href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
-        <a
-          href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
-        <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, MDL/SDF/XSD,
-        ...). <br>
-        See the full list <a
-          href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
-        We provide a few examples: <a href="POSCAR_Al">Al</a>, <a
-          href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>, <a
-          href="POSCAR_Si">Si</a>, <a href="POSCAR_NaCl">NaCl</a>, <a
-          href="POSCAR_SrTiO3">SrTiO3</a>.<br>
-      </p>
+            file to Upload (max 5Mb):</b></font> <input name="source"
+          type="file"> </p>
+      <p> Supported formats: </p>
+      <ul>
+        <li><a
+            href="https://fr.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>
+          (.CIF) from e.g. the <a
+            href="http://icsd.ill.fr/icsd/index.php">Inorganic Crystal
+            Structure Database</a> (ICSD) and <a
+            href="http://www.crystallography.net/browse.html">The
+            Crystallography data base</a> </li>
+        <li>FullProf (.CFL) for instance the <a
+            href="http://ifit.mccode.org/Data/Na2Ca3Al2F14.cfl">Na2Ca3Al2F14</a>.
+        </li>
+        <li>FullProf (.PCR) </li>
+        <li>ShelX (.SHX) </li>
+        <li>ShelX (.INS) </li>
+        <li>ShelX (.RES) </li>
+      </ul>
+      <p align="left"> </p>
       <p align="left"> <font color="#3366ff"><b>2- Indicate the
             calculator to use:</b></font>
         <select name="calculator">
@@ -114,6 +111,7 @@
 
 
 
+
                 and proven code.</i></td>
           </tr>
           <tr>
@@ -143,6 +141,7 @@
                 href="http://wiki.fysik.dtu.dk/gpaw"><br>
               </a></td>
             <td valign="top">Real-space/plane-wave/LCAO PAW code. <i>Fast
+
 
 
 
@@ -267,6 +266,7 @@
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
 
 
 

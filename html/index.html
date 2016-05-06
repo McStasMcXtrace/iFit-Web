@@ -15,9 +15,12 @@
         <ul>
           <li> convert file within formats of use for neutron scattering</li>
           <li> compute phonon dispersions in 4D</li>
+          <li>estimate the measurement from a neutron scattering
+            experiment<br>
+          </li>
         </ul>
         <h2>Converters</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
               <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
@@ -31,7 +34,9 @@
               <td valign="top"><b><a
                     href="Converters/cif2hkl/index.html">cif2hkl</a></b><b><br>
                 </b> </td>
-              <td valign="top">A CIF/ShelX/FullProf file<br>
+              <td valign="top">A <a
+                  href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>/ShelX/FullProf
+                file<br>
               </td>
               <td valign="top">A file with the F²(HKL) reflection list
                 for use with e.g.&nbsp; <a href="http://www.mcstas.org">McStas</a>
@@ -59,7 +64,7 @@
           </tbody>
         </table>
         <h2>Computations</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
               <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
@@ -72,6 +77,10 @@
             <tr>
               <td valign="top"><b><a
                     href="Computing/sqw_phonons/index.html">sqw_phonons</a></b><b><br>
+                  <a href="Computing/sqw_phonons/index.html"><img
+                      alt="sqw_phonons" title="sqw_phonons"
+                      src="Computing/sqw_phonons/images/Models_sqw_ph_ase.png"
+                      border="0" height="47" width="64"></a><br>
                 </b> </td>
               <td valign="top">A <a
                   href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
@@ -80,6 +89,7 @@
                 <a href="http://www.rcsb.org/pdb/">PDB</a>, ... </td>
               <td valign="top">Phonon dispersions from the Dynamical
                 matrix, using forces estimated by <i>ab-initio </i>using
+
 
 
 
@@ -112,27 +122,6 @@
             <!--                  neutron scattering cross section</b> tool below. </td>-->
             <!--            </tr>-->
             <!--            <tr>-->
-            <!--              <td valign="top"><b>neutron powder diffractometer</b><br>-->
-            <!--              </td>-->
-            <!--              <td valign="top">A&nbsp; <a-->
-            <!--                  href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,-->
-            <!--                SHELX or CFL<br>-->
-            <!--              </td>-->
-            <!--              <td valign="top">The powder diffractogram obtained from-->
-            <!--                neutron scattering<br>-->
-            <!--              </td>-->
-            <!--            </tr>-->
-            <!--            <tr>-->
-            <!--              <td valign="top"><b>small angle neutron scattering</b><br>-->
-            <!--              </td>-->
-            <!--              <td valign="top">A <a href="http://www.rcsb.org/pdb/">PDB</a>-->
-            <!--                <br>-->
-            <!--              </td>-->
-            <!--              <td valign="top">The small angle neutron scattering from-->
-            <!--                e.g. proteins, colloids and polymers<br>-->
-            <!--              </td>-->
-            <!--            </tr>-->
-            <!--            <tr>-->
             <!--              <td valign="top"><b>sqw_scatt_xs</b><br>-->
             <!--              </td>-->
             <!--              <td valign="top">an <i>S(|q|,w)</i><br>-->
@@ -154,6 +143,49 @@
         </table>
       </div>
     </div>
+    <h2>Virtual neutron scattering experiments</h2>
+    <table border="1" cellpadding="2" cellspacing="2" width="100%">
+      <tbody>
+        <tr>
+          <td valign="top" bgcolor="#ffcc99"><b>TOOL</b><br>
+          </td>
+          <td valign="top" bgcolor="#ffcc99"><b>INPUT</b><b> =&gt;<br>
+            </b></td>
+          <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+            </b></td>
+        </tr>
+        <tr>
+          <td valign="top"><b>neutron powder diffractometer</b><br>
+          </td>
+          <td valign="top">A <a
+              href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+            SHELX or CFL<br>
+          </td>
+          <td valign="top">The powder diffractogram obtained from
+            neutron scattering<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top"><b>neutron single-crystal diffractometer</b></td>
+          <td valign="top">A <a
+              href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+            SHELX or CFL</td>
+          <td valign="top">The single-crystal diffraction obtained from
+            neutron scattering<br>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top"><b>small angle neutron scattering</b><br>
+          </td>
+          <td valign="top">A <a href="http://www.rcsb.org/pdb/">PDB</a>
+            <br>
+          </td>
+          <td valign="top">The small angle neutron scattering from e.g.
+            proteins, colloids and polymers<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <h2>Availability and Credits</h2>
     If you use any of these services, please acknowledge:<a
       href="http://ifit.mccode.org"><img alt="iFit" title="iFit"
@@ -164,6 +196,7 @@
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
 
 
 
