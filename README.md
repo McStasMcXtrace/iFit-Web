@@ -1,9 +1,6 @@
 #iFit-Web
 Web Interface for selected iFit functionalities
 
-
-
-
 #INSTALLATION:
 Designed for Debian class Linux systems.
 
@@ -26,18 +23,20 @@ install necessary packages, then
   copy the etc/config file   as e.g. /etc/ifit-web-services/config
   
 ** Tuning to your needs **
-The ifit-web-services configuration is specified in the file
-  /etc/ifit-web-services/config
-To improve security you may set the ownership of this file to e.g. chmod 400 for user www-data so
-that other users can not read it.
-The following items can be set:
-  # the server which sends emails, you can specify a given port, e.g. smtp.somewhere.org
-  # the account which sends emails. Must contain the domain name, e.g. email@somewhere.org
-  from:   email@domain
-  # the password for this 'from' account
-  password: XXXXXX
-  # the number of processors to use for the 'heavy' computations, as a number.
-  mpi:    N
+
+The computing_sqw_phonons configuration is specified in the file
+  cgi-bin/computing_sqw_phonons.pl
+  
+Then you should adapt the lines which define:
+  # number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
+  my $mpi          = 16;
+
+  # the name of the SMTP server, optionally followed by the :port, as in "smtp.google.com:587"
+  my $email_server = "smtp.ill.fr";
+  # the name of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
+  my $email_from   = "XXXX\@ill.eu";
+  # the password for the sender
+  my $email_passwd = "XXXX";
 
 #USAGE
 open a browser and connect to:

@@ -21,32 +21,19 @@ use Sys::CpuLoad; # libsys-cpuload-perl
 use FileHandle;   # to read the configuration file
 
 # ------------------------------------------------------------------------------
-# read the service configuration
+# service configuration: tune for your needs
 # ------------------------------------------------------------------------------
-my $mpi          = 8;  # number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
 
-my $email_config = "/etc/ifit-web-services/config";
-my $email_server = "";
-my $email_from   = "";
-my $email_passwd = "";
+# number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
+my $mpi          = 16;
+# the name of the SMTP server, optionally followed by the :port, as in "smtp.google.com:587"
+my $email_server = "smtp.ill.fr";
+# the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
+my $email_from   = "XXXX\@ill.eu";
+# the password for the sender on the SMTP server
+my $email_passwd = "XXXX";
 
-# read lines from the configuration file
-my $h = new FileHandle;
-open $h, $email_config;
-
-while (<$h>) {
-  if (/^\s*server:\s*(.*)/i) {
-    $email_server = $1;
-  } elsif (/^\s*from:\s*(.*)/i) {
-    $email_from = $1;
-    $email_account= substr($email_from, 0, index($email_from, '@'));
-  } elsif (/^\s*password:\s*(.*)/i) {
-    $email_passwd = $1;
-  } elsif (/^\s*mpi:\s*([0-9]+)/i) {
-    $mpi = $1;
-  }
-}
-close $h
+my $email_account= substr($email_from, 0, index($email_from, '@'));
 
 # ------------------------------------------------------------------------------
 # GET and CHECK input parameters
@@ -175,7 +162,7 @@ if ($email_server ne "" and $email_from ne "" and $email_passwd ne "") {
   # the final email can be sent. We assemble the message and the command using sendemail
   $datestring = localtime();
   $email_subject = "$service:$material:$calculator just ended";
-  $email_body    = "Hello $email !\nYour calculation $service:$material:$calculator started on $datestring just ended.\nAccess the whole report at\n  http://$fqdn/$dir_short\nand the log file at\n  http://$fqdn/$dir_short/ifit.log\nThankf for using ifit-web-services.";
+  $email_body    = "Hello $email !\nYour calculation $service:$material:$calculator started on $datestring just ended.\nAccess the whole report at\n  http://$fqdn/$dir_short\nand the log file at\n  http://$fqdn/$dir_short/ifit.log\nThanks for using ifit-web-services.";
 
   $email_cmd    = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject' -m '$email_body' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log";
 } else { $email = ""; }
@@ -187,8 +174,9 @@ $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;k
 
 # dump initial material file
 $res = system("cat $dir/$source > $dir/ifit.log");
+# start command, handle possible email
 if ($email ne "") {
-  $res = system("{ ifit \"$cmd\"; $cmd_email; } >> $dir/ifit.log 2>&1 &");
+  $res = system("{ ifit \"$cmd\"; $email_cmd; } >> $dir/ifit.log 2>&1 &");
 } else {
   $res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
 }
@@ -209,15 +197,15 @@ print <<END_HTML;
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
-  <li>Service URL: <a href="$referer">$fqdn/ifit-web-services</a></li>
+  <li>Service URL: <a href="$referer">$host/ifit-web-services</a></li>
   <li>Command: $cmd</li>
-  <li>Status: $service:$material:$calculator STARTED</li>
+  <li>Status: STARTED</li>
   <li>From: $remote_addr
   </ul></p>
-  <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
+  <p>Results will be available on this server at <a href="http://$host/$dir_short">$dir_short</a>.<br>
   You will find:<ul>
-  <li>a <a href="http://$fqdn/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
-  <li>the <a href="http://$fqdn/$dir_short/ifit.log">Log file</a>.</li></ul>
+  <li>a <a href="http://$host/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
+  <li>the <a href="http://$host/$dir_short/ifit.log">Log file</a>.</li></ul>
   </p>
   <p>WARNING: Think about getting your data back upon completion,as soon as possible. There is no guaranty we keep it.</p>
 END_HTML
@@ -228,8 +216,8 @@ if ($email ne "") {
 END_HTML
 } else {
   print <<END_HTML;
-  <p>Keep the reference <a href="http://$fqdn/$dir_short">http://$fqdn/$dir_short</a> safe 
-  to be able to access your data when computation ends, as you <b>will not be informed</b> when it does. 
+  <p>Keep the reference <a href="http://$host/$dir_short">http://$host/$dir_short</a> safe 
+  to be able to access your data when computation ends, as you will not be informed when it does. 
   Check regularly. In practice, the computation should not exceed a few hours for 
   most simple systems, but could be a few days for large ones (e.g. 50-100 atoms).</p>
 END_HTML
@@ -268,7 +256,7 @@ END_HTML
  sub error {
    print $q->header(-type=>'text/html'),
          $q->start_html(-title=>'Error'),
-         $q->h3("ERROR: $_[0]"),
+         $q->h3("$service: Error: $_[0]"),
          $q->end_html;
    exit(0);
 }

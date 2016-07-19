@@ -5,16 +5,16 @@
     <title>Computing services: Computing: sqw_phonons</title>
   </head>
   <body>
-    <iframe src="../../Layout/header.html" name="header" height="100"
-      width="100%"></iframe> <br>
+    <iframe src="../../Layout/header.html" name="header" width="100%"
+      height="100"></iframe> <br>
     <h1 class="csc-firstHeader" align="center"><i><img alt="sqw_phonons"
           title="sqw_phonons" src="images/Models_sqw_ph_ase.png"
-          height="95" width="128" align="middle">&nbsp;sqw_phonons:
+          align="middle" width="128" height="95">&nbsp;sqw_phonons:
         Phonon dispersions in 4D<br>
       </i></h1>
-    <div align="center"><i>version 1.8-1</i><i> - E. Farhi, Apr 2016</i>
+    <div align="center"><i>version 1.8-1</i><i> - E. Farhi, July 2016</i>
     </div>
-    <hr width="100%" size="2"> <br>
+    <hr size="2" width="100%"> <br>
     The <b>sqw_phonons</b> tool, which is part of <a
       href="http://ifit.mccode.org">iFit</a>, is a tool to compute the
     phonon dispersion curves (vibrational modes) in 4D (HKLE) and for
@@ -25,8 +25,8 @@
       href="http://ifit.mccode.org/Models.html#mozTocId990577">Models</a>
     page.<i><br>
       <br>
-      To try this service, select use <a href="POSCAR_Al">Aluminium</a>,
-      then use the EMT code, which is extremely fast (but very limited),
+      To try this service, use <a href="POSCAR_Al">Aluminium</a>, then
+      select the EMT code, which is extremely fast (but very limited),
       and press the COMPUTE button. You should get something like <a
         href="example/index.html">this</a>.<br>
       <br>
@@ -34,9 +34,9 @@
     <table border="1" cellpadding="2" cellspacing="2" width="100%">
       <tbody>
         <tr>
-          <td valign="top" bgcolor="#ffcc99"><b>INPUT: sqw_phonons</b><b><br>
+          <td bgcolor="#ffcc99" valign="top"><b>INPUT: sqw_phonons</b><b><br>
             </b></td>
-          <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+          <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
             </b></td>
         </tr>
         <tr>
@@ -50,7 +50,7 @@
             using forces estimated by <i>ab-initio </i>using <a
               href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
             selection of DFT codes (EMT, GPAW, ABINIT, Elk, Dacapo,
-            QuantumEspresso). </td>
+            QuantumEspresso,VASP). </td>
         </tr>
       </tbody>
     </table>
@@ -63,15 +63,49 @@
           href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
         <a
           href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
-        <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, MDL/SDF/XSD,
+        <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, <a
+href="http://accelrys.com/products/collaborative-science/biovia-materials-studio/">MDL</a>/SDF/XSD,
+
+
+
         ...). <br>
         See the full list <a
           href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
         We provide a few examples: <a href="POSCAR_Al">Al</a>, <a
           href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>, <a
           href="POSCAR_Si">Si</a>, <a href="POSCAR_NaCl">NaCl</a>, <a
-          href="POSCAR_SrTiO3">SrTiO3</a>.<br>
+          href="POSCAR_SrTiO3">SrTiO3</a>. You can also look at:
+        <meta http-equiv="content-type" content="text/html;
+          charset=UTF-8">
       </p>
+      <ul style="color: rgb(0, 0, 0); font-family: 'Times New Roman';
+        font-size: medium; font-style: normal; font-variant: normal;
+        font-weight: normal; letter-spacing: normal; line-height:
+        normal; orphans: auto; text-align: start; text-indent: 0px;
+        text-transform: none; white-space: normal; widows: 1;
+        word-spacing: 0px; -webkit-text-stroke-width: 0px;">
+        <li>MaterialsProject&lt;<a
+            href="https://www.materialsproject.org/">https://www.materialsproject.org/</a>&gt;
+
+
+          and get POSCAR files ;<br>
+        </li>
+        <li>PhononDB &lt;<a href="http://phonondb.mtl.kyoto-u.ac.jp/">http://phonondb.mtl.kyoto-u.ac.jp/</a>&gt;
+
+
+          and get POSCAR files ;<br>
+        </li>
+        <li>NoMaD repository &lt;<a
+            href="http://nomad-repository.eu/cms/">http://nomad-repository.eu/cms/</a>&gt;and
+
+
+          get many configurations ;<br>
+        </li>
+        <li>Inorganic Crystal Structure Database &lt;<a
+            href="http://icsd.ill.fr">http://icsd.ill.fr</a>&gt; with
+          plenty of CIFs.</li>
+      </ul>
+      <p align="left"> </p>
       <p align="left"> <font color="#3366ff"><b>2- Indicate the
             calculator to use:</b></font>
         <select name="calculator">
@@ -99,9 +133,8 @@
           </tr>
           <tr>
             <td valign="top"><b><img alt="qe" title="qe"
-                  src="images/logo_qe.jpg" height="34" width="80"
-                  align="middle"><a
-                  href="http://www.quantum-espresso.org/">QuantumEspresso</a></b></td>
+                  src="images/logo_qe.jpg" align="middle" width="80"
+                  height="34"><a href="http://www.quantum-espresso.org/">QuantumEspresso</a></b></td>
             <td valign="top">Density-functional theory, plane waves, and
               pseudopotentials based code for electronic-structure
               calculations and materials modeling. When using this
@@ -114,12 +147,15 @@
 
 
 
+
+
+
                 and proven code.</i></td>
           </tr>
           <tr>
             <td valign="top"><img alt="emt" title="emt"
-                src="images/emt.png" height="50" width="71"
-                align="middle">&nbsp;<a
+                src="images/emt.png" align="middle" width="71"
+                height="50">&nbsp;<a
                 href="https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html">EMT</a></td>
             <td valign="top">Effective Medium Theory calculator (<b>only</b>
               for Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O). <br>
@@ -129,7 +165,7 @@
           <tr>
             <td valign="top"><a href="http://www.abinit.org/"><img
                   alt="abinit" title="abinit" src="images/abinit.png"
-                  border="0" height="34" width="80" align="middle"></a><a
+                  align="middle" border="0" width="80" height="34"></a><a
                 href="http://www.abinit.org/">&nbsp;ABINIT</a></td>
             <td valign="top">Plane-wave pseudopotential code. <i>Fast
                 and proven code.</i><br>
@@ -138,7 +174,7 @@
           <tr>
             <td valign="top"><a href="http://wiki.fysik.dtu.dk/gpaw"><img
                   alt="GPAW" title="GPAW" src="images/logo-gpaw.png"
-                  border="0" height="39" width="80" align="middle"> </a><a
+                  align="middle" border="0" width="80" height="39"> </a><a
                 href="http://wiki.fysik.dtu.dk/gpaw">GPAW</a><a
                 href="http://wiki.fysik.dtu.dk/gpaw"><br>
               </a></td>
@@ -149,12 +185,15 @@
 
 
 
+
+
+
                 and proven code.</i></td>
           </tr>
           <tr>
             <td valign="top"><a href="http://elk.sourceforge.net/"><img
-                  alt="elk" title="elk" src="images/elk.png" border="0"
-                  height="47" width="81" align="middle"></a><a
+                  alt="elk" title="elk" src="images/elk.png"
+                  align="middle" border="0" width="81" height="47"></a><a
                 href="http://elk.sourceforge.net/">&nbsp;ELK</a></td>
             <td valign="top">Full Potential, all electrons LAPW code,
               similar to Wien2k.<br>
@@ -163,7 +202,7 @@
           <tr>
             <td valign="top"><a href="https://www.vasp.at/"><img
                   alt="vasp" title="vasp" src="images/vasp.png"
-                  border="0" height="50" width="77" align="middle"></a><a
+                  align="middle" border="0" width="77" height="50"></a><a
                 href="https://www.vasp.at/"> VASP</a><br>
             </td>
             <td valign="top">Plane-wave PAW code. <b><i>Requires a
@@ -225,8 +264,8 @@
         you may try 2x2x2. </p>
       <p align="left"> <font color="#3366ff"><b>7- Indicate your email
             address:</b></font> <input name="email" type="text"> <br>
-        Recommended. If you are behind a proxy server, do NOT use this
-        option.<br>
+        <b>Required</b>, to be warned when the calculation ends. Use
+        name@domain.name.<br>
       </p>
       <p align="center"> <b><input value="COMPUTE !" type="SUBMIT"></b>
       </p>
@@ -244,9 +283,9 @@
     </p>
     In addition:
     <ul>
-      <li>You will be notified by email when the computation starts and
-        ends. </li>
-      <li>A full report will be sent to you upon completion as a ZIP
+      <li>You will be notified by email when the computation&nbsp; ends.
+      </li>
+      <li>A report will be written and available for download as a ZIP
         file. Open the 'index.html' document there-in.</li>
       <li>An example of such a report using QuantumEspresso with
         Aluminium is available <a href="example/index.html">here</a>.<br>
@@ -255,11 +294,12 @@
         VTK, MRC, FIG/MAT, ...).</li>
       <li>The Model is provided as a Matlab object, to be used within <a
           href="http://ifit.mccode.org">iFit</a>, which evaluation is
-        very fast, without the need to restart the DFT.</li>
+        very fast, without the need to restart the DFT.<br>
+      </li>
       <li>You can read and analyze the results with <a
           href="http://ifit.mccode.org">iFit</a>.</li>
     </ul>
-    <hr width="100%" size="2">
+    <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge:<br>
     <ul>
@@ -267,6 +307,9 @@
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
+
+
 
 
 
@@ -283,24 +326,25 @@ href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">D
     available as part of iFit <a href="http://ifit.mccode.org">ifit.mccode.org</a>,
     and <a href="https://github.com/McStasMcXtrace/iFit">GitHub
       repository</a>.<a href="http://ifit.mccode.org"><img alt="iFit"
-        title="iFit" src="images/iFit-logo.png" height="64" width="116"
-        align="right"></a><img alt="ase" title="ase"
-      src="images/ase256.png" height="64" width="64" align="right"><br>
+        title="iFit" src="images/iFit-logo.png" align="right"
+        width="116" height="64"></a><img alt="ase" title="ase"
+      src="images/ase256.png" align="right" width="64" height="64"><br>
     A Debian package installer <a
 href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/ifit-phonons_1.8_amd64.deb">ifit-phonons</a>
     exists for e.g. Ubuntu/Mint at <a href="http://packages.mccode.org">packages.mccode.org</a>
     <h2>Limitations</h2>
     There is no guaranty that the phonon dispersions that will be
     computed are exact. The validity depends on the material, the DFT
-    code, and the peudo-potentials in use. In practice, if you get zero
-    phonon energy outside Bragg locations, this may be an indication
-    that the Model is not satisfactory. You should then increase the
-    supercell size, the k-points mesh, and last the cut-off energy. <br>
+    code, and the peudo-potentials in use. In practice, if you get
+    zero/negative/imaginary phonon energy outside Bragg locations, this
+    may be an indication that the Model is not satisfactory. You should
+    then increase the supercell size, the k-points mesh, and last the
+    cut-off energy. <br>
     <br>
     Currently, this service <b>only</b> computes the vibrational modes
     energy, <b>not</b> their intensity and polarisation vectors.<br>
     <br>
-    <iframe src="../../Layout/footer.html" name="footer" height="100"
-      width="100%"></iframe> <br>
+    <iframe src="../../Layout/footer.html" name="footer" width="100%"
+      height="100"></iframe> <br>
   </body>
 </html>
