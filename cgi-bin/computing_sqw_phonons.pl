@@ -15,10 +15,38 @@ use File::Temp qw/ tempfile tempdir /;
 use IO::Compress::Zip qw(zip $ZipError) ;
 use IPC::Open3;
 use File::Basename;
-use Sys::Hostname;
+use Net::Domain qw(hostname hostfqdn);
 use Sys::CPU;     # libsys-cpu-perl
 use Sys::CpuLoad; # libsys-cpuload-perl
+use FileHandle;   # to read the configuration file
 
+# ------------------------------------------------------------------------------
+# read the service configuration
+# ------------------------------------------------------------------------------
+my $mpi          = 8;  # number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
+
+my $email_config = "/etc/ifit-web-services/config";
+my $email_server = "";
+my $email_from   = "";
+my $email_passwd = "";
+
+# read lines from the configuration file
+my $h = new FileHandle;
+open $h, $email_config;
+
+while (<$h>) {
+  if (/^\s*server:\s*(.*)/i) {
+    $email_server = $1;
+  } elsif (/^\s*from:\s*(.*)/i) {
+    $email_from = $1;
+    $email_account= substr($email_from, 0, index($email_from, '@'));
+  } elsif (/^\s*password:\s*(.*)/i) {
+    $email_passwd = $1;
+  } elsif (/^\s*mpi:\s*([0-9]+)/i) {
+    $mpi = $1;
+  }
+}
+close $h
 
 # ------------------------------------------------------------------------------
 # GET and CHECK input parameters
@@ -30,12 +58,10 @@ my $q = new CGI;    # create new CGI object
 my $service="sqw_phonons";
 my $safe_filename_characters = "a-zA-Z0-9_.-";
 my $safe_email_characters     = "a-zA-Z0-9_.-@";
-my $host = hostname();
 
 # configuration of the web service
 my $upload_base= "/var/www/html";   # root of the HTML web server area
 my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
-my $mpi        = "4";  # number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
 
 # testing computer load
 $cpuload = Sys::CpuLoad::load();
@@ -44,7 +70,6 @@ $cpunb   = Sys::CPU::cpu_count();
 if ($cpuload > $cpunb) { 
   error("$service: CPU load exceeded. Current=$cpuload. Available=$cpunb. Try later (sorry).");
 }
-
 
 # testing/security
 if (my $error = $q->cgi_error()){
@@ -64,7 +89,6 @@ my $ecut           = $q->param('ecut');       # 4- Indicate the energy cut-off
 my $kpoints        = $q->param('kpoints');    # 5- Indicate the K-points
 my $supercell      = $q->param('supercell');  # 6- Indicate the supercell size
 my $email          = $q->param('email');      # 7- Indicate your email
-
 
 if ( !$material )
 {
@@ -93,6 +117,7 @@ if ( $email =~ /^([$safe_email_characters]+)$/ )
 }
 else
 {
+  error("$service: This service requires a valid email. Retry with one.");
   $email="";
 }
 
@@ -130,23 +155,8 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
   $calculator = "QuantumEspresso";
 }
 
-# ------------------------------------------------------------------------------
-# DO the work
-# ------------------------------------------------------------------------------
-
-# assemble command line
-if ($email ne "") {
-  $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;email=$email;mpi=$mpi;target=$dir','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
-} else {
-  $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
-}
-
-# launch the command for the service
-
-# dump initial material file
-$res = system("cat $dir/$source > $dir/ifit.log");
-$res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
-
+$host       = hostname;
+$fqdn       = hostfqdn();
 $dir_short = $dir;
 $dir_short =~ s|$upload_base/||;
 
@@ -155,6 +165,33 @@ $remote_host =$q->remote_host();
 $remote_addr =$q->remote_addr();
 $referer     =$q->referer();
 $user_agent  =$q->user_agent();
+
+# ------------------------------------------------------------------------------
+# DO the work
+# ------------------------------------------------------------------------------
+    
+# test if the email service is valid
+if ($email_server ne "" and $email_from ne "" and $email_passwd ne "") {
+  # the final email can be sent. We assemble the message and the command using sendemail
+  $datestring = localtime();
+  $email_subject = "$service:$material:$calculator just ended";
+  $email_body    = "Hello $email !\nYour calculation $service:$material:$calculator started on $datestring just ended.\nAccess the whole report at\n  http://$fqdn/$dir_short\nand the log file at\n  http://$fqdn/$dir_short/ifit.log\nThankf for using ifit-web-services.";
+
+  $email_cmd    = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject' -m '$email_body' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log";
+} else { $email = ""; }
+
+# assemble calculation command line
+$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
+
+# launch the command for the service
+
+# dump initial material file
+$res = system("cat $dir/$source > $dir/ifit.log");
+if ($email ne "") {
+  $res = system("{ ifit \"$cmd\"; $cmd_email; } >> $dir/ifit.log 2>&1 &");
+} else {
+  $res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
+}
 
 # display computation results
 print $q->header ( );
@@ -172,27 +209,27 @@ print <<END_HTML;
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
-  <li>Service URL: <a href="$referer">$host/ifit-web-services</a></li>
+  <li>Service URL: <a href="$referer">$fqdn/ifit-web-services</a></li>
   <li>Command: $cmd</li>
-  <li>Status: STARTED</li>
+  <li>Status: $service:$material:$calculator STARTED</li>
   <li>From: $remote_addr
   </ul></p>
-  <p>Results will be available on this server at <a href="http://$host/$dir_short">$dir_short</a>.<br>
+  <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
   You will find:<ul>
-  <li>a <a href="http://$host/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
-  <li>the <a href="http://$host/$dir_short/ifit.log">Log file</a>.</li></ul>
+  <li>a <a href="http://$fqdn/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
+  <li>the <a href="http://$fqdn/$dir_short/ifit.log">Log file</a>.</li></ul>
   </p>
   <p>WARNING: Think about getting your data back upon completion,as soon as possible. There is no guaranty we keep it.</p>
 END_HTML
 
 if ($email ne "") {
   print <<END_HTML;
-  <p>You should receive an email at $email now, and when the computation ends.</p>
+  <p>You should receive an email at $email when the computation ends.</p>
 END_HTML
 } else {
   print <<END_HTML;
-  <p>Keep the reference <a href="http://$host/$dir_short">http://$host/$dir_short</a> safe 
-  to be able to access your data when computation ends, as you will not be informed when it does. 
+  <p>Keep the reference <a href="http://$fqdn/$dir_short">http://$fqdn/$dir_short</a> safe 
+  to be able to access your data when computation ends, as you <b>will not be informed</b> when it does. 
   Check regularly. In practice, the computation should not exceed a few hours for 
   most simple systems, but could be a few days for large ones (e.g. 50-100 atoms).</p>
 END_HTML
