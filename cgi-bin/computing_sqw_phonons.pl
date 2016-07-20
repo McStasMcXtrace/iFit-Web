@@ -18,7 +18,6 @@ use File::Basename;
 use Net::Domain qw(hostname hostfqdn);
 use Sys::CPU;     # libsys-cpu-perl
 use Sys::CpuLoad; # libsys-cpuload-perl
-use FileHandle;   # to read the configuration file
 
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
@@ -51,20 +50,20 @@ my $upload_base= "/var/www/html";   # root of the HTML web server area
 my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
 
 # testing computer load
-$cpuload = Sys::CpuLoad::load();
+@cpuload = Sys::CpuLoad::load();
 $cpunb   = Sys::CPU::cpu_count();
 
-if ($cpuload > $cpunb) { 
-  error("$service: CPU load exceeded. Current=$cpuload. Available=$cpunb. Try later (sorry).");
+if (@cpuload[0] > $cpunb) { 
+  error("CPU load exceeded. Current=$cpuload. Available=$cpunb. Try later (sorry).");
 }
 
 # testing/security
 if (my $error = $q->cgi_error()){
   if ($error =~ /^413\b/o) {
-    error("$service: Maximum data limit exceeded.");
+    error("Maximum data limit exceeded.");
   }
   else {
-    error("$service: An unknown error has occured."); 
+    error("An unknown error has occured."); 
   }
 }
 
@@ -79,7 +78,7 @@ my $email          = $q->param('email');      # 7- Indicate your email
 
 if ( !$material )
 {
-  error("$service: There was a problem uploading your file (try a smaller file).");
+  error("There was a problem uploading your file (try a smaller file).");
 }
 
 # check input file name
@@ -93,7 +92,7 @@ if ( $material =~ /^([$safe_filename_characters]+)$/ )
 }
 else
 {
-  error("$service: Filename contains invalid characters. Allowed: '$safe_filename_characters'");
+  error("Filename contains invalid characters. Allowed: '$safe_filename_characters'");
 }
 
 # check email
@@ -104,7 +103,7 @@ if ( $email =~ /^([$safe_email_characters]+)$/ )
 }
 else
 {
-  error("$service: This service requires a valid email. Retry with one.");
+  error("This service requires a valid email. Retry with one.");
   $email="";
 }
 
@@ -142,16 +141,19 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
   $calculator = "QuantumEspresso";
 }
 
-$host       = hostname;
-$fqdn       = hostfqdn();
-$dir_short = $dir;
-$dir_short =~ s|$upload_base/||;
+$host         = hostname;
+$fqdn         = hostfqdn();
+$dir_short    = $dir;
+$dir_short    =~ s|$upload_base/||;
+$upload_short = $upload_dir;
+$upload_short =~ s|$upload_base/||;
 
 $remote_ident=$q->remote_ident();
 $remote_host =$q->remote_host();
 $remote_addr =$q->remote_addr();
 $referer     =$q->referer();
 $user_agent  =$q->user_agent();
+$datestring  = localtime();
 
 # ------------------------------------------------------------------------------
 # DO the work
@@ -160,7 +162,6 @@ $user_agent  =$q->user_agent();
 # test if the email service is valid
 if ($email_server ne "" and $email_from ne "" and $email_passwd ne "") {
   # the final email can be sent. We assemble the message and the command using sendemail
-  $datestring = localtime();
   $email_subject = "$service:$material:$calculator just ended";
   $email_body    = "Hello $email !\nYour calculation $service:$material:$calculator started on $datestring just ended.\nAccess the whole report at\n  http://$fqdn/$dir_short\nand the log file at\n  http://$fqdn/$dir_short/ifit.log\nThanks for using ifit-web-services.";
 
@@ -181,6 +182,9 @@ if ($email ne "") {
   $res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
 }
 
+# file used for monitoring the service usage
+$filename = "$upload_dir/$service.html";
+
 # display computation results
 print $q->header ( );
 print <<END_HTML;
@@ -194,18 +198,27 @@ print <<END_HTML;
   </style>
   </head>
   <body>
+  <img alt="iFit" title="iFit"
+        src="http://ifit.mccode.org/images/iFit-logo.png"
+        align="right" width="116" height="64">
+  <img
+          alt="the ILL" title="the ILL"
+          src="http://ifit.mccode.org/images/ILL-web-jpeg.jpg"
+          align="right" border="0" width="68" height="64">
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
-  <li>Service URL: <a href="$referer">$host/ifit-web-services</a></li>
+  <li>Service URL: <a href="$referer">$fqdn/ifit-web-services</a></li>
   <li>Command: $cmd</li>
   <li>Status: STARTED</li>
   <li>From: $remote_addr
   </ul></p>
-  <p>Results will be available on this server at <a href="http://$host/$dir_short">$dir_short</a>.<br>
+  <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
   You will find:<ul>
-  <li>a <a href="http://$host/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
-  <li>the <a href="http://$host/$dir_short/ifit.log">Log file</a>.</li></ul>
+  <li>a <a href="http://$fqdn/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
+  <li>the <a href="http://$fqdn/$dir_short/ifit.log">Log file</a>.</li>
+  <li>the <a href="http://$fqdn/$upload_short/$service.html">report</a> on the $service usage (with current and past computations).</li>
+  </ul>
   </p>
   <p>WARNING: Think about getting your data back upon completion,as soon as possible. There is no guaranty we keep it.</p>
 END_HTML
@@ -228,6 +241,63 @@ print <<END_HTML;
   </body>
   </html>
 END_HTML
+
+# add an entry in the list of computations
+if (not -f $filename) {
+  # the table file does not exist. Create it
+  open($fh, '>', $filename);
+  printf $fh <<END_HTML;
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>$service: Usage report </title>
+  <style type="text/css">
+  img {border: none;}
+  </style>
+  </head>
+  <body>
+  <img alt="iFit" title="iFit"
+        src="http://ifit.mccode.org/images/iFit-logo.png"
+        align="right" width="116" height="64">
+  <img
+          alt="the ILL" title="the ILL"
+          src="http://ifit.mccode.org/images/ILL-web-jpeg.jpg"
+          align="right" border="0" width="68" height="64">
+  <h1><a href="$fqdn/ifit-web-services">$service</a>: usage</h1>
+  This page reports on past and current computations.
+  <ul>
+    <li>machine: <a href="$fqdn/ifit-web-services">$fqdn</a></li>
+    <li>service: $service</li>
+    <li>allocated resources: $mpi cpu's</li>
+  </ul>
+  <table style="width:100%">
+  <tr>
+    <th>URL</th>
+    <th>Material</th>
+    <th>Calculator</th> 
+    <th>User</th>
+    <th>Options</th>
+    <th>Log</th>
+    <th>Date</th>
+  </tr>
+END_HTML
+} else {
+  open($fh, '>>', $filename);
+}
+printf $fh <<END_HTML;
+  <tr>
+    <td><a href="http://$fqdn/$dir_short/">$dir_short</a></td>
+    <td><a href="http://$fqdn/$dir_short/$material">$material</a></td>
+    <td>$calculator</td>
+    <td>$email from $remote_addr</td>
+    <td>occupations=$smearing<br>\nkpoints=$kpoints<br>\necut=$ecut<br>\nsupercell=$supercell</td>
+    <td><a href="http://$fqdn/$dir_short/ifit.log">Log file</a></td>
+    <td>$datestring</td>
+  </tr>
+END_HTML
+
+close $fh;
 
 # -----------------------------------------------------------
  sub download {
