@@ -210,7 +210,7 @@ print <<END_HTML;
   <ul>
   <li>Service URL: <a href="$referer">$fqdn/ifit-web-services</a></li>
   <li>Command: $cmd</li>
-  <li>Status: STARTED</li>
+  <li>Status: STARTED on $mpi cpu's</li>
   <li>From: $remote_addr
   </ul></p>
   <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
@@ -290,7 +290,7 @@ printf $fh <<END_HTML;
     <td><a href="http://$fqdn/$dir_short/">$dir_short</a></td>
     <td><a href="http://$fqdn/$dir_short/$material">$material</a></td>
     <td>$calculator</td>
-    <td>$email from $remote_addr</td>
+    <td><a href="mailto:$email">$email</a> from $remote_addr</td>
     <td>occupations=$smearing<br>\nkpoints=$kpoints<br>\necut=$ecut<br>\nsupercell=$supercell</td>
     <td><a href="http://$fqdn/$dir_short/ifit.log">Log file</a></td>
     <td>$datestring</td>
