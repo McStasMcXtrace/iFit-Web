@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # requirements:
-#   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons
+#   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl
 
 # ensure all fatals go to browser during debugging and set-up
 # comment this BEGIN block out on production code for security
@@ -52,9 +52,10 @@ my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store resul
 # testing computer load
 @cpuload = Sys::CpuLoad::load();
 $cpunb   = Sys::CPU::cpu_count();
+$cpuload0= @cpuload[0];
 
-if (@cpuload[0] > $cpunb) { 
-  error("CPU load exceeded. Current=$cpuload. Available=$cpunb. Try later (sorry).");
+if ($cpuload0 > 2.5*$cpunb) { 
+  error("CPU load exceeded. Current=$cpuload0. Available=$cpunb. Try later (sorry).");
 }
 
 # testing/security
@@ -160,12 +161,27 @@ $datestring  = localtime();
 # ------------------------------------------------------------------------------
     
 # test if the email service is valid
-if ($email_server ne "" and $email_from ne "" and $email_passwd ne "") {
+if ($email_server ne "" and $email_from ne "" and $email_passwd ne "" and $email_passwd ne "XXXX") {
   # the final email can be sent. We assemble the message and the command using sendemail
-  $email_subject = "$service:$material:$calculator just ended";
-  $email_body    = "Hello $email !\nYour calculation $service:$material:$calculator started on $datestring just ended.\nAccess the whole report at\n  http://$fqdn/$dir_short\nand the log file at\n  http://$fqdn/$dir_short/ifit.log\nThanks for using ifit-web-services.";
+  $email_subject = "$service:$material:$calculator just ended on $fqdn";
+  $email_body    = <<"END_MESSAGE";
+Hello $email !
+  
+Your calculation just ended:
+   service:    $service on machine $fqdn
+   material:   $material (attached)
+   calculator: $calculator
+   date:       started on $datestring, just ended.
+   
+Access the whole calculation report at
+  http://$fqdn/$dir_short
+and the log file (attached) at
+  http://$fqdn/$dir_short/ifit.log
+  
+Thanks for using ifit-web-services. (c) E.Farhi, ILL.
+END_MESSAGE
 
-  $email_cmd    = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject' -m '$email_body' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log";
+  $email_cmd    = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject' -m '$email_body' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log -a $dir/$material";
 } else { $email = ""; }
 
 # assemble calculation command line
@@ -208,19 +224,20 @@ print <<END_HTML;
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
-  <li>Service URL: <a href="$referer">$fqdn/ifit-web-services</a></li>
-  <li>Command: $cmd</li>
-  <li>Status: STARTED on $mpi cpu's</li>
-  <li>From: $remote_addr
+  <li><b>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
+  <li><b>Input configuration</b>: <a href="http://$fqdn/$dir_short/$material" target="_blank">$material</a></li>
+  <li><b>Command</b>: $cmd</li>
+  <li><b>Status</b>: STARTED $datestring on $mpi cpu's (current machine load: $cpuload0)</li>
+  <li><b>From</b>: $email $remote_addr
   </ul></p>
   <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
-  You will find:<ul>
-  <li>a <a href="http://$fqdn/$dir_short/index.html">full report</a> to look at the current status of the computation.<a/li>
-  <li>the <a href="http://$fqdn/$dir_short/ifit.log">Log file</a>.</li>
-  <li>the <a href="http://$fqdn/$upload_short/$service.html">report</a> on the $service usage (with current and past computations).</li>
+  You can now view:<ul>
+  <li>a <a href="http://$fqdn/$dir_short/index.html" target="_blank">report on this calculation</a> to look at the current status and results.</li>
+  <li>the <a href="http://$fqdn/$dir_short/ifit.log" target="_blank">Log file</a>.</li>
+  <li>the <a href="http://$fqdn/$upload_short/$service.html" target="_blank">report on the $service usage</a> (with current and past computations).</li>
   </ul>
   </p>
-  <p>WARNING: Think about getting your data back upon completion,as soon as possible. There is no guaranty we keep it.</p>
+  <p>WARNING: Think about getting your data back upon completion, as soon as possible. There is no guaranty we keep it.</p>
 END_HTML
 
 if ($email ne "") {
@@ -229,7 +246,7 @@ if ($email ne "") {
 END_HTML
 } else {
   print <<END_HTML;
-  <p>Keep the reference <a href="http://$host/$dir_short">http://$host/$dir_short</a> safe 
+  <p>Keep the reference <a href="http://$host/$dir_short" target="_blank">http://$host/$dir_short</a> safe 
   to be able to access your data when computation ends, as you will not be informed when it does. 
   Check regularly. In practice, the computation should not exceed a few hours for 
   most simple systems, but could be a few days for large ones (e.g. 50-100 atoms).</p>
@@ -237,7 +254,7 @@ END_HTML
 }
 print <<END_HTML;
   <hr>
-  Powered by <a href="http://ifit.mccode.org">iFit</a> E. Farhi (c) 2016.<br>
+  Powered by <a href="http://ifit.mccode.org" target="_blank">iFit</a> E. Farhi (c) 2016.<br>
   </body>
   </html>
 END_HTML
@@ -264,10 +281,10 @@ if (not -f $filename) {
           alt="the ILL" title="the ILL"
           src="http://ifit.mccode.org/images/ILL-web-jpeg.jpg"
           align="right" border="0" width="68" height="64">
-  <h1><a href="$fqdn/ifit-web-services">$service</a>: usage</h1>
+  <h1><a href="$fqdn/ifit-web-services" target="_blank">$service</a>: usage</h1>
   This page reports on past and current computations.
   <ul>
-    <li>machine: <a href="$fqdn/ifit-web-services">$fqdn</a></li>
+    <li>machine: <a href="$fqdn/ifit-web-services" target="_blank">$fqdn</a></li>
     <li>service: $service</li>
     <li>allocated resources: $mpi cpu's</li>
   </ul>
@@ -279,7 +296,7 @@ if (not -f $filename) {
     <th>User</th>
     <th>Options</th>
     <th>Log</th>
-    <th>Date</th>
+    <th>Start Date</th>
   </tr>
 END_HTML
 } else {
@@ -287,12 +304,12 @@ END_HTML
 }
 printf $fh <<END_HTML;
   <tr>
-    <td><a href="http://$fqdn/$dir_short/">$dir_short</a></td>
-    <td><a href="http://$fqdn/$dir_short/$material">$material</a></td>
+    <td><a href="http://$fqdn/$dir_short/" target="_blank"><img src="http://$fqdn/$dir_short/Phonons3D.png" width="50" height="50"><img src="http://$fqdn/$dir_short/Phonons_DOS.png" width="50" height="50">$dir_short</a></td>
+    <td><a href="http://$fqdn/$dir_short/$material" target="_blank"><img src="http://$fqdn/$dir_short/configuration.png" width="50" height="50">$material</a></td>
     <td>$calculator</td>
     <td><a href="mailto:$email">$email</a> from $remote_addr</td>
     <td>occupations=$smearing<br>\nkpoints=$kpoints<br>\necut=$ecut<br>\nsupercell=$supercell</td>
-    <td><a href="http://$fqdn/$dir_short/ifit.log">Log file</a></td>
+    <td><a href="http://$fqdn/$dir_short/ifit.log" target="_blank">Log file</a></td>
     <td>$datestring</td>
   </tr>
 END_HTML
