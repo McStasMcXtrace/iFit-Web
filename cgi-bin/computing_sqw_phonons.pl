@@ -232,7 +232,8 @@ print <<END_HTML;
   </ul></p>
   <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
   You can now view:<ul>
-  <li>a <a href="http://$fqdn/$dir_short/index.html" target="_blank">report on this calculation</a> to look at the current status and results.</li>
+  <li>a <a href="http://$fqdn/$dir_short/sqw_phonons.html" target="_blank">report on this calculation</a> to look at the current status and results.</li>
+  <li>a <a href="http://$fqdn/$dir_short/" target="_blank">data files for this calculation</a>.</li>
   <li>the <a href="http://$fqdn/$dir_short/ifit.log" target="_blank">Log file</a>.</li>
   <li>the <a href="http://$fqdn/$upload_short/$service.html" target="_blank">report on the $service usage</a> (with current and past computations).</li>
   </ul>
