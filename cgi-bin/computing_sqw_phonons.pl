@@ -77,6 +77,8 @@ my $kpoints        = $q->param('kpoints');    # 5- Indicate the K-points
 my $supercell      = $q->param('supercell');  # 6- Indicate the supercell size
 my $email          = $q->param('email');      # 7- Indicate your email
 
+my $raw            = "";  # additional options for sqw_phonons
+
 if ( !$material )
 {
   error("There was a problem uploading your file (try a smaller file).");
@@ -137,8 +139,19 @@ if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4") {
 if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4") {
   $supercell = "2";
 }
+
+# specific calculators
+if ($calculator eq "ABINIT_JTH") {
+  $calculator = "ABINIT";
+  $raw        = "pps=pawxml;";
+}
+if ($calculator eq "ABINIT_GBRV") {
+  $calculator = "ABINIT";
+  $raw        = "pps=paw;";
+}
+
 # test: calculator=EMT,QuantumEspresso,ABINIT,GPAW,ELK,VASP
-if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne "ABINIT"  and $calculator ne "GPAW" and $calculator ne "ELK" and $calculator ne "VASP") {
+if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne "QuantumEspresso_ASE" and $calculator ne "ABINIT"  and $calculator ne "GPAW" and $calculator ne "ELK" and $calculator ne "VASP") {
   $calculator = "QuantumEspresso";
 }
 
@@ -185,7 +198,7 @@ END_MESSAGE
 } else { $email = ""; }
 
 # assemble calculation command line
-$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
+$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir;$raw','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
 
 # launch the command for the service
 
@@ -309,7 +322,7 @@ printf $fh <<END_HTML;
     <td><a href="http://$fqdn/$dir_short/$material" target="_blank"><img src="http://$fqdn/$dir_short/configuration.png" width="50" height="50">$material</a></td>
     <td>$calculator</td>
     <td><a href="mailto:$email">$email</a> from $remote_addr</td>
-    <td>occupations=$smearing<br>\nkpoints=$kpoints<br>\necut=$ecut<br>\nsupercell=$supercell</td>
+    <td>$raw occupations=$smearing<br>\nkpoints=$kpoints<br>\necut=$ecut<br>\nsupercell=$supercell</td>
     <td><a href="http://$fqdn/$dir_short/ifit.log" target="_blank">Log file</a></td>
     <td>$datestring</td>
   </tr>

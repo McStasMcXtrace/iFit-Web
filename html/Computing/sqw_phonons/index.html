@@ -12,7 +12,7 @@
           align="middle" width="128" height="95">&nbsp;sqw_phonons:
         Phonon dispersions in 4D<br>
       </i></h1>
-    <div align="center"><i>version 1.8-1</i><i> - E. Farhi, July 2016</i>
+    <div align="center"><i>version 1.8-1</i><i> - E. Farhi, Aug 2016</i>
     </div>
     <hr size="2" width="100%"> <br>
     The <b>sqw_phonons</b> tool, which is part of <a
@@ -49,7 +49,7 @@
           <td valign="top">Phonon dispersions from the Dynamical matrix,
             using forces estimated by <i>ab-initio </i>using <a
               href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
-            selection of DFT codes (EMT, GPAW, ABINIT, Elk, Dacapo,
+            selection of DFT codes (EMT, GPAW, ABINIT, Elk,
             QuantumEspresso,VASP). </td>
         </tr>
       </tbody>
@@ -65,6 +65,8 @@
           href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
         <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, <a
 href="http://accelrys.com/products/collaborative-science/biovia-materials-studio/">MDL</a>/SDF/XSD,
+
+
 
 
 
@@ -88,15 +90,21 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
             href="https://www.materialsproject.org/">https://www.materialsproject.org/</a>&gt;
 
 
+
+
           and get POSCAR files ;<br>
         </li>
         <li>PhononDB &lt;<a href="http://phonondb.mtl.kyoto-u.ac.jp/">http://phonondb.mtl.kyoto-u.ac.jp/</a>&gt;
+
+
 
 
           and get POSCAR files ;<br>
         </li>
         <li>NoMaD repository &lt;<a
             href="http://nomad-repository.eu/cms/">http://nomad-repository.eu/cms/</a>&gt;and
+
+
 
 
           get many configurations ;<br>
@@ -109,18 +117,26 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
       <p align="left"> <font color="#3366ff"><b>2- Indicate the
             calculator to use:</b></font>
         <select name="calculator">
+          <option value="QuantumEspresso_ASE">QuantumEspresso:
+            Plane-wave pseudopotential code/ASE. Pseudo: SSSP Accuracy</option>
           <option value="QuantumEspresso">QuantumEspresso: Plane-wave
-            pseudopotential code</option>
-          <option value="EMT">EMT: Effective Medium Theory</option>
-          <option value="ABINIT">ABINIT: Plane-wave pseudopotential code</option>
-          <option value="GPAW">GPAW: Real-space/plane-wave/LCAO PAW code</option>
+            pseudopotential code/PHON. Pseudo: SSSP Accuracy</option>
+          <option value="ABINIT_GBRV">ABINIT: Plane-wave pseudopotential
+            code. Pseudo: GBRV</option>
+          <option value="ABINIT_JTH">ABINIT: Plane-wave pseudopotential
+            code. Pseudo: JTH</option>
           <option value="ELK">ELK: Full Potential LAPW code, similar to
-            Wien2k</option>
-          <option value="VASP">VASP: Plane-wave PAW code, when installed</option>
+            Wien2k. All-electron full-potential</option>
+          <option value="GPAW">GPAW: Real-space/plane-wave/LCAO PAW
+            code. Pseudo: 0.9.11971</option>
+          <option value="VASP">VASP: Plane-wave PAW code, when installed
+            </option>
+          <option value="EMT">EMT: Effective Medium Theory
+            (Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O)</option>
         </select>
         <br>
-        We recommend <b>QuantumEspresso</b> (or EMT with a simple metal
-        for a try). </p>
+        We recommend <b>QuantumEspresso</b> and <b>ABINIT</b> (or EMT
+        with a simple metal for a try). </p>
       <ul>
       </ul>
       <table border="1" cellpadding="2" cellspacing="2" width="100%">
@@ -129,6 +145,10 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
             <td valign="top"><b><font color="#cc33cc">Calculator</font></b><br>
             </td>
             <td valign="top"><b>Description</b><br>
+            </td>
+            <td valign="top"><b><a
+                  href="http://molmod.ugent.be/deltacodesdft">Delta</a>
+                [meV/atom]</b><br>
             </td>
           </tr>
           <tr>
@@ -150,7 +170,11 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
 
 
 
+
+
                 and proven code.</i></td>
+            <td valign="top"><b><font color="#33cc00">0.3</font> </b><br>
+            </td>
           </tr>
           <tr>
             <td valign="top"><img alt="emt" title="emt"
@@ -161,14 +185,21 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
               for Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O). <br>
               <i><b>Very fast, but limited.</b></i><br>
             </td>
+            <td valign="top">-<br>
+            </td>
           </tr>
           <tr>
             <td valign="top"><a href="http://www.abinit.org/"><img
                   alt="abinit" title="abinit" src="images/abinit.png"
                   align="middle" border="0" width="80" height="34"></a><a
                 href="http://www.abinit.org/">&nbsp;ABINIT</a></td>
-            <td valign="top">Plane-wave pseudopotential code. <i>Fast
-                and proven code.</i><br>
+            <td valign="top">Plane-wave pseudopotential code. Using <a
+                href="https://www.physics.rutgers.edu/gbrv/">GBRV</a>
+              and <a href="http://www.abinit.org/downloads/PAW2">JTH</a>
+              pseudo. <i>Fast and proven code.</i><br>
+            </td>
+            <td valign="top">JTH: <b><font color="#33cc00">0.4</font> </b><br>
+              GBRV: <font color="#33cc00"><b>0.8</b> </font><br>
             </td>
           </tr>
           <tr>
@@ -188,7 +219,11 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
 
 
 
+
+
                 and proven code.</i></td>
+            <td valign="top">1.5<br>
+            </td>
           </tr>
           <tr>
             <td valign="top"><a href="http://elk.sourceforge.net/"><img
@@ -197,6 +232,8 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
                 href="http://elk.sourceforge.net/">&nbsp;ELK</a></td>
             <td valign="top">Full Potential, all electrons LAPW code,
               similar to Wien2k.<br>
+            </td>
+            <td valign="top"><font color="#33cc00"><b>0.3</b></font><br>
             </td>
           </tr>
           <tr>
@@ -208,15 +245,16 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
             <td valign="top">Plane-wave PAW code. <b><i>Requires a
                   specific licens</i></b><b>e.</b><br>
             </td>
+            <td valign="top">&gt; 2.0 (2007)<br>
+            </td>
           </tr>
         </tbody>
       </table>
       <br>
       Quantum Espresso and ABINIT are good choices, with excellent
-      parallelization and accuracy (comparable to VASP). <br>
+      parallelization and accuracy. <br>
       GPAW is usually slower than QuantumEspresso. <br>
-      Elk is often slower than Quantum Espresso, but is supposed to be
-      very accurate.
+      Elk is often slower than Quantum Espresso, but is very accurate.
       <p align="left"> <font color="#3366ff"><b>3- Indicate if the
             material is a conductor or insulator:</b></font>
         <select name="smearing">
@@ -237,7 +275,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         </select>
         <br>
         Nice people say the cut-off energy should not be lower than 1000
-        eV. <br>
+        eV. ABINIT/JTH requires 1000 eV cutoff.<br>
         However, this results in very long computations. To start you
         can use 260 or 340 eV. </p>
       <p align="left"> <font color="#3366ff"><b>5- Indicate the
@@ -264,8 +302,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         you may try 2x2x2. </p>
       <p align="left"> <font color="#3366ff"><b>7- Indicate your email
             address:</b></font> <input name="email" type="text"> <br>
-        <b>Required</b>, to be warned when the calculation ends. Use
-        name@domain.name.<br>
+        <b>Required</b>, to be warned when the calculation ends. Use <i>name@domain.name</i><br>
       </p>
       <p align="center"> <b><input value="COMPUTE !" type="SUBMIT"></b>
       </p>
@@ -307,6 +344,8 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
+
 
 
 
