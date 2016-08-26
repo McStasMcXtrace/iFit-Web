@@ -70,6 +70,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
 
 
 
+
         ...). <br>
         See the full list <a
           href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
@@ -92,9 +93,11 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
 
 
 
+
           and get POSCAR files ;<br>
         </li>
         <li>PhononDB &lt;<a href="http://phonondb.mtl.kyoto-u.ac.jp/">http://phonondb.mtl.kyoto-u.ac.jp/</a>&gt;
+
 
 
 
@@ -103,6 +106,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         </li>
         <li>NoMaD repository &lt;<a
             href="http://nomad-repository.eu/cms/">http://nomad-repository.eu/cms/</a>&gt;and
+
 
 
 
@@ -130,7 +134,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           <option value="GPAW">GPAW: Real-space/plane-wave/LCAO PAW
             code. Pseudo: 0.9.11971</option>
           <option value="VASP">VASP: Plane-wave PAW code, when installed
-            </option>
+          </option>
           <option value="EMT">EMT: Effective Medium Theory
             (Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O)</option>
         </select>
@@ -164,6 +168,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
               and <a href="http://www.quantum-espresso.org/">Quantum
                 Espresso</a>. Using the <a
                 href="http://materialscloud.org/">SSSP library</a>. <i>Fast
+
 
 
 
@@ -221,6 +226,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
 
 
 
+
                 and proven code.</i></td>
             <td valign="top">1.5<br>
             </td>
@@ -263,26 +269,28 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           <option value="insulator">Insulator (no smearing)</option>
         </select>
         <br>
-        If you don't know, leave the smearing on, to help convergence. </p>
+        If you don't know, leave the smearing on ('Perhaps' or 'Conductor'), to help convergence. </p>
       <p align="left"> <font color="#3366ff"><b>4- Indicate the energy
             cut-off:</b></font>
         <select name="ecut">
-          <option value="260">260 eV</option>
-          <option value="340">340 eV</option>
+          <option value="1500">1500 eV (recommended)</option>
+          <option value="260">260 eV (fast, may fail)</option>
+          <option value="340">340 eV (fast, may fail)</option>
           <option value="500">500 eV</option>
           <option value="1000">1000 eV</option>
-          <option value="1500">1500 eV</option>
+          <option value="2000">2000 eV</option>
         </select>
         <br>
         Nice people say the cut-off energy should not be lower than 1000
-        eV. ABINIT/JTH requires 1000 eV cutoff.<br>
-        However, this results in very long computations. To start you
-        can use 260 or 340 eV. </p>
+        eV. <b>ABINIT requires 1000 eV</b> cutoff (or more).<br>
+        For fast computations, you can use 260 or 340 eV, but it may fail. </p>
       <p align="left"> <font color="#3366ff"><b>5- Indicate the
             K-points binning:</b></font>
         <select name="kpoints">
           <option value="3">3x3x3</option>
           <option value="4">4x4x4</option>
+          <option value="5">5x5x5</option>
+          <option value="6">6x6x6</option>
           <option value="2">2x2x2 (fast but may fail)</option>
         </select>
         <br>
@@ -299,7 +307,9 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         <br>
         Using a supercell 3x3x3 is often the minimum for sensible
         results. For large material structures (containing many atoms),
-        you may try 2x2x2. </p>
+        you may try 2x2x2.This parameter has large impact on the
+        computation time.<br>
+      </p>
       <p align="left"> <font color="#3366ff"><b>7- Indicate your email
             address:</b></font> <input name="email" type="text"> <br>
         <b>Required</b>, to be warned when the calculation ends. Use <i>name@domain.name</i><br>
@@ -344,6 +354,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
 
 
 

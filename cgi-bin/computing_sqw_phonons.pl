@@ -54,6 +54,18 @@ my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store resul
 $cpunb   = Sys::CPU::cpu_count();
 $cpuload0= @cpuload[0];
 
+$host         = hostname;
+$fqdn         = hostfqdn();
+$upload_short = $upload_dir;
+$upload_short =~ s|$upload_base/||;
+
+$remote_ident=$q->remote_ident();
+$remote_host =$q->remote_host();
+$remote_addr =$q->remote_addr();
+$referer     =$q->referer();
+$user_agent  =$q->user_agent();
+$datestring  = localtime();
+
 if ($cpuload0 > 2.5*$cpunb) { 
   error("CPU load exceeded. Current=$cpuload0. Available=$cpunb. Try later (sorry).");
 }
@@ -155,19 +167,8 @@ if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne
   $calculator = "QuantumEspresso";
 }
 
-$host         = hostname;
-$fqdn         = hostfqdn();
 $dir_short    = $dir;
 $dir_short    =~ s|$upload_base/||;
-$upload_short = $upload_dir;
-$upload_short =~ s|$upload_base/||;
-
-$remote_ident=$q->remote_ident();
-$remote_host =$q->remote_host();
-$remote_addr =$q->remote_addr();
-$referer     =$q->referer();
-$user_agent  =$q->user_agent();
-$datestring  = localtime();
 
 # ------------------------------------------------------------------------------
 # DO the work
@@ -175,26 +176,47 @@ $datestring  = localtime();
     
 # test if the email service is valid
 if ($email_server ne "" and $email_from ne "" and $email_passwd ne "" and $email_passwd ne "XXXX") {
-  # the final email can be sent. We assemble the message and the command using sendemail
-  $email_subject = "$service:$material:$calculator just ended on $fqdn";
-  $email_body    = <<"END_MESSAGE";
+  # prepare email parts
+  $email_body1   = <<"END_MESSAGE";
 Hello $email !
   
-Your calculation just ended:
+Your calculation:
    service:    $service on machine $fqdn
    material:   $material (attached)
    calculator: $calculator
-   date:       started on $datestring, just ended.
-   
-Access the whole calculation report at
+END_MESSAGE
+
+  $email_body2   = <<"END_MESSAGE";
+
+Access the calculation report at
   http://$fqdn/$dir_short
-and the log file (attached) at
+and the log file at
   http://$fqdn/$dir_short/ifit.log
+All past and present computations at
+  http://$fqdn/$upload_short/$service.html
   
 Thanks for using ifit-web-services. (c) E.Farhi, ILL.
 END_MESSAGE
+  # We assemble the messages and the command using sendemail
+  $email_subject_start = "$service:$material:$calculator just started on $fqdn";
+  $email_subject_end   = "$service:$material:$calculator just ended on $fqdn";
 
-  $email_cmd    = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject' -m '$email_body' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log -a $dir/$material";
+  $email_body_start    = <<"END_MESSAGE";
+$email_body1
+   date:       STARTING on $datestring.
+$email_body2
+END_MESSAGE
+  $email_body_end    = <<"END_MESSAGE";
+$email_body1
+   date:       started on $datestring, just ENDED. 
+   
+   Log file and initial structure are attached.
+$email_body2
+END_MESSAGE
+
+  # initial and final emails can be sent. We assemble the message and the command using sendemail
+  $email_cmd_end = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject_end' -m '$email_body_end' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log -a $dir/$material";
+  $email_cmd_start= "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject_start' -m '$email_body_start' -s $email_server -xu $email_account -xp $email_passwd -a $dir/$material";
 } else { $email = ""; }
 
 # assemble calculation command line
@@ -203,10 +225,10 @@ $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;k
 # launch the command for the service
 
 # dump initial material file
-$res = system("cat $dir/$source > $dir/ifit.log");
+$res = system("cat $dir/$material > $dir/ifit.log");
 # start command, handle possible email
 if ($email ne "") {
-  $res = system("{ ifit \"$cmd\"; $email_cmd; } >> $dir/ifit.log 2>&1 &");
+  $res = system("{ $email_cmd_start; ifit \"$cmd\"; $email_cmd_end; } >> $dir/ifit.log 2>&1 &");
 } else {
   $res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
 }
@@ -356,8 +378,10 @@ close $fh;
 
  sub error {
    print $q->header(-type=>'text/html'),
-         $q->start_html(-title=>'Error'),
+         $q->start_html(-title=>"$service: Error"),
          $q->h3("$service: Error: $_[0]"),
+         $q->h4("$fqdn: Current machine load: $cpuload0"),
+         $q->h4("<a href='http://$fqdn/$upload_short/$service.html'>Report on the $service usage</a> (with current and past computations)"),
          $q->end_html;
    exit(0);
 }
