@@ -87,7 +87,9 @@ my $smearing       = $q->param('smearing');   # 3- Indicate if the material is a
 my $ecut           = $q->param('ecut');       # 4- Indicate the energy cut-off
 my $kpoints        = $q->param('kpoints');    # 5- Indicate the K-points
 my $supercell      = $q->param('supercell');  # 6- Indicate the supercell size
-my $email          = $q->param('email');      # 7- Indicate your email
+my $nsteps         = $q->param('nsteps');     # 7- Indicate the maximum number of iterations for SCF convergence
+my $optimizer      = $q->param('optimizer');  # 8- Optimize the material structure first
+my $email          = $q->param('email');      # 9- Indicate your email
 
 my $raw            = "";  # additional options for sqw_phonons
 
@@ -140,16 +142,20 @@ if ($smearing ne "metal" and $smearing ne "insulator" and $smearing ne "semicond
   $smearing = "metal";
 }
 # test: ecut    =260 340 500 1000 1500
-if ($ecut ne "260" and $ecut ne "340" and $ecut ne "500"  and $ecut ne "1000" and $ecut ne "1500") {
+if ($ecut ne "260" and $ecut ne "340" and $ecut ne "500"  and $ecut ne "1000" and $ecut ne "1500" and $ecut ne "2000") {
   $ecut = "340";
 }
-# test: kpoints =2 3 4
-if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4") {
+# test: kpoints =2 3 4 5 6
+if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4" and $kpoints ne "5" and $kpoints ne "6") {
   $kpoints = "3";
 }
 # test: supercell=2 3 4
 if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4") {
   $supercell = "2";
+}
+# test: supercell=2 3 4
+if ($optimizer ne "MDmin" or $calculator eq "QuantumEspresso") {
+  $optimizer = "";
 }
 
 # specific calculators
@@ -184,6 +190,7 @@ Your calculation:
    service:    $service on machine $fqdn
    material:   $material (attached)
    calculator: $calculator
+   options:    occupations=$smearing;kpoints=$kpoints;nsteps=$nsteps;ecut=$ecut;supercell=$supercell;optimizer=$optimizer
 END_MESSAGE
 
   $email_body2   = <<"END_MESSAGE";
@@ -220,7 +227,7 @@ END_MESSAGE
 } else { $email = ""; }
 
 # assemble calculation command line
-$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir;$raw','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
+$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;nsteps=$nsteps;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir;optimizer=$optimizer;$raw','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
 
 # launch the command for the service
 

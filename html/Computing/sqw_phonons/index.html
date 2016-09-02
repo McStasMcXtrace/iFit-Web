@@ -12,7 +12,7 @@
           align="middle" width="128" height="95">&nbsp;sqw_phonons:
         Phonon dispersions in 4D<br>
       </i></h1>
-    <div align="center"><i>version 1.8-1</i><i> - E. Farhi, Aug 2016</i>
+    <div align="center"><i>version 1.9-rc2</i><i> - E. Farhi, Sept 2016</i>
     </div>
     <hr size="2" width="100%"> <br>
     The <b>sqw_phonons</b> tool, which is part of <a
@@ -66,13 +66,8 @@
         <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, <a
 href="http://accelrys.com/products/collaborative-science/biovia-materials-studio/">MDL</a>/SDF/XSD,
 
-
-
-
-
-
         ...). <br>
-        See the full list <a
+        See the file format full list <a
           href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
         We provide a few examples: <a href="POSCAR_Al">Al</a>, <a
           href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>, <a
@@ -90,27 +85,14 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         <li>MaterialsProject&lt;<a
             href="https://www.materialsproject.org/">https://www.materialsproject.org/</a>&gt;
 
-
-
-
-
           and get POSCAR files ;<br>
         </li>
         <li>PhononDB &lt;<a href="http://phonondb.mtl.kyoto-u.ac.jp/">http://phonondb.mtl.kyoto-u.ac.jp/</a>&gt;
-
-
-
-
 
           and get POSCAR files ;<br>
         </li>
         <li>NoMaD repository &lt;<a
             href="http://nomad-repository.eu/cms/">http://nomad-repository.eu/cms/</a>&gt;and
-
-
-
-
-
           get many configurations ;<br>
         </li>
         <li>Inorganic Crystal Structure Database &lt;<a
@@ -163,36 +145,17 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
               pseudopotentials based code for electronic-structure
               calculations and materials modeling. When using this
               option through ASE, the input file is converted to POSCAR,
-              and makes use of <a
+              and can make use of <a
                 href="http://chianti.geol.ucl.ac.uk/%7Edario">PHON</a>
               and <a href="http://www.quantum-espresso.org/">Quantum
                 Espresso</a>. Using the <a
                 href="http://materialscloud.org/">SSSP library</a>. <i>Fast
 
-
-
-
-
-
-
-
-
                 and proven code.</i></td>
             <td valign="top"><b><font color="#33cc00">0.3</font> </b><br>
             </td>
           </tr>
-          <tr>
-            <td valign="top"><img alt="emt" title="emt"
-                src="images/emt.png" align="middle" width="71"
-                height="50">&nbsp;<a
-                href="https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html">EMT</a></td>
-            <td valign="top">Effective Medium Theory calculator (<b>only</b>
-              for Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O). <br>
-              <i><b>Very fast, but limited.</b></i><br>
-            </td>
-            <td valign="top">-<br>
-            </td>
-          </tr>
+         
           <tr>
             <td valign="top"><a href="http://www.abinit.org/"><img
                   alt="abinit" title="abinit" src="images/abinit.png"
@@ -207,30 +170,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
               GBRV: <font color="#33cc00"><b>0.8</b> </font><br>
             </td>
           </tr>
-          <tr>
-            <td valign="top"><a href="http://wiki.fysik.dtu.dk/gpaw"><img
-                  alt="GPAW" title="GPAW" src="images/logo-gpaw.png"
-                  align="middle" border="0" width="80" height="39"> </a><a
-                href="http://wiki.fysik.dtu.dk/gpaw">GPAW</a><a
-                href="http://wiki.fysik.dtu.dk/gpaw"><br>
-              </a></td>
-            <td valign="top">Real-space/plane-wave/LCAO PAW code. <i>Fast
-
-
-
-
-
-
-
-
-
-
-
-
-                and proven code.</i></td>
-            <td valign="top">1.5<br>
-            </td>
-          </tr>
+          
           <tr>
             <td valign="top"><a href="http://elk.sourceforge.net/"><img
                   alt="elk" title="elk" src="images/elk.png"
@@ -242,6 +182,21 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
             <td valign="top"><font color="#33cc00"><b>0.3</b></font><br>
             </td>
           </tr>
+          
+          <tr>
+            <td valign="top"><a href="http://wiki.fysik.dtu.dk/gpaw"><img
+                  alt="GPAW" title="GPAW" src="images/logo-gpaw.png"
+                  align="middle" border="0" width="80" height="39"> </a><a
+                href="http://wiki.fysik.dtu.dk/gpaw">GPAW</a><a
+                href="http://wiki.fysik.dtu.dk/gpaw"><br>
+              </a></td>
+            <td valign="top">Real-space/plane-wave/LCAO PAW code. <i>Fast
+
+                and proven code.</i></td>
+            <td valign="top">1.5<br>
+            </td>
+          </tr>
+          
           <tr>
             <td valign="top"><a href="https://www.vasp.at/"><img
                   alt="vasp" title="vasp" src="images/vasp.png"
@@ -254,6 +209,19 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
             <td valign="top">&gt; 2.0 (2007)<br>
             </td>
           </tr>
+          
+          <tr>
+            <td valign="top"><img alt="emt" title="emt"
+                src="images/emt.png" align="middle" width="71"
+                height="50">&nbsp;<a
+                href="https://wiki.fysik.dtu.dk/ase/ase/calculators/emt.html">EMT</a></td>
+            <td valign="top">Effective Medium Theory calculator (<b>only</b>
+              for Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O). <br>
+              <i><b>Very fast, but limited.</b></i><br>
+            </td>
+            <td valign="top">-<br>
+            </td>
+          </tr>
         </tbody>
       </table>
       <br>
@@ -261,6 +229,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
       parallelization and accuracy. <br>
       GPAW is usually slower than QuantumEspresso. <br>
       Elk is often slower than Quantum Espresso, but is very accurate.
+      
       <p align="left"> <font color="#3366ff"><b>3- Indicate if the
             material is a conductor or insulator:</b></font>
         <select name="smearing">
@@ -270,6 +239,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         </select>
         <br>
         If you don't know, leave the smearing on ('Perhaps' or 'Conductor'), to help convergence. </p>
+        
       <p align="left"> <font color="#3366ff"><b>4- Indicate the energy
             cut-off:</b></font>
         <select name="ecut">
@@ -282,7 +252,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         </select>
         <br>
         Nice people say the cut-off energy should not be lower than 1000
-        eV. <b>ABINIT requires 1000 eV</b> cutoff (or more).<br>
+        eV. <b>WARNING: ABINIT requires 1000 eV</b> cutoff (or more).<br>
         For fast computations, you can use 260 or 340 eV, but it may fail. </p>
       <p align="left"> <font color="#3366ff"><b>5- Indicate the
             K-points binning:</b></font>
@@ -305,27 +275,51 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           <option value="2">2x2x2 (fast but may fail)</option>
         </select>
         <br>
+        A 'supercell' is built by replicating the initial structure, to assemble a
+        larger system and provide a more accurate vibrational spectra.
         Using a supercell 3x3x3 is often the minimum for sensible
         results. For large material structures (containing many atoms),
-        you may try 2x2x2.This parameter has large impact on the
-        computation time.<br>
+        you may try 2x2x2. This parameter has large impact on the
+        computation time, as it multiplies the number of atoms in the model.<br>
       </p>
-      <p align="left"> <font color="#3366ff"><b>7- Indicate your email
+      <p align="left"> <font color="#3366ff"><b>7- Indicate the
+            maximum number of iterations for SCF convergence:</b></font>
+        <select name="nsteps">
+          <option value="0">(default)</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="200">500 (will be long...)</option>
+        </select>
+        <br>
+        Each computation step requires to determine the material energy. This is achieved in a self consistent cycle. The maximum number of iterations determines when to consider that the material energy can not be determined accurately. In this case, it may be that the material structure is not stable, in which case a structure optimization should be performed first. The 'default' choice depends on the selected calculator, and it often in the range 30-100.<br>
+      </p>
+      
+      <p align="left"> <font color="#3366ff"><b>8- Optimize the material structure first:</b></font>
+        <select name="optimizer">
+          <option value="MDmin">yes (short MD)</option>
+          <option value="">no</option>
+        </select>
+        <br>
+        The material structure can first be optimized in a short molecular dynamics simulation which 'shakes' the structure to find a better (lower energy) configuration before computing the phonons. <b>WARNING: The structure optimization can not be performed with the QuantumEspresso/PHON option.</b><br>
+      </p>
+      
+      <p align="left"> <font color="#3366ff"><b>9- Indicate your email
             address:</b></font> <input name="email" type="text"> <br>
         <b>Required</b>, to be warned when the calculation ends. Use <i>name@domain.name</i><br>
       </p>
       <p align="center"> <b><input value="COMPUTE !" type="SUBMIT"></b>
       </p>
     </form>
+    <hr>
     <b>What will happen</b>
     <p>The input material description will be processed and sent to the
-      selected DFT code. The structure will first be optimized. Then,
-      the atoms will be moved slightly, and the restoring forces will be
+      selected DFT code. When requested, a material structure optimization is launched. 
+      Then, the atoms will be moved slightly, and the restoring forces will be
       computed. The dynamical matrix can then be evaluated for any HKL
       location in the crystal reciprocal space. We then compute the
       phonon spectrum (vibrational density of states), and the
       dispersions in a full HKL cube, as example. You will be able to
-      evaluate the Model anywhere yourself. by evaluating the resulting
+      evaluate the Model anywhere yourself, by evaluating the resulting
       Model using iFit.<br>
     </p>
     In addition:
