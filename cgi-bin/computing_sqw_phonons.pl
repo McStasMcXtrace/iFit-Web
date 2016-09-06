@@ -250,7 +250,7 @@ print <<END_HTML;
   <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>$service: Thanks!</title>
+  <title>$service: Thanks! [$fqdn]</title>
   <style type="text/css">
   img {border: none;}
   </style>
@@ -311,7 +311,7 @@ if (not -f $filename) {
   <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>$service: Usage report </title>
+  <title>$service: Usage report [$fqdn]</title>
   <style type="text/css">
   img {border: none;}
   </style>
@@ -385,7 +385,7 @@ close $fh;
 
  sub error {
    print $q->header(-type=>'text/html'),
-         $q->start_html(-title=>"$service: Error"),
+         $q->start_html(-title=>"$service: Error [$fqdn]"),
          $q->h3("$service: Error: $_[0]"),
          $q->h4("$fqdn: Current machine load: $cpuload0"),
          $q->h4("<a href='http://$fqdn/$upload_short/$service.html'>Report on the $service usage</a> (with current and past computations)"),
