@@ -150,7 +150,7 @@ if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4" and $kpoints ne "5" 
   $kpoints = "3";
 }
 # test: supercell=2 3 4
-if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4") {
+if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4" and $supercell ne "5" and $supercell ne "6") {
   $supercell = "2";
 }
 # test: supercell=2 3 4

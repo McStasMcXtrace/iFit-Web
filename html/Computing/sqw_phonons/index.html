@@ -243,11 +243,12 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
       <p align="left"> <font color="#3366ff"><b>4- Indicate the energy
             cut-off:</b></font>
         <select name="ecut">
-          <option value="1500">1500 eV (recommended)</option>
+          <option value="0">(default)</option>
           <option value="260">260 eV (fast, may fail)</option>
           <option value="340">340 eV (fast, may fail)</option>
           <option value="500">500 eV</option>
-          <option value="1000">1000 eV</option>
+          <option value="1000">1000 eV (recommended)</option>
+          <option value="1500">1500 eV</option>
           <option value="2000">2000 eV</option>
         </select>
         <br>
@@ -272,6 +273,8 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         <select name="supercell">
           <option value="3">3x3x3</option>
           <option value="4">4x4x4</option>
+          <option value="5">5x5x5</option>
+          <option value="6">6x6x6</option>
           <option value="2">2x2x2 (fast but may fail)</option>
         </select>
         <br>
@@ -296,11 +299,11 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
       
       <p align="left"> <font color="#3366ff"><b>8- Optimize the material structure first:</b></font>
         <select name="optimizer">
-          <option value="MDmin">yes (short MD)</option>
           <option value="">no</option>
+          <option value="MDmin">yes (short MD)</option>
         </select>
         <br>
-        The material structure can first be optimized in a short molecular dynamics simulation which 'shakes' the structure to find a better (lower energy) configuration before computing the phonons. <b>WARNING: The structure optimization can not be performed with the QuantumEspresso/PHON option.</b><br>
+        It is desirable to use an already optimized structure as input (step 1- above). However, in case this is not true, the material structure can first be optimized in a short molecular dynamics simulation which 'shakes' the structure to find a better (lower energy) configuration before computing the phonons. <b>WARNING: This feature is experimental. The structure optimization can not be performed with the QuantumEspresso/PHON option.</b><br>
       </p>
       
       <p align="left"> <font color="#3366ff"><b>9- Indicate your email
