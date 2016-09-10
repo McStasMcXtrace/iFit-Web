@@ -233,11 +233,16 @@ $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;k
 
 # dump initial material file
 $res = system("cat $dir/$material > $dir/ifit.log");
-# start command, handle possible email
+# initial email
 if ($email ne "") {
-  $res = system("{ $email_cmd_start; ifit \"$cmd\"; $email_cmd_end; } >> $dir/ifit.log 2>&1 &");
-} else {
-  $res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
+  # split the commands so that email passwd is not visible in the 'ps' list
+  $res = system("$email_cmd_start >> $dir/ifit.log 2>&1 &");
+}
+# the computation starts... 
+$res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
+# final email
+if ($email ne "") {
+  $res = system("$email_cmd_end >> $dir/ifit.log 2>&1 &");
 }
 
 # file used for monitoring the service usage
@@ -324,10 +329,10 @@ if (not -f $filename) {
           alt="the ILL" title="the ILL"
           src="http://ifit.mccode.org/images/ILL-web-jpeg.jpg"
           align="right" border="0" width="68" height="64">
-  <h1><a href="$fqdn/ifit-web-services" target="_blank">$service</a>: usage</h1>
+  <h1><a href="http://$fqdn/ifit-web-services" target="_blank">$service</a>: usage</h1>
   This page reports on past and current computations.
   <ul>
-    <li>machine: <a href="$fqdn/ifit-web-services" target="_blank">$fqdn</a></li>
+    <li>machine: <a href="http://$fqdn/ifit-web-services" target="_blank">$fqdn</a></li>
     <li>service: $service</li>
     <li>allocated resources: $mpi cpu's</li>
   </ul>
