@@ -145,13 +145,13 @@ if ($smearing ne "metal" and $smearing ne "insulator" and $smearing ne "semicond
 if ($ecut ne "260" and $ecut ne "340" and $ecut ne "500"  and $ecut ne "1000" and $ecut ne "1500" and $ecut ne "2000") {
   $ecut = "340";
 }
-# test: kpoints =2 3 4 5 6
-if ($kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4" and $kpoints ne "5" and $kpoints ne "6") {
-  $kpoints = "3";
+# test: kpoints =0 2 3 4 5 6
+if ($kpoints ne "0" and $kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4" and $kpoints ne "5" and $kpoints ne "6") {
+  $kpoints = "0";
 }
 # test: supercell=2 3 4
-if ($supercell ne "2" and $supercell ne "3" and $supercell ne "4" and $supercell ne "5" and $supercell ne "6") {
-  $supercell = "2";
+if ($supercell ne "0" and $supercell ne "2" and $supercell ne "3" and $supercell ne "4" and $supercell ne "5" and $supercell ne "6") {
+  $supercell = "0";
 }
 # test: supercell=2 3 4
 if ($optimizer ne "MDmin" or $calculator eq "QuantumEspresso") {
@@ -239,7 +239,7 @@ if ($email ne "") {
   $res = system("$email_cmd_start >> $dir/ifit.log 2>&1 &");
 }
 # the computation starts... 
-$res = system("ifit \"$cmd\" >> $dir/ifit.log 2>&1 &");
+$res = system("ifit -nodesktop \"$cmd\" >> $dir/ifit.log 2>&1 &");
 # final email
 if ($email ne "") {
   $res = system("$email_cmd_end >> $dir/ifit.log 2>&1 &");
