@@ -352,7 +352,7 @@ END_HTML
 }
 printf $fh <<END_HTML;
   <tr>
-    <td><a href="http://$fqdn/$dir_short/" target="_blank"><img src="http://$fqdn/$dir_short/Phonons3D.png" width="50" height="50"><img src="http://$fqdn/$dir_short/Phonons_DOS.png" width="50" height="50">$dir_short</a></td>
+    <td><a href="http://$fqdn/$dir_short/" target="_blank"><img src="http://$fqdn/$dir_short/Phonon_0KLE.png" width="50" height="50"><img src="http://$fqdn/$dir_short/Phonon_DOS.png" width="50" height="50">$dir_short</a></td>
     <td><a href="http://$fqdn/$dir_short/$material" target="_blank"><img src="http://$fqdn/$dir_short/configuration.png" width="50" height="50">$material</a></td>
     <td>$calculator</td>
     <td><a href="mailto:$email">$email</a> from $remote_addr</td>
