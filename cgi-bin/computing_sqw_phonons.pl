@@ -23,8 +23,6 @@ use Sys::CpuLoad; # libsys-cpuload-perl
 # service configuration: tune for your needs
 # ------------------------------------------------------------------------------
 
-# number of core/cpu's to allocate to the service. 1 is serial. Requires OpenMPI.
-my $mpi          = 16;
 # the name of the SMTP server, optionally followed by the :port, as in "smtp.google.com:587"
 my $email_server = "smtp.ill.fr";
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
@@ -227,7 +225,7 @@ END_MESSAGE
 } else { $email = ""; }
 
 # assemble calculation command line
-$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;nsteps=$nsteps;ecut=$ecut;supercell=$supercell;mpi=$mpi;target=$dir;optimizer=$optimizer;$raw','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
+$cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;kpoints=$kpoints;nsteps=$nsteps;ecut=$ecut;supercell=$supercell;target=$dir;optimizer=$optimizer;$raw','report');catch ME;disp('Error when executing sqw_phonons');disp(getReport(ME));end;exit'";
 
 # launch the command for the service
 
@@ -274,7 +272,7 @@ print <<END_HTML;
   <li><b>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
   <li><b>Input configuration</b>: <a href="http://$fqdn/$dir_short/$material" target="_blank">$material</a></li>
   <li><b>Command</b>: $cmd</li>
-  <li><b>Status</b>: STARTED $datestring on $mpi cpu's (current machine load: $cpuload0)</li>
+  <li><b>Status</b>: STARTED $datestring (current machine load: $cpuload0)</li>
   <li><b>From</b>: $email $remote_addr
   </ul></p>
   <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
@@ -334,7 +332,6 @@ if (not -f $filename) {
   <ul>
     <li>machine: <a href="http://$fqdn/ifit-web-services" target="_blank">$fqdn</a></li>
     <li>service: $service</li>
-    <li>allocated resources: $mpi cpu's</li>
   </ul>
   <table style="width:100%">
   <tr>
