@@ -64,6 +64,12 @@ $referer     =$q->referer();
 $user_agent  =$q->user_agent();
 $datestring  = localtime();
 
+# test if we are working from the local machine 127.0.0.1 == ::1 in IPv6)
+if ($remote_host eq "::1") {
+  $fqdn = "localhost";
+  $host = $fqdn;
+}
+
 if ($cpuload0 > 2.5*$cpunb) { 
   error("CPU load exceeded. Current=$cpuload0. Available=$cpunb. Try later (sorry).");
 }
@@ -273,7 +279,7 @@ print <<END_HTML;
   <li><b>Input configuration</b>: <a href="http://$fqdn/$dir_short/$material" target="_blank">$material</a></li>
   <li><b>Command</b>: $cmd</li>
   <li><b>Status</b>: STARTED $datestring (current machine load: $cpuload0)</li>
-  <li><b>From</b>: $email $remote_addr
+  <li><b>From</b>: $email $remote_addr $remote_host
   </ul></p>
   <p>Results will be available on this server at <a href="http://$fqdn/$dir_short">$dir_short</a>.<br>
   You can now view:<ul>
