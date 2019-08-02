@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # requirements:
-#   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl
+#   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
 
 # ensure all fatals go to browser during debugging and set-up
 # comment this BEGIN block out on production code for security
@@ -19,7 +19,7 @@ use Net::Domain qw(hostname hostfqdn);
 use Sys::CPU;     # libsys-cpu-perl
 use Sys::CpuLoad; # libsys-cpuload-perl
 use Socket;
-use POSIX ":sys_wait_h"; # for fork/exec/waitpid
+use Proc::Background;
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
 # ------------------------------------------------------------------------------
@@ -57,6 +57,7 @@ my $remote_addr =$q->remote_addr();
 my $referer     =$q->referer();
 my $user_agent  =$q->user_agent();
 my $datestring  = localtime();
+my $cmd         = "";
 
 # test if we are working from the local machine 127.0.0.1 == ::1 in IPv6)
 if ($remote_host eq "::1") {
@@ -126,8 +127,8 @@ print <<END_HTML;
         src="http://ifit.mccode.org/images/iFit-logo.png"
         align="right" width="116" height="64">
   <img
-          alt="the SOLEIL Synchrotron" title="SOLEIL"
-          src="http://ifit.mccode.org/images/logo-soleil.png"
+          alt="SOLEIL" title="SOLEIL"
+          src="http://ifit.mccode.org/images/logo_soleil.png"
           align="right" border="0" height="64">
   <h1>$service: Virtual Machines: $vm</h1>
   <p>Thanks for using our service <b>$service</b>
@@ -152,15 +153,16 @@ END_HTML
 # Keep it after creation so that the VM can run.
 
 # create ytemporary VM file
-my $vm_copy = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".qcow2", UNLINK => 0);
+my $vm_copy = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".qcow2");
 print "<p><b>Creating</b>: $vm_copy</p>";
 my $res = "";
 
 # create snapshot from base VM in that temporary file
 sleep(1); # make sure the tmp file has been assigned
 if (-e "$upload_dir/$vm.qcow2") {
-  print "<p><b>Cloning</b>: qemu-img create -b  $upload_dir/$vm.qcow2 -f qcow2 $vm_copy<br></p>";
-  $res = system("qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_copy");
+  $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_copy";
+  print "<p><b>Cloning</b>: $cmd<br></p>";
+  $res = system($cmd);
   print "<p>Result: $res</p>";
 } else {
   error("Virtual Machine $vm file does not exist on this server.");
@@ -169,35 +171,37 @@ if (-e "$upload_dir/$vm.qcow2") {
 # check for existence of cloned VM
 sleep(1); # make sure the VM has been cloned
 if (not -e $vm_copy) {
-  error("Virtual Machine $vm could not be cloned.");
+  error("Could not clone Virtual Machine $vm.");
 }
+
+# do not wait for VNC to stop
+$cmd = "$novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port";
+my $pid_novnc = Proc::Background->new($cmd);
+if (not $pid_novnc) {
+  error("Could not start noVNC.");
+}
+
+print "<p><b>Launching VNC</b>: $cmd<br></p>";
+my $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
+print "OPEN: <a href=$redirect target=_blank>$redirect</a></p>";
+
 
 # launch cloned VM
-# we use a fork/exec/waitpid to distribute execution on threads and catch end of execution (for clean-up)
-if (my $pid_qemu = fork) {
-  sleep(5); # wait for qemu child to start
-  # we fork again to start noVNC, but do not wait for it to stop. We shall kill it at cleanup
-  if (my $pid_novnc = fork) { 
-    # go to the waitpid qemu...
-  } else {
-    # child: pid_novnc
-    print "<p><b>Launching</b>: $novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port<br></p>";
-    print "OPEN: <a href=http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port target=_blank>http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port</a></p>";
-    exec("$novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port");
-  }
-
-  # parent: wait for end
-  # waitpid($pid_qemu, 0);
-  # parent: child qemu ended: clean-up
-  
-} else {
-  # child: pid_qemu
-  print "<p><b>Launching</b>: qemu-system-x86_64-spice -m 4096 -hda $vm_copy -enable-kvm -no-acpi -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1<br></p>";
-  exec("qemu-system-x86_64 -m 4096 -hda $vm_copy -enable-kvm -no-acpi -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1");
+$cmd = "qemu-system-x86_64 -m 4096 -hda $vm_copy -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1";
+my $pid_qemu = Proc::Background->new($cmd);
+if (not $pid_qemu) {
+  error("Could not start QEMU/VM $vm.");
 }
+print "<p><b>Launching VM</b>: $cmd<br></p>";
+
+print $q->redirect($redirect);
+
+$pid_qemu->wait;
+print "<p>QEMU stopped. OK.</p>";
 
 # clean-up: temporary file, pid_qemu, pid_novnc
 print "Cleaning-up...<br>";
+$pid_novnc->die;
 
 print <<END_HTML;
   </body>

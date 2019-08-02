@@ -278,7 +278,7 @@ print <<END_HTML;
         align="right" width="116" height="64">
   <img
           alt="the SOLEIL Synchrotron" title="SOLEIL"
-          src="http://ifit.mccode.org/images/logo-soleil.png"
+          src="http://ifit.mccode.org/images/logo_soleil.png"
           align="right" border="0" height="64">
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
@@ -350,7 +350,7 @@ if (not -f $filename) {
         align="right" width="116" height="64">
   <img
           alt="the SOLEIL Synchrotron" title="SOLEIL"
-          src="http://ifit.mccode.org/images/logo-soleil.png"
+          src="http://ifit.mccode.org/images/logo_soleil.png"
           align="right" border="0" height="64">
   <h1><a href="http://$fqdn/ifit-web-services" target="_blank">$service</a>: usage</h1>
   This page reports on past and current computations.
