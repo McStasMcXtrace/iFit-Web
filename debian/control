@@ -1,0 +1,26 @@
+Package: ifit-web-services
+Version: 1.9.1
+Installed-Size: 17060
+Maintainer: Emmanuel Farhi <farhi@ill.fr>
+Section: science
+Architecture: all
+Priority: optional
+Depends: looktxt, idl2matlab, cif2hkl, libcgi-pm-perl, libapache2-mod-perl2, apache2, ifit-phonons, mcrinstaller, ifit, libnet-dns-perl, libxmu6, libxp6, sendemail, libsys-cpuload-perl, libsys-cpu-perl, mcstas-suite, libopenmpi-dev, abinit, elk-lapw, abinit-psp-jth, abinit-psp, abinit-psp-gbrv
+Description: A set of Web services for chosen iFit computations
+ Web Services from iFit generic data analysis and fitting to models
+ .
+ Simple methods to be used for complex data analysis.
+ .
+ This package provides a set of web services:
+ .
+ Converters:
+ cif2hkl;
+ looktxt;
+ idl2matlab;
+ .
+ Computations:
+ sqw_phonons; this service requires to edit the /usr/lib/cgi-bin/computing_sqw_phonons.pl file and indicate the email address to use for reporting.
+ .
+ To use these services, open a browser and go to e.g. http://localhost/ifit-web-services/
+ or connect to it distantly.
+

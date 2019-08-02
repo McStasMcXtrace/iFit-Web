@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=iFit-Web
+Version=1.0
+Exec=gnome-open http://localhost/ifit-web-services
+Comment=Start the iFit web services
+Icon=/var/www/html/ifit-web-services/Computing/sqw_phonons/images/iFit-logo.png
+Type=Application
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=Graphics;Math;Calculator;

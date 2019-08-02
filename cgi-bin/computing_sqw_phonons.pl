@@ -18,15 +18,15 @@ use File::Basename;
 use Net::Domain qw(hostname hostfqdn);
 use Sys::CPU;     # libsys-cpu-perl
 use Sys::CpuLoad; # libsys-cpuload-perl
-
+use Socket;
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
 # ------------------------------------------------------------------------------
 
 # the name of the SMTP server, optionally followed by the :port, as in "smtp.google.com:587"
-my $email_server = "smtp.ill.fr";
+my $email_server = "smtp.synchrotron-soleil.fr";
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
-my $email_from   = "XXXX\@ill.eu";
+my $email_from   = "XXXX\@synchrotron-soleil.eu";
 # the password for the sender on the SMTP server
 my $email_passwd = "XXXX";
 
@@ -40,8 +40,8 @@ $CGI::POST_MAX = 1024*5000; # max 5M upload
 
 my $q = new CGI;    # create new CGI object
 my $service="sqw_phonons";
-my $safe_filename_characters = "a-zA-Z0-9_.-";
-my $safe_email_characters     = "a-zA-Z0-9_.-@";
+my $safe_filename_characters = "a-zA-Z0-9_.\-";
+my $safe_email_characters     = "a-zA-Z0-9_.\-@";
 
 # configuration of the web service
 my $upload_base= "/var/www/html";   # root of the HTML web server area
@@ -68,6 +68,14 @@ $datestring  = localtime();
 if ($remote_host eq "::1") {
   $fqdn = "localhost";
   $host = $fqdn;
+  $remote_host = $fqdn;
+}
+if ($fqdn eq "localhost") {
+  $fqdn = inet_ntoa(
+        scalar gethostbyname( $host || 'localhost' )
+    );
+  $host = $fqdn;
+  $remote_host = $fqdn;
 }
 
 if ($cpuload0 > 2.5*$cpunb) { 
@@ -106,8 +114,8 @@ if ( !$material )
 my ( $name, $path, $extension ) = fileparse ( $material, '..*' );
 $material = $name . $extension;
 $material =~ tr/ /_/;
-$material =~ s/[^$safe_filename_characters]//g;
-if ( $material =~ /^([$safe_filename_characters]+)$/ )
+$material =~ s/[^a-zA-Z0-9_.\-]//g; # safe_filename_characters
+if ( $material =~ /^([a-zA-Z0-9_.\-]+)$/ )
 {
   $material = $1;
 }
@@ -117,8 +125,8 @@ else
 }
 
 # check email
-$email =~ s/[^$safe_email_characters]//g;
-if ( $email =~ /^([$safe_email_characters]+)$/ )
+$email =~ s/[^a-zA-Z0-9_.\-@]//g; # safe_email_characters
+if ( $email =~ /^([a-zA-Z0-9_.\-@]+)$/ )
 {
   $email = $1;
 }
@@ -206,7 +214,7 @@ and the log file at
 All past and present computations at
   http://$fqdn/$upload_short/$service.html
   
-Thanks for using ifit-web-services. (c) E.Farhi, ILL.
+Thanks for using ifit-web-services. (c) E.Farhi, Synchrotron SOLEIL.
 END_MESSAGE
   # We assemble the messages and the command using sendemail
   $email_subject_start = "$service:$material:$calculator just started on $fqdn";
@@ -269,9 +277,9 @@ print <<END_HTML;
         src="http://ifit.mccode.org/images/iFit-logo.png"
         align="right" width="116" height="64">
   <img
-          alt="the ILL" title="the ILL"
-          src="http://ifit.mccode.org/images/ILL-web-jpeg.jpg"
-          align="right" border="0" width="68" height="64">
+          alt="the SOLEIL Synchrotron" title="SOLEIL"
+          src="http://ifit.mccode.org/images/logo-soleil.png"
+          align="right" border="0" height="64">
   <h1>$service: Phonon dispersions in 4D</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
@@ -307,6 +315,17 @@ END_HTML
 print <<END_HTML;
   <hr>
   Powered by <a href="http://ifit.mccode.org" target="_blank">iFit</a> E. Farhi (c) 2016.<br>
+  <ul>
+    <li>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
+    <li>host: $host</li>
+    <li>remote_ident: $remote_ident</li>
+    <li>remote_host: $remote_host</li>
+    <li>remote_addr: $remote_addr</li>
+    <li>referer: $referer</li>
+    <li>user_agent: $user_agent</li>
+    <li>date: $datestring</li>
+    <li>$fqdn: Current machine load: $cpuload0</li>
+  </ul>
   </body>
   </html>
 END_HTML
@@ -330,9 +349,9 @@ if (not -f $filename) {
         src="http://ifit.mccode.org/images/iFit-logo.png"
         align="right" width="116" height="64">
   <img
-          alt="the ILL" title="the ILL"
-          src="http://ifit.mccode.org/images/ILL-web-jpeg.jpg"
-          align="right" border="0" width="68" height="64">
+          alt="the SOLEIL Synchrotron" title="SOLEIL"
+          src="http://ifit.mccode.org/images/logo-soleil.png"
+          align="right" border="0" height="64">
   <h1><a href="http://$fqdn/ifit-web-services" target="_blank">$service</a>: usage</h1>
   This page reports on past and current computations.
   <ul>

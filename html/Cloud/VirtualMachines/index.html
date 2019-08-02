@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Computing services: Cloud: Virtual machines</title>
+  </head>
+  <body>
+    <iframe src="../../Layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
+    <h1 class="csc-firstHeader" align="center"><i>Freshly Cooked Virtual
+        Machines<br>
+      </i></h1>
+    <div align="center"><i>version 1.0</i><i> - Aug 2019 (c) SOLEIL</i>
+    </div>
+    <hr size="2" width="100%"> <br>
+    <i>This page allows to select and launch a Virtual machine in a
+      Browser Window, with distant execution. This way, you can access
+      pre-installed systems with specific applications matching specific
+      scientific domains.<br>
+      <br>
+    </i>
+    <table border="1" cellpadding="2" cellspacing="2" width="100%">
+      <tbody>
+        <tr>
+          <td bgcolor="#ffcc99" valign="top"><b>INPUT: VirtualBox
+              machine</b><b><br>
+            </b></td>
+          <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
+            </b></td>
+        </tr>
+        <tr>
+          <td valign="top">Select the machine you need<b><br>
+            </b></td>
+          <td valign="top">A browser showing the distant machine through
+            VNC<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <form action="/cgi-bin/cloud_vm.pl" method="post"
+      enctype="multipart/form-data">
+      <p align="left"> <font color="#3366ff"><b>1- Indicate the machine
+            you need:</b></font>
+        <select name="vm">
+          <option value="Lubuntu">Lubuntu 18.04 vanilla</option>
+        </select>
+      </p>
+      <ul>
+        <li><b>Lubuntu: </b>a minimal Lubuntu 18.04 system (used for
+          testing).</li>
+      </ul>
+      <p align="center"> <b><input value="LAUNCH !" type="SUBMIT"></b>
+      </p>
+    </form>
+    &nbsp; A virtual machine will be created, and a browser window will
+    be opened.
+    <hr size="2" width="100%">
+    <h2>Availability and Credits</h2>
+    If you use this software, please acknowledge
+    <ul>
+      <li>E. Farhi, Synchrotron Soleil (2019).<br>
+      </li>
+    </ul>
+    <h2>Limitations</h2>
+    The virtual machines are made secure by inactivating some of their
+    functionalities.<br>
+    <h2>How it works</h2>
+    A one-shot virtual machine is cloned from a template. It is then
+    started with <a href="https://www.qemu.org/">QEMU</a>/<a
+      href="https://www.linux-kvm.org/page/Main_Page">KVM</a>. A VNC
+    client (<a href="https://github.com/novnc/noVNC">noVNC</a>) is
+    connected to it, and shown in your browser. All the available
+    virtual machines are <a href="../../upload">stored</a> on our
+    Apache server.<br>
+    <br>
+    <iframe src="../../Layout/footer.html" name="header" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+#! /bin/bash
+
+chown -R www-data  /var/www/html/ifit-web-services
+a2enmod cgi
