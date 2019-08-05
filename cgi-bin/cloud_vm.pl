@@ -202,8 +202,8 @@ if (not $proc_novnc) {
   error("Could not start noVNC.");
 }
 
-# LAUNCH CLONED VM
-$cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1";
+# LAUNCH CLONED VM with QXL video driver, KVM, and VNC, 4 cores
+$cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
 my $proc_qemu = Proc::Background->new($cmd);
 if (not $proc_qemu) {
   error("Could not start QEMU/VM $vm.");
@@ -229,6 +229,9 @@ print $clean_handle "# remote_user    $remote_user\n";
 print $clean_handle "# user_agent     $user_agent\n\n";
 print $clean_handle "# novnc_port     $novnc_port\n";
 print $clean_handle "# vnc            $qemuvnc_ip:5901\n";
+print $clean_handle "# qcow2 command  qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name\n";
+print $clean_handle "# qemu command   $cmd\n";
+print $clean_handle "# novnc command  $novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port\n";
 print $clean_handle "# \n";
 print $clean_handle "rm -f $base_name\n";
 print $clean_handle "rm -f $vm_name\n";
