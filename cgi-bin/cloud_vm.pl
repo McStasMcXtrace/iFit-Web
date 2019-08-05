@@ -35,8 +35,12 @@ my $safe_filename_characters = "a-zA-Z0-9_.\-";
 my $upload_base= "/var/www/html";   # root of the HTML web server area
 my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
 my $novnc_client="$upload_base/ifit-web-services/Cloud/VirtualMachines/novnc/utils/launch.sh";
-my $novnc_port = 6080;        # should be assigned dynamically
-my $qemuvnc_ip = "127.0.0.2"; # should be assigned dynamically
+
+# we count how many instances are already opened
+my @stuff = glob( "$upload_dir/*." );
+my $id = 1 + scalar @stuff;
+my $novnc_port = 6080+$id;        # assigned dynamically
+my $qemuvnc_ip = "127.0.0.$id";   # assigned dynamically
 
 # testing computer load
 my @cpuload = Sys::CpuLoad::load();
@@ -230,7 +234,7 @@ print $clean_handle "rm -f $base_name\n";
 print $clean_handle "rm -f $vm_name\n";
 print $clean_handle "rm -f $html_name\n";
 print $clean_handle "rm -f $clean_name\n";
-print $clean_handle "kill -9 -$pid_novnc -$pid_qemu\n";
+print $clean_handle "kill -9 -$pid_novnc -$pid_qemu -$$\n";
 close $clean_handle;
 chmod 0755, $clean_name;
 
