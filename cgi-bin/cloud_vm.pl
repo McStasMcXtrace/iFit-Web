@@ -3,6 +3,10 @@
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
 
+
+# NOTE  this one nearly works. See https://www.unix.com/shell-programming-and-scripting/142242-perl-cgi-no-output-until-backend-script-done.html
+# to flush HTML output as it comes...
+
 # ensure all fatals go to browser during debugging and set-up
 # comment this BEGIN block out on production code for security
 BEGIN {
@@ -12,13 +16,10 @@ BEGIN {
 
 use CGI;            # use CGI.pm
 use File::Temp qw/ tempfile tempdir /;
-use IO::Compress::Zip qw(zip $ZipError) ;
-use IPC::Open3;
-use File::Basename;
 use Net::Domain qw(hostname hostfqdn);
+use File::Basename qw(fileparse);
 use Sys::CPU;     # libsys-cpu-perl
 use Sys::CpuLoad; # libsys-cpuload-perl
-use Socket;
 use Proc::Background;
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
@@ -54,6 +55,7 @@ my $upload_short =~ s|$upload_base/||;
 my $remote_ident=$q->remote_ident();
 my $remote_host =$q->remote_host();
 my $remote_addr =$q->remote_addr();
+my $remote_user =$q->remote_user();
 my $referer     =$q->referer();
 my $user_agent  =$q->user_agent();
 my $datestring  = localtime();
@@ -95,8 +97,8 @@ if ( !$vm )
 }
 
 # check input file name
-my ( $name, $path, $extension ) = fileparse ( $vm, '..*' );
-$vm = $name . $extension;
+my ( $name, $path) = fileparse ( $vm );
+$vm = $name;
 $vm =~ tr/ /_/;
 $vm =~ s/[^a-zA-Z0-9_.\-]//g; # safe_filename_characters
 if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
@@ -110,19 +112,23 @@ if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
 # DO the work
 # ------------------------------------------------------------------------------
 
-# display welcome information
-print $q->header ( );
-print <<END_HTML;
-  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
-  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>$service: $vm [$fqdn]</title>
-  <style type="text/css">
-  img {border: none;}
-  </style>
-  </head>
-  <body>
+# we open a temporary HTML document, write into it, then redirect to it.
+# The HTML document contains a meta redirect with delay, and some text.
+
+my $html = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".html", UNLINK => 1);
+( $name, $path ) = fileparse ( $html );
+# display welcome information in the temporary HTML file
+my $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
+
+print $html <<END_HTML;
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="refresh" content="5; URL=$redirect">
+</head>
+  <title>$service: $vm [$fqdn] (redirecting in 5 sec)</title>
+</head>
+<body>
   <img alt="iFit" title="iFit"
         src="http://ifit.mccode.org/images/iFit-logo.png"
         align="right" width="116" height="64">
@@ -145,25 +151,34 @@ print <<END_HTML;
     <li>$fqdn: Current machine load: $cpuload0</li>
   </ul>
   <hr>
-  <p>Sending commands...</p>
+
+Now redirecting to<br>
+<h1><a href=$redirect target=_blank>$redirect</a></h1>
+<br>in (5 sec)...
+</body>
+</html>
 END_HTML
+
+close $html;
+sleep(1); # make sure the file has been created and flushed
+
+# now we redirect to that temporary file
+$redirect="http://localhost/ifit-web-services/upload/$name";
+print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
 
 # now send commands
 # use 'upload' directory to store the temporary VM. 
 # Keep it after creation so that the VM can run.
 
-# create ytemporary VM file
-my $vm_copy = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".qcow2");
-print "<p><b>Creating</b>: $vm_copy</p>";
+# create temporary VM file
+my $vm_copy = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".qcow2", UNLINK => 1);
 my $res = "";
 
 # create snapshot from base VM in that temporary file
 sleep(1); # make sure the tmp file has been assigned
 if (-e "$upload_dir/$vm.qcow2") {
   $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_copy";
-  print "<p><b>Cloning</b>: $cmd<br></p>";
   $res = system($cmd);
-  print "<p>Result: $res</p>";
 } else {
   error("Virtual Machine $vm file does not exist on this server.");
 }
@@ -181,39 +196,25 @@ if (not $pid_novnc) {
   error("Could not start noVNC.");
 }
 
-print "<p><b>Launching VNC</b>: $cmd<br></p>";
-my $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
-print "OPEN: <a href=$redirect target=_blank>$redirect</a></p>";
-
-
 # launch cloned VM
 $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_copy -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1";
 my $pid_qemu = Proc::Background->new($cmd);
 if (not $pid_qemu) {
   error("Could not start QEMU/VM $vm.");
 }
-print "<p><b>Launching VM</b>: $cmd<br></p>";
-
-print $q->redirect($redirect);
 
 $pid_qemu->wait;
-print "<p>QEMU stopped. OK.</p>";
 
-# clean-up: temporary file, pid_qemu, pid_novnc
-print "Cleaning-up...<br>";
+# clean-up: temporary files (qcow2, html), pid_qemu, pid_novnc
 $pid_novnc->die;
 
-print <<END_HTML;
-  </body>
-  </html>
-END_HTML
 # ------------------------------------------------------------------------------
 
- sub error {
-   print $q->header(-type=>'text/html'),
-         $q->start_html(-title=>"$service: Error [$fqdn]"),
-         $q->h3("$service: Error: $_[0]"),
-         $q->h4("$fqdn: Current machine load: $cpuload0"),
-         $q->end_html;
-   exit(0);
+sub error {
+ # print $q->header(-type=>'text/html'),
+       $q->start_html(-title=>"$service: Error [$fqdn]"),
+       $q->h3("$service: Error: $_[0]"),
+       $q->h4("$fqdn: Current machine load: $cpuload0"),
+       $q->end_html;
+ exit(0);
 }
