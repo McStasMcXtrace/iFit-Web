@@ -113,12 +113,15 @@ if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
 # The HTML document contains a meta redirect with delay, and some text.
 # This way the cgi script can launch all and the web browser display is made independent
 # (else only display CGI dynamic content when script ends).
-my $html = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".html", UNLINK => 1);
-( $name, $path ) = fileparse ( $html );
+my $base_name = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, UNLINK => 1);
+
+my $html_name = $base_name . ".html";
+open(my $html_handle, '>', $html_name) or error("Could not create $html_name");
+( $name, $path ) = fileparse ( $html_name );
 # display welcome information in the temporary HTML file
 my $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
 
-print $html <<END_HTML;
+print $html_handle <<END_HTML;
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -140,7 +143,7 @@ print $html <<END_HTML;
     <li>date: $datestring</li>
     <li><b>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
     <li><b>Status</b>: STARTED $datestring (current machine load: $cpuload0)</li>
-    <li>host: $host $fqdn</li>
+    <li>host: $host $fqdn $server_name</li>
     <li>server_name: $server_name</li>
     <li>referer: $referer</li>
     <li>remote_ident: $remote_ident</li>
@@ -158,25 +161,25 @@ Now redirecting to<br>
 </html>
 END_HTML
 
-close $html;
+close $html_handle;
 sleep(1); # make sure the file has been created and flushed
 
 # NOW WE REDIRECT TO THAT TEMPORARY FILE (this is our display)
-$redirect="http://localhost/ifit-web-services/upload/$name";
+$redirect="http://$server_name/ifit-web-services/upload/$name";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
 
 # now send commands
 # use 'upload' directory to store the temporary VM. 
 # Keep it after creation so that the VM can run.
 
-# create temporary VM file
-my $vm_copy = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".qcow2", UNLINK => 1);
+# set temporary VM file
+my $vm_name = $base_name . ".qcow2";
 my $res = "";
 
 # CREATE SNAPSHOT FROM BASE VM IN THAT TEMPORARY FILE
 sleep(1); # make sure the tmp file has been assigned
 if (-e "$upload_dir/$vm.qcow2") {
-  $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_copy";
+  $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name";
   $res = system($cmd);
 } else {
   error("Virtual Machine $vm file does not exist on this server.");
@@ -184,28 +187,64 @@ if (-e "$upload_dir/$vm.qcow2") {
 
 # check for existence of cloned VM
 sleep(1); # make sure the VM has been cloned
-if (not -e $vm_copy) {
-  error("Could not clone Virtual Machine $vm.");
+if (not -e $vm_name) {
+  error("Could not clone Virtual Machine $vm_name.");
 }
 
 # LAUNCH NOVNC (do not wait for VNC to stop)
 $cmd = "$novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port";
-my $pid_novnc = Proc::Background->new($cmd);
-if (not $pid_novnc) {
+my $proc_novnc = Proc::Background->new($cmd);
+if (not $proc_novnc) {
   error("Could not start noVNC.");
 }
 
 # LAUNCH CLONED VM
-$cmd = "qemu-system-x86_64 -m 4096 -hda $vm_copy -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1";
-my $pid_qemu = Proc::Background->new($cmd);
-if (not $pid_qemu) {
+$cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1";
+my $proc_qemu = Proc::Background->new($cmd);
+if (not $proc_qemu) {
   error("Could not start QEMU/VM $vm.");
 }
 
-$pid_qemu->wait;
+# we write a script that lists all clean-ups for automatic/daemon tasks
+my $clean_name = $base_name . ".sh";
+open(my $clean_handle, '>', $clean_name) or error("Could not create $clean_name");
+my $pid_qemu  = $proc_qemu->pid;
+my $pid_novnc = $proc_novnc->pid;
+print $clean_handle "#!/bin/sh\n#\n";
+print $clean_handle "# clean up script for virtual machine $vm\n";
+print $clean_handle "# started        $datestring\n";
+print $clean_handle "# referer        $referer\n";
+print $clean_handle "# fqdn           $fqdn/ifit-web-services\n";
+print $clean_handle "# machine load   $cpuload0\n";
+print $clean_handle "# server         $fqdn $host $fqdn $server_name\n";
+print $clean_handle "# server_name    $server_name\n";
+print $clean_handle "# remote_ident   $remote_ident\n";
+print $clean_handle "# remote_host    $remote_host\n";
+print $clean_handle "# remote_addr    $remote_addr\n";
+print $clean_handle "# remote_user    $remote_user\n";
+print $clean_handle "# user_agent     $user_agent\n\n";
+print $clean_handle "# novnc_port     $novnc_port\n";
+print $clean_handle "# vnc            $qemuvnc_ip:5901\n";
+print $clean_handle "# \n";
+print $clean_handle "rm -f $base_name\n";
+print $clean_handle "rm -f $vm_name\n";
+print $clean_handle "rm -f $html_name\n";
+print $clean_handle "rm -f $clean_name\n";
+print $clean_handle "kill -9 -$pid_novnc -$pid_qemu\n";
+close $clean_handle;
+chmod 0755, $clean_name;
 
-# CLEAN-UP temporary files (qcow2, html), pid_qemu, pid_novnc
-$pid_novnc->die;
+$proc_qemu->wait;
+
+open(my $clean_handle, '>>', $clean_name) or error("Could not open $clean_name");
+print $clean_handle "# ended " . localtime();
+close $clean_handle;
+sleep(1);
+system($clean_name);
+
+# CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
+$proc_novnc->die;
+
 
 # ------------------------------------------------------------------------------
 
