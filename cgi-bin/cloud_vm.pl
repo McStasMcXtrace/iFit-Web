@@ -3,10 +3,6 @@
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
 
-
-# NOTE  this one nearly works. See https://www.unix.com/shell-programming-and-scripting/142242-perl-cgi-no-output-until-backend-script-done.html
-# to flush HTML output as it comes...
-
 # ensure all fatals go to browser during debugging and set-up
 # comment this BEGIN block out on production code for security
 BEGIN {
@@ -56,6 +52,7 @@ my $remote_ident=$q->remote_ident();
 my $remote_host =$q->remote_host();
 my $remote_addr =$q->remote_addr();
 my $remote_user =$q->remote_user();
+my $server_name =$q->server_name();
 my $referer     =$q->referer();
 my $user_agent  =$q->user_agent();
 my $datestring  = localtime();
@@ -112,9 +109,10 @@ if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
 # DO the work
 # ------------------------------------------------------------------------------
 
-# we open a temporary HTML document, write into it, then redirect to it.
+# WE OPEN A TEMPORARY HTML DOCUMENT, WRITE INTO IT, THEN REDIRECT TO IT.
 # The HTML document contains a meta redirect with delay, and some text.
-
+# This way the cgi script can launch all and the web browser display is made independent
+# (else only display CGI dynamic content when script ends).
 my $html = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".html", UNLINK => 1);
 ( $name, $path ) = fileparse ( $html );
 # display welcome information in the temporary HTML file
@@ -139,16 +137,17 @@ print $html <<END_HTML;
   <h1>$service: Virtual Machines: $vm</h1>
   <p>Thanks for using our service <b>$service</b>
   <ul>
+    <li>date: $datestring</li>
     <li><b>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
     <li><b>Status</b>: STARTED $datestring (current machine load: $cpuload0)</li>
-    <li>host: $host</li>
+    <li>host: $host $fqdn</li>
+    <li>server_name: $server_name</li>
+    <li>referer: $referer</li>
     <li>remote_ident: $remote_ident</li>
     <li>remote_host: $remote_host</li>
     <li>remote_addr: $remote_addr</li>
-    <li>referer: $referer</li>
+    <li>remote_user: $remote_user</li>
     <li>user_agent: $user_agent</li>
-    <li>date: $datestring</li>
-    <li>$fqdn: Current machine load: $cpuload0</li>
   </ul>
   <hr>
 
@@ -162,7 +161,7 @@ END_HTML
 close $html;
 sleep(1); # make sure the file has been created and flushed
 
-# now we redirect to that temporary file
+# NOW WE REDIRECT TO THAT TEMPORARY FILE (this is our display)
 $redirect="http://localhost/ifit-web-services/upload/$name";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
 
@@ -174,7 +173,7 @@ print $q->redirect($redirect); # this works (does not wait for script to end bef
 my $vm_copy = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, SUFFIX => ".qcow2", UNLINK => 1);
 my $res = "";
 
-# create snapshot from base VM in that temporary file
+# CREATE SNAPSHOT FROM BASE VM IN THAT TEMPORARY FILE
 sleep(1); # make sure the tmp file has been assigned
 if (-e "$upload_dir/$vm.qcow2") {
   $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_copy";
@@ -189,14 +188,14 @@ if (not -e $vm_copy) {
   error("Could not clone Virtual Machine $vm.");
 }
 
-# do not wait for VNC to stop
+# LAUNCH NOVNC (do not wait for VNC to stop)
 $cmd = "$novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port";
 my $pid_novnc = Proc::Background->new($cmd);
 if (not $pid_novnc) {
   error("Could not start noVNC.");
 }
 
-# launch cloned VM
+# LAUNCH CLONED VM
 $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_copy -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vnc $qemuvnc_ip:1";
 my $pid_qemu = Proc::Background->new($cmd);
 if (not $pid_qemu) {
@@ -205,7 +204,7 @@ if (not $pid_qemu) {
 
 $pid_qemu->wait;
 
-# clean-up: temporary files (qcow2, html), pid_qemu, pid_novnc
+# CLEAN-UP temporary files (qcow2, html), pid_qemu, pid_novnc
 $pid_novnc->die;
 
 # ------------------------------------------------------------------------------

@@ -48,13 +48,15 @@ die() {
 }
 
 cleanup() {
-    trap - TERM QUIT INT EXIT
+    trap - TERM QUIT INT EXIT HUP ABRT KILL ALRM 0
     trap "true" CHLD   # Ignore cleanup messages
     echo
     if [ -n "${proxy_pid}" ]; then
         echo "Terminating WebSockets proxy (${proxy_pid})"
         kill ${proxy_pid}
     fi
+    # kill all remaining process in the group
+    kill -HUP 0
 }
 
 # Process Arguments
