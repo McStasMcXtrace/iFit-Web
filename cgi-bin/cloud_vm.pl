@@ -2,6 +2,10 @@
 
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
+# sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libqcow2 qemu spice-html iptables dnsmasq
+# sudo adduser www-data libvirt
+# sudo adduser www-data kvm
+# sudo chmod 755 /etc/qemu-ifup
 
 # ensure all fatals go to browser during debugging and set-up
 # comment this BEGIN block out on production code for security
@@ -117,11 +121,11 @@ if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
 # The HTML document contains a meta redirect with delay, and some text.
 # This way the cgi script can launch all and the web browser display is made independent
 # (else only display CGI dynamic content when script ends).
-my $base_name = File::Temp->new(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, UNLINK => 1);
+my $base_name = tempdir(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, CLEANUP => 1);
 
-my $html_name = $base_name . ".html";
+my $html_name = $base_name . "/cloud_vm.html";
 open(my $html_handle, '>', $html_name) or error("Could not create $html_name");
-( $name, $path ) = fileparse ( $html_name );
+( $name, $path ) = fileparse ( $base_name );
 # display welcome information in the temporary HTML file
 my $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
 
@@ -169,7 +173,7 @@ close $html_handle;
 sleep(1); # make sure the file has been created and flushed
 
 # NOW WE REDIRECT TO THAT TEMPORARY FILE (this is our display)
-$redirect="http://$server_name/ifit-web-services/upload/$name";
+$redirect="http://$server_name/ifit-web-services/upload/$name/cloud_vm.html";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
 
 # now send commands
@@ -177,7 +181,7 @@ print $q->redirect($redirect); # this works (does not wait for script to end bef
 # Keep it after creation so that the VM can run.
 
 # set temporary VM file
-my $vm_name = $base_name . ".qcow2";
+my $vm_name = $base_name . "/cloud_vm.qcow2";
 my $res = "";
 
 # CREATE SNAPSHOT FROM BASE VM IN THAT TEMPORARY FILE
@@ -210,7 +214,7 @@ if (not $proc_qemu) {
 }
 
 # we write a script that lists all clean-ups for automatic/daemon tasks
-my $clean_name = $base_name . ".sh";
+my $clean_name = $base_name . "/cloud_vm.sh";
 open(my $clean_handle, '>', $clean_name) or error("Could not create $clean_name");
 my $pid_qemu  = $proc_qemu->pid;
 my $pid_novnc = $proc_novnc->pid;
@@ -233,13 +237,14 @@ print $clean_handle "# qcow2 command  qemu-img create -b $upload_dir/$vm.qcow2 -
 print $clean_handle "# qemu command   $cmd\n";
 print $clean_handle "# novnc command  $novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port\n";
 print $clean_handle "# \n";
+print $clean_handle "kill -9 -$pid_novnc -$pid_qemu -$$\n";
 print $clean_handle "rm -f $base_name\n";
 print $clean_handle "rm -f $vm_name\n";
 print $clean_handle "rm -f $html_name\n";
 print $clean_handle "rm -f $clean_name\n";
-print $clean_handle "kill -9 -$pid_novnc -$pid_qemu -$$\n";
+print $clean_handle "rm -rf $base_name\n"; 
 close $clean_handle;
-chmod 0755, $clean_name;
+chmod 0700, $clean_name;
 
 $proc_qemu->wait;
 
