@@ -224,50 +224,16 @@ if (not $proc_qemu) {
   error("Could not start QEMU/VM $vm.");
 }
 
-# we write a script that lists all clean-ups for automatic/daemon tasks
-my $clean_name = $base_name . "/cloud_vm.sh";
-open(my $clean_handle, '>', $clean_name) or error("Could not create $clean_name");
-my $pid_qemu  = $proc_qemu->pid;
-my $pid_novnc = $proc_novnc->pid;
-print $clean_handle "#!/bin/sh\n#\n";
-print $clean_handle "# clean up script for virtual machine $vm\n";
-print $clean_handle "# started        $datestring\n";
-print $clean_handle "# referer        $referer\n";
-print $clean_handle "# fqdn           $fqdn/ifit-web-services\n";
-print $clean_handle "# machine load   $cpuload0\n";
-print $clean_handle "# server         $fqdn $host $fqdn $server_name\n";
-print $clean_handle "# server_name    $server_name\n";
-print $clean_handle "# remote_ident   $remote_ident\n";
-print $clean_handle "# remote_host    $remote_host\n";
-print $clean_handle "# remote_addr    $remote_addr\n";
-print $clean_handle "# remote_user    $remote_user\n";
-print $clean_handle "# user_agent     $user_agent\n\n";
-print $clean_handle "# novnc_port     $novnc_port\n";
-print $clean_handle "# vnc            $qemuvnc_ip:5901\n";
-print $clean_handle "# qcow2 command  qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name\n";
-print $clean_handle "# qemu command   $cmd\n";
-print $clean_handle "# novnc command  $novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port\n";
-print $clean_handle "# \n";
-print $clean_handle "kill -9 -$pid_novnc -$pid_qemu -$$\n";
-print $clean_handle "rm -f $base_name\n";
-print $clean_handle "rm -f $vm_name\n";
-print $clean_handle "rm -f $html_name\n";
-print $clean_handle "rm -f $clean_name\n";
-print $clean_handle "rm -rf $base_name\n"; 
-close $clean_handle;
-chmod 0700, $clean_name;
-
 $proc_qemu->wait;
 
-open(my $clean_handle, '>>', $clean_name) or error("Could not open $clean_name");
-print $clean_handle "# ended " . localtime();
-close $clean_handle;
 sleep(1);
-system($clean_name);
+unlink $vm_name;
+unlink $html_name;
+rmdir  $base_name;  # in case auto-clean up fails
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
 $proc_novnc->die;
-
+$proc_qemu->die;
 
 # ------------------------------------------------------------------------------
 
