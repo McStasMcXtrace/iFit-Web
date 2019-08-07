@@ -133,9 +133,9 @@ print $html_handle <<END_HTML;
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <meta http-equiv="refresh" content="5; URL=$redirect">
+  <meta http-equiv="refresh" content="60; URL=$redirect">
 </head>
-  <title>$service: $vm [$fqdn] (redirecting in 5 sec)</title>
+  <title>$service: $vm [$fqdn] (redirecting in 60 sec)</title>
 </head>
 <body>
   <img alt="iFit" title="iFit"
@@ -146,7 +146,21 @@ print $html_handle <<END_HTML;
           src="http://ifit.mccode.org/images/logo_soleil.png"
           align="right" border="0" height="64">
   <h1>$service: Virtual Machines: $vm</h1>
-  <p>Thanks for using our service <b>$service</b>
+  <img alt="virtualmachines" title="virtualmachines"
+        src="http://$server_name/ifit-web-services/Cloud/VirtualMachines/images/virtualmachines.png" align="right" height="128" width="173">
+  <p>Your machine $service $vm has just started. Open the following <a href=$redirect target=_blank>link to display its screen</a> (click on the <b>Connect</b> button).</p>
+  
+  <p><b>IMPORTANT NOTES:</b><ul>
+  <li>
+   Remember that the virtual machine is created on request, and destroyed afterwards. You should then export any work done there-in elsewhere (e.g. mounted disk, ssh/sftp, Dropox, ...).</li>
+  
+  <li><b>When done, please shutdown the virtual machine properly</b> by selecting the 'Logout/Shutdown' button. 
+  <b>Avoid</b> just closing the QEMU-noVNC $vm browser tab.</li>
+  </ul>
+  </p>
+  <h1><a href=$redirect target=_blank>$redirect</a></h1>
+  <br>This page will automatically open this link in 60 seconds.<br>
+  <hr>
   <ul>
     <li>date: $datestring</li>
     <li><b>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
@@ -162,9 +176,6 @@ print $html_handle <<END_HTML;
   </ul>
   <hr>
 
-Now redirecting to<br>
-<h1><a href=$redirect target=_blank>$redirect</a></h1>
-<br>in (5 sec)...
 </body>
 </html>
 END_HTML
