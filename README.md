@@ -5,9 +5,14 @@ Web Interface for selected iFit functionalities
 Designed for Debian class Linux systems.
 
 - sudo apt-add-repository 'deb http://packages.mccode.org/debian stable main'
-- sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl libsys-cpuload-perl libsys-cpu-perl libnet-dns-perl libxmu6 libxp6 sendemail
-- sudo apt-get install cif2hkl idl2matlab looktxt
-- sudo apt-get install ifit-phonons
+- sudo apt update
+- sudo apt install apache2 libapache2-mod-perl2 libcgi-pm-perl libsys-cpuload-perl libsys-cpu-perl libnet-dns-perl libxmu6 libxp6 sendemail
+- sudo apt install cif2hkl idl2matlab looktxt
+- sudo apt install ifit-phonons
+- sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libqcow2 qemu spice-html iptables dnsmasq
+- sudo adduser www-data libvirt
+- sudo adduser www-data kvm
+- sudo chmod 755 /etc/qemu-ifup
 
 or simpler:
 - sudo apt-add-repository 'deb http://packages.mccode.org/debian stable main'
@@ -21,9 +26,10 @@ install necessary packages, then
 - copy the html directory    in e.g. /var/www/html/ifit-web-services
 - copy the cgi-bin directory in e.g. /usr/lib/cgi-bin
   
-** Tuning to your needs **
+#Tuning to your needs
 
-The computing_sqw_phonons configuration is specified in the file
+##Phonons
+The Computing/sqw_phonons configuration is specified in the file:
 - cgi-bin/computing_sqw_phonons.pl
   
 Then you should adapt the lines which define:
@@ -37,17 +43,22 @@ Then you should adapt the lines which define:
 - # the password for the sender
 - my $email_passwd = "XXXX";
 
+##Virtual Machines
+The Cloud/virtual machine is specified in the file:
+- html/Cloud/Virtualmachines/index.html
+
+Add as many `<option value="blah">description</option>` lines as needed where the
+"blah" should correspond with a `blah.qcow2` file in the /var/www/html/ifit-web-services/upload area.
+
 #USAGE
 open a browser and connect to:
-
 -  http://localhost/ifit-web-services
 
 which can be accessed distantly when the server is on the net.
 
 
 #CREATE LIVE DVD ISO
-
-you can try the following tools, once the web server is running.
+You can try the following tools, once the web server is running.
 This way you can disseminate. But the easiest is to set-up your own system as above.
 
 ** https://sourceforge.net/projects/pinguy-os/files/ISO_Builder/

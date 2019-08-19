@@ -14,13 +14,13 @@ BEGIN {
     use CGI::Carp('fatalsToBrowser');
 }
 
-use CGI;            # use CGI.pm
-use File::Temp qw/ tempfile tempdir /;
-use Net::Domain qw(hostname hostfqdn);
-use File::Basename qw(fileparse);
-use Sys::CPU;     # libsys-cpu-perl
-use Sys::CpuLoad; # libsys-cpuload-perl
-use Proc::Background;
+use CGI;              # use CGI.pm
+use File::Temp      qw/ tempfile tempdir /;
+use Net::Domain     qw(hostname hostfqdn);
+use File::Basename  qw(fileparse);
+use Sys::CPU;         # libsys-cpu-perl
+use Sys::CpuLoad;     # libsys-cpuload-perl
+use Proc::Background; # libproc-background-perl
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
 # ------------------------------------------------------------------------------
@@ -40,21 +40,15 @@ my $upload_base= "/var/www/html";   # root of the HTML web server area
 my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
 my $novnc_client="$upload_base/ifit-web-services/Cloud/VirtualMachines/novnc/utils/launch.sh";
 
-# we count how many instances are already opened
-my @stuff = glob( "$upload_dir/*." );
-my $id = 1 + scalar @stuff;
-my $novnc_port = 6080+$id;        # assigned dynamically
-my $qemuvnc_ip = "127.0.0.$id";   # assigned dynamically
-
 # testing computer load
 my @cpuload = Sys::CpuLoad::load();
 my $cpunb   = Sys::CPU::cpu_count();
-my $cpuload0= @cpuload[0];
+my $cpuload0= $cpuload[0];
 
 my $host         = hostname;
 my $fqdn         = hostfqdn();
 my $upload_short = $upload_dir;
-my $upload_short =~ s|$upload_base/||;
+$upload_short =~ s|$upload_base/||;
 
 my $remote_ident=$q->remote_ident();
 my $remote_host =$q->remote_host();
@@ -65,6 +59,38 @@ my $referer     =$q->referer();
 my $user_agent  =$q->user_agent();
 my $datestring  = localtime();
 my $cmd         = "";
+
+# used further, but defined here  so that END block works
+my $vm_name     = "";
+my $html_name   = "";
+my $base_name   = "";
+my $proc_novnc  = "";
+my $proc_qemu   = "";
+
+# both IP and PORT will be random in 0-254.
+# a test is made to see if the port has already been allocated.
+my $id = 0;
+my $novnc_port  = 0;
+my $lock        = "";
+my $lock_name   = "";
+my $qemuvnc_ip  = "";
+my $id_ok       = 0;  # flag true when we found a non used IP/PORT
+my $i           = 0;  # ID counter
+
+# we try 10 times at most to search for suitable IP
+for ($i=0; $i<=10; $i++) {
+  $id          = int(rand(254));
+  $novnc_port  = 6100 + $id;
+  $lock        = "$service.$novnc_port";
+  $lock_name   = "$upload_dir/$lock";
+  $qemuvnc_ip  = "127.0.0.$id";
+  if (not -e $lock_name) { $id_ok = 1; last; };  # exit loop if the ID is OK
+}
+
+# check for the existence of the IP:PORT pair.
+if (not $id_ok) { 
+  error("Can not assign unique ID $lock_name for session. Try again.");
+}
 
 # test if we are working from the local machine 127.0.0.1 == ::1 in IPv6)
 if ($remote_host eq "::1") {
@@ -121,9 +147,9 @@ if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
 # The HTML document contains a meta redirect with delay, and some text.
 # This way the cgi script can launch all and the web browser display is made independent
 # (else only display CGI dynamic content when script ends).
-my $base_name = tempdir(TEMPLATE => "cloud_vm_XXXXX", DIR => $upload_dir, CLEANUP => 1);
+$base_name = tempdir(TEMPLATE => "$service" . "_XXXXX", DIR => $upload_dir, CLEANUP => 1);
 
-my $html_name = $base_name . "/cloud_vm.html";
+$html_name = $base_name . "/$service.html";
 open(my $html_handle, '>', $html_name) or error("Could not create $html_name");
 ( $name, $path ) = fileparse ( $base_name );
 # display welcome information in the temporary HTML file
@@ -148,7 +174,7 @@ print $html_handle <<END_HTML;
   <h1>$service: Virtual Machines: $vm</h1>
   <img alt="virtualmachines" title="virtualmachines"
         src="http://$server_name/ifit-web-services/Cloud/VirtualMachines/images/virtualmachines.png" align="right" height="128" width="173">
-  <p>Your machine $service $vm has just started. Open the following <a href=$redirect target=_blank>link to display its screen</a> (click on the <b>Connect</b> button).</p>
+  <p>Your machine $service $vm has just started. Open the following <a href=$redirect>link to display its screen</a> (click on the <b>Connect</b> button).</p>
   
   <p><b>IMPORTANT NOTES:</b><ul>
   <li>
@@ -173,18 +199,32 @@ print $html_handle <<END_HTML;
     <li>remote_addr: $remote_addr</li>
     <li>remote_user: $remote_user</li>
     <li>user_agent: $user_agent</li>
+    <li>session ID: $lock_name</li>
   </ul>
   <hr>
 
 </body>
 </html>
 END_HTML
-
 close $html_handle;
-sleep(1); # make sure the file has been created and flushed
+
+# we create a lock file
+open(my $lock_handle, '>', $lock_name) or error("Could not create $lock_name");
+print $lock_handle <<END_TEXT;
+date: $datestring
+service: $service
+machine: $vm
+pid: $$
+ip: $qemuvnc_ip
+port: $novnc_port
+directory: $base_name
+END_TEXT
+close $lock_handle;
+
+sleep(1); # make sure the files have been created and flushed
 
 # NOW WE REDIRECT TO THAT TEMPORARY FILE (this is our display)
-$redirect="http://$server_name/ifit-web-services/upload/$name/cloud_vm.html";
+$redirect="http://$server_name/ifit-web-services/upload/$name/$service.html";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
 
 # now send commands
@@ -192,7 +232,7 @@ print $q->redirect($redirect); # this works (does not wait for script to end bef
 # Keep it after creation so that the VM can run.
 
 # set temporary VM file
-my $vm_name = $base_name . "/cloud_vm.qcow2";
+$vm_name = $base_name . "/$service.qcow2";
 my $res = "";
 
 # CREATE SNAPSHOT FROM BASE VM IN THAT TEMPORARY FILE
@@ -212,28 +252,32 @@ if (not -e $vm_name) {
 
 # LAUNCH NOVNC (do not wait for VNC to stop)
 $cmd = "$novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port";
-my $proc_novnc = Proc::Background->new($cmd);
+$proc_novnc = Proc::Background->new($cmd);
 if (not $proc_novnc) {
   error("Could not start noVNC.");
 }
 
 # LAUNCH CLONED VM with QXL video driver, KVM, and VNC, 4 cores
 $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
-my $proc_qemu = Proc::Background->new($cmd);
+$proc_qemu = Proc::Background->new($cmd);
 if (not $proc_qemu) {
   error("Could not start QEMU/VM $vm.");
 }
 
 $proc_qemu->wait;
 
+# normal end: remove lock
+if ($lock_name)  { unlink $lock_name; }
 sleep(1);
-unlink $vm_name;
-unlink $html_name;
-rmdir  $base_name;  # in case auto-clean up fails
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
-$proc_novnc->die;
-$proc_qemu->die;
+END {
+  if ($vm_name)    { unlink $vm_name; }
+  if ($html_name)  { unlink $html_name; }
+  if ($base_name)  { rmdir  $base_name; } # in case auto-clean up fails
+  if ($proc_novnc) { $proc_novnc->die; }
+  if ($proc_qemu)  { $proc_qemu->die; }
+}
 
 # ------------------------------------------------------------------------------
 

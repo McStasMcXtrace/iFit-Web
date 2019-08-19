@@ -56,7 +56,7 @@ cleanup() {
         kill ${proxy_pid}
     fi
     # kill all remaining process in the group
-    kill -HUP 0
+    # kill -HUP 0
 }
 
 # Process Arguments

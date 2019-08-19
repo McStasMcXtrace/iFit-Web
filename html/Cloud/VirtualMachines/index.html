@@ -44,6 +44,9 @@
       enctype="multipart/form-data">
       <p align="left"> <font color="#3366ff"><b>1- Indicate the machine
             you need:</b></font>
+            <!-- THIS IS WHERE YOU ADD MACHINE NAMES                                          -->
+            <!-- Add as many <option value="blah">description</option> lines as needed        -->
+            <!-- where the "blah" should correspond with a blah.qcow2 file in the upload area -->
         <select name="vm">
           <option value="Lubuntu">Lubuntu 18.04 vanilla</option>
         </select>
@@ -67,7 +70,7 @@
     <h2>Limitations</h2>
     The virtual machines are made secure by inactivating some of their
     functionalities. Remember that the virtual machine is created on
-    request, and destroyed afterwards. You should then export any work
+    request, and <b></b>destroyed afterwards</b>. You should then export any work
     done there-in elsewhere (e.g. mounted disk, ssh/sftp, DropBox, ...).<br>
     <i><b>When done, please shutdown the virtual machine properly</b></i>
     by selecting the 'Logout/Shutdown' button. <br>
