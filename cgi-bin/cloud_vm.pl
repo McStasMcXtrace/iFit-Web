@@ -2,7 +2,7 @@
 
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
-# sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libqcow2 qemu spice-html iptables dnsmasq
+# sudo apt install qemu-kvm bridge-utils libqcow2 qemu iptables dnsmasq libproc-processtable-perl
 # sudo adduser www-data libvirt
 # sudo adduser www-data kvm
 # sudo chmod 755 /etc/qemu-ifup
@@ -18,9 +18,10 @@ use CGI;              # use CGI.pm
 use File::Temp      qw/ tempfile tempdir /;
 use Net::Domain     qw(hostname hostfqdn);
 use File::Basename  qw(fileparse);
-use Sys::CPU;         # libsys-cpu-perl
-use Sys::CpuLoad;     # libsys-cpuload-perl
-use Proc::Background; # libproc-background-perl
+use Sys::CPU;           # libsys-cpu-perl           for CPU::cpu_count
+use Sys::CpuLoad;       # libsys-cpuload-perl       for CpuLoad::load
+use Proc::Background;   # libproc-background-perl   for Background->new
+use Proc::Killfam;      # libproc-processtable-perl for killfam (kill pid and children)
 
 # ==============================================================================
 # DECLARE all our variables
@@ -348,8 +349,9 @@ END {
   if (-e $vm_name)    { unlink $vm_name; }
   if (-e $html_name)  { unlink $html_name; }
   if (-e $base_name)  { rmdir  $base_name; } # in case auto-clean up fails
-  if ($proc_novnc) { $proc_novnc->die; }
-  if ($proc_qemu)  { $proc_qemu->die; }
+  if ($proc_novnc) { killfam($proc_novnc->pid); $proc_novnc->die; }
+  # make sure QEMU and asssigned 'sh' are killed
+  if ($proc_qemu)  { killfam('TERM',($proc_qemu->pid));  $proc_qemu->die; }
 }
 
 # ------------------------------------------------------------------------------
