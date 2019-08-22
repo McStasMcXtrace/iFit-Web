@@ -251,7 +251,7 @@ if (not $error) {
     $error .= "Could not start QEMU/KVM for $vm. ";
   } else {
     $output .= "<li>[OK] Started QEMU/VNC for $vm with VNC on $qemuvnc_ip:1 and token '$novnc_token'</li>\n";
-    if (-e $novnc_token) { unlink($token_name); } # remove any footprint of the token
+    if (-e $token_name) { unlink($token_name); } # remove any footprint of the token
   }
 }
 
@@ -341,6 +341,10 @@ sleep(1); # make sure the files have been created and flushed
 # REDIRECT TO THAT TEMPORARY FILE (this is our display)
 $redirect="http://$server_name/ifit-web-services/upload/$name/index.html";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
+
+sleep(5);
+
+if (-e $html_name)  { unlink $html_name; } # remove that file which contains the token.
 
 # WAIT for QEMU/noVNC to end ---------------------------------------------------
 if ($proc_novnc) { $proc_novnc->wait; }
