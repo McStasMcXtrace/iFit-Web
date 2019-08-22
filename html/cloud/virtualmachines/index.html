@@ -34,7 +34,7 @@
           <td valign="top">Select the machine you need<b><br>
             </b></td>
           <td valign="top">A browser showing the distant machine through
-            VNC<br>
+            VNC.<br>
           </td>
         </tr>
       </tbody>
@@ -44,22 +44,22 @@
       enctype="multipart/form-data">
       <p align="left"> <font color="#3366ff"><b>1- Indicate the machine
             you need:</b></font>
-            <!-- THIS IS WHERE YOU ADD MACHINE NAMES                                          -->
-            <!-- Add as many <option value="blah">description</option> lines as needed        -->
-            <!-- where the "blah" should correspond with a blah.qcow2 file in the upload area -->
+        <!-- THIS IS WHERE YOU ADD MACHINE NAMES                                          -->
+        <!-- Add as many <option value="blah">description</option> lines as needed        -->
+        <!-- where the "blah" should correspond with a blah.qcow2 file in the upload area -->
         <select name="vm">
           <option value="Lubuntu">Lubuntu 18.04 vanilla</option>
         </select>
       </p>
       <ul>
-        <li><b>Lubuntu: </b>a minimal Lubuntu 18.04 system (used for
-          testing).</li>
+        <li><b>Lubuntu: </b>a minimal <a href="https://lubuntu.net/">Lubuntu</a>
+          18.04 system (used for testing).</li>
       </ul>
       <p align="center"> <b><input value="LAUNCH !" type="SUBMIT"></b>
       </p>
     </form>
     &nbsp; A virtual machine will be created, and a browser window will
-    be opened.&nbsp;
+    be opened. Use the one-shot token to connect to the VNC.
     <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge
@@ -70,11 +70,13 @@
     <h2>Limitations</h2>
     The virtual machines are made secure by inactivating some of their
     functionalities. Remember that the virtual machine is created on
-    request, and <b></b>destroyed afterwards</b>. You should then export any work
-    done there-in elsewhere (e.g. mounted disk, ssh/sftp, DropBox, ...).<br>
-    <i><b>When done, please shutdown the virtual machine properly</b></i>
-    by selecting the 'Logout/Shutdown' button. <br>
-    Avoid just closing the QEMU-noVNC browser tab.<br>
+    request, and destroyed afterwards. You should then<b> export any
+      work</b> done there-in elsewhere (e.g. mounted disk, ssh/sftp,
+    DropBox, ...). This is a single-shot virtual machine.<br>
+    <br>
+    We recommend to use the Firefox web browser to display the virtual
+    machine. Other web browsers may show an offset between two mouse
+    pointers (local and distant).<br>
     <h2>How it works</h2>
     A one-shot virtual machine is cloned from a template. It is then
     started with <a href="https://www.qemu.org/">QEMU</a>/<a

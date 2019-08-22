@@ -21,76 +21,59 @@ use File::Basename  qw(fileparse);
 use Sys::CPU;         # libsys-cpu-perl
 use Sys::CpuLoad;     # libsys-cpuload-perl
 use Proc::Background; # libproc-background-perl
-# ------------------------------------------------------------------------------
-# service configuration: tune for your needs
-# ------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# GET and CHECK input parameters
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# DECLARE all our variables
+# ==============================================================================
 
+# CGI stuff --------------------------------------------------------------------
 $CGI::POST_MAX = 1024*5000; # max 5M upload
+my $q     = new CGI;    # create new CGI object
+my $error = "";
 
-my $q = new CGI;    # create new CGI object
-my $service="cloud_vm";
-my $safe_filename_characters = "a-zA-Z0-9_.\-";
-
-# configuration of the web service
-my $upload_base= "/var/www/html";   # root of the HTML web server area
-my $upload_dir = "$upload_base/ifit-web-services/upload"; # where to store results. Must exist.
-my $novnc_client="$upload_base/ifit-web-services/Cloud/VirtualMachines/novnc/utils/launch.sh";
-
-# testing computer load
+# identification stuff ---------------------------------------------------------
 my @cpuload = Sys::CpuLoad::load();
 my $cpunb   = Sys::CPU::cpu_count();
 my $cpuload0= $cpuload[0];
 
 my $host         = hostname;
 my $fqdn         = hostfqdn();
+my $remote_host = $q->remote_host();
+my $server_name = $q->server_name();
+my $datestring  = localtime();
+
+# service stuff ----------------------------------------------------------------
+my $service     = "cloud_vm";
+my $upload_base = "/var/www/html";   # root of the HTML web server area
+my $upload_dir  = "$upload_base/ifit-web-services/upload"; # where to store files. Must exist.
 my $upload_short = $upload_dir;
 $upload_short =~ s|$upload_base/||;
 
-my $remote_ident=$q->remote_ident();
-my $remote_host =$q->remote_host();
-my $remote_addr =$q->remote_addr();
-my $remote_user =$q->remote_user();
-my $server_name =$q->server_name();
-my $referer     =$q->referer();
-my $user_agent  =$q->user_agent();
-my $datestring  = localtime();
+my $redirect    = "";
+my $vm          = "";
 my $cmd         = "";
-
-# used further, but defined here  so that END block works
+my $res         = "";
 my $vm_name     = "";
+my $html_handle;
 my $html_name   = "";
 my $base_name   = "";
 my $proc_novnc  = "";
 my $proc_qemu   = "";
+my ( $name, $path );
 
 # both IP and PORT will be random in 0-254.
-# a test is made to see if the port has already been allocated.
-my $id = 0;
+my $id          = 0;
 my $novnc_port  = 0;
-my $lock        = "";
-my $lock_name   = "";
+my $novnc_token = "";
+my $lock_name   = ""; # filename written to indicate IP:PORT lock
+my $lock_handle;
 my $qemuvnc_ip  = "";
 my $id_ok       = 0;  # flag true when we found a non used IP/PORT
-my $i           = 0;  # ID counter
+my $output      = "";
 
-# we try 10 times at most to search for suitable IP
-for ($i=0; $i<=10; $i++) {
-  $id          = int(rand(254));
-  $novnc_port  = 6100 + $id;
-  $lock        = "$service.$novnc_port";
-  $lock_name   = "$upload_dir/$lock";
-  $qemuvnc_ip  = "127.0.0.$id";
-  if (not -e $lock_name) { $id_ok = 1; last; };  # exit loop if the ID is OK
-}
-
-# check for the existence of the IP:PORT pair.
-if (not $id_ok) { 
-  error("Can not assign unique ID $lock_name for session. Try again.");
-}
+# ==============================================================================
+# GET and CHECK input parameters
+# ==============================================================================
 
 # test if we are working from the local machine 127.0.0.1 == ::1 in IPv6)
 if ($remote_host eq "::1") {
@@ -105,112 +88,209 @@ if ($fqdn eq "localhost") {
   $host = $fqdn;
   $remote_host = $fqdn;
 }
+$output .= "<li>[OK] Starting on $datestring</li>\n";
+$output .= "<li>[OK] The server name is $server_name.</li>\n";
+$output .= "<li>[OK] You are accessing this service from $remote_host.</li>\n";
 
-if ($cpuload0 > 2.5*$cpunb) { 
-  error("CPU load exceeded. Current=$cpuload0. Available=$cpunb. Try later (sorry).");
+# test host load
+if ($cpuload0 > 1.25*$cpunb) {
+  $error .= "CPU load exceeded. Current=$cpuload0. Available=$cpunb. Try again later. ";
+} else {
+  $output .= "<li>[OK] Server $server_name load $cpuload0 is acceptable.</li>\n";
 }
 
 # testing/security
-if (my $error = $q->cgi_error()){
-  if ($error =~ /^413\b/o) {
-    error("Maximum data limit exceeded.");
-  }
-  else {
-    error("An unknown error has occured."); 
+if (not $error) {
+  if ($res = $q->cgi_error()){
+    if ($res =~ /^413\b/o) {
+      $error .= "Maximum data limit exceeded. ";
+    }
+    else {
+      $error .= "An unknown error has occured. "; 
+    }
   }
 }
 
-# now get values of form parameters
-my $vm       = $q->param('vm');   # 1- VM base name, must match a $vm.ova filename
-if ( !$vm )
-{
-  error("There was a problem selecting the Virtual Machine.");
+# now get values from thre HTML form
+if (not $error) {
+  $vm       = $q->param('vm');   # 1- VM base name, must match a $vm.ova filename
+  if ( !$vm )
+  {
+    $error .= "There was a problem selecting the Virtual Machine. ";
+  } else {
+    $output .= "<li>[OK] Selected virtual machine $vm.</li>\n";
+  }
 }
 
 # check input file name
-my ( $name, $path) = fileparse ( $vm );
-$vm = $name;
-$vm =~ tr/ /_/;
-$vm =~ s/[^a-zA-Z0-9_.\-]//g; # safe_filename_characters
-if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
-  $vm = $1;
-} else {
-  error("Virtual Machine file name contains invalid characters. Allowed: '$safe_filename_characters'");
+if (not $error) {
+  ( $name, $path ) = fileparse ( $vm );
+  $vm = $name;
+  $vm =~ tr/ /_/;
+  $vm =~ s/[^a-zA-Z0-9_.\-]//g; # safe_filename_characters
+  if ( $vm =~ /^([a-zA-Z0-9_.\-]+)$/ ) {
+    $vm = $1;
+  } else {
+    $error .= "Virtual Machine file name contains invalid characters. ";
+  }
 }
 
+# a test is made to see if the port has already been allocated.
+# we search the 1st free port (allow up to 99)
+if (not $error) {
+  for ($id=1; $id<100; $id++) {
+    $novnc_port  = 6079 + $id;
+    $lock_name   = "$upload_dir/$service.$novnc_port";
+    $qemuvnc_ip  = "127.0.0.$id";
+    if (not -e $lock_name) { $id_ok = 1; last; };  # exit loop if the ID is OK
+  }
+  # check for the existence of the IP:PORT pair.
+  if (not $id_ok) { 
+    $error .= "Can not assign port for session. Try again later. ";
+  } else {
+    $output .= "<li>[OK] Assigned $qemuvnc_ip:$novnc_port.</li>\n";
+  }
+}
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 # DO the work
-# ------------------------------------------------------------------------------
+# ==============================================================================
 
-# WE OPEN A TEMPORARY HTML DOCUMENT, WRITE INTO IT, THEN REDIRECT TO IT.
-# The HTML document contains a meta redirect with delay, and some text.
-# This way the cgi script can launch all and the web browser display is made independent
-# (else only display CGI dynamic content when script ends).
+# define where our stuff will be (snapshot and HTML file)
+# use 'upload' directory to store the temporary VM. 
+# Keep it after creation so that the VM can run.
 $base_name = tempdir(TEMPLATE => "$service" . "_XXXXX", DIR => $upload_dir, CLEANUP => 1);
 
-$html_name = $base_name . "/$service.html";
-open(my $html_handle, '>', $html_name) or error("Could not create $html_name");
+# initiate the HTML output
+# WE OPEN A TEMPORARY HTML DOCUMENT, WRITE INTO IT, THEN REDIRECT TO IT.
+# The HTML document contains some text (our output).
+# This way the cgi script can launch all and the web browser display is made independent
+# (else only display CGI dynamic content when script ends).
+$html_name = $base_name . "/index.html";
 ( $name, $path ) = fileparse ( $base_name );
-# display welcome information in the temporary HTML file
-my $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
 
-print $html_handle <<END_HTML;
+if (open($html_handle, '>', $html_name)) {
+  # display information in the temporary HTML file
+
+  print $html_handle <<END_HTML;
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <meta http-equiv="refresh" content="60; URL=$redirect">
-</head>
-  <title>$service: $vm [$fqdn] (redirecting in 60 sec)</title>
+  <title>$service: $vm [$fqdn]</title>
 </head>
 <body>
   <img alt="iFit" title="iFit"
-        src="http://ifit.mccode.org/images/iFit-logo.png"
-        align="right" width="116" height="64">
+    src="http://$server_name/ifit-web-services/images/iFit-logo.png"
+    align="right" width="116" height="64">
   <img
-          alt="SOLEIL" title="SOLEIL"
-          src="http://ifit.mccode.org/images/logo_soleil.png"
-          align="right" border="0" height="64">
+    alt="SOLEIL" title="SOLEIL"
+    src="http://$server_name/ifit-web-services/images/logo_soleil.png"
+    align="right" border="0" height="64">
   <h1>$service: Virtual Machines: $vm</h1>
   <img alt="virtualmachines" title="virtualmachines"
-        src="http://$server_name/ifit-web-services/Cloud/VirtualMachines/images/virtualmachines.png" align="right" height="128" width="173">
-  <p>Your machine $service $vm has just started. Open the following <a href=$redirect>link to display its screen</a> (click on the <b>Connect</b> button).</p>
-  
-  <p><b>IMPORTANT NOTES:</b><ul>
-  <li>
-   Remember that the virtual machine is created on request, and destroyed afterwards. You should then export any work done there-in elsewhere (e.g. mounted disk, ssh/sftp, Dropox, ...).</li>
-  
-  <li><b>When done, please shutdown the virtual machine properly</b> by selecting the 'Logout/Shutdown' button. 
-  <b>Avoid</b> just closing the QEMU-noVNC $vm browser tab.</li>
-  </ul>
-  </p>
-  <h1><a href=$redirect target=_blank>$redirect</a></h1>
-  <br>This page will automatically open this link in 60 seconds.<br>
-  <hr>
-  <ul>
-    <li>date: $datestring</li>
-    <li><b>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
-    <li><b>Status</b>: STARTED $datestring (current machine load: $cpuload0)</li>
-    <li>host: $host $fqdn $server_name</li>
-    <li>server_name: $server_name</li>
-    <li>referer: $referer</li>
-    <li>remote_ident: $remote_ident</li>
-    <li>remote_host: $remote_host</li>
-    <li>remote_addr: $remote_addr</li>
-    <li>remote_user: $remote_user</li>
-    <li>user_agent: $user_agent</li>
-    <li>session ID: $lock_name</li>
-  </ul>
-  <hr>
+    src="http://$server_name/ifit-web-services/cloud/virtualmachines/images/virtualmachines.png"
+    align="right" height="128" width="173">
+END_HTML
+  close $html_handle;
+} else {
+  # this indicates 'upload' is probably not there, or incomplete installation
+  $error .= "Can not open $html_name (initial open). ";
+  error($error);
+}
 
+# set temporary VM file (snapshot)
+$vm_name = $base_name . "/$service.qcow2";
+
+# CREATE SNAPSHOT FROM BASE VM IN THAT TEMPORARY FILE
+if (not $error) {
+  if (-e "$upload_dir/$vm.qcow2") {
+    $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name";
+    $res = `$cmd`;
+    $output .= "<li>[OK] Created snapshot from <a href='http://$server_name/ifit-web-services/upload/$vm.qcow2'>$vm.qcow2</a> in <a href='http://$server_name/ifit-web-services/upload/$name/index.html'>$name</a></li>\n";
+  } else {
+    $error .= "Virtual Machine $vm file does not exist on this server. ";
+  }
+}
+
+# check for existence of cloned VM
+sleep(1); # make sure the VM has been cloned
+if (not $error and not -e $vm_name) {
+  $error .= "Could not clone Virtual Machine $vm into snapshot. ";
+}
+
+# LAUNCH CLONED VM with QXL video driver, KVM, and VNC, 4 cores
+if (not $error) {
+  # cast a random token key for VNC
+  sub rndStr{ join'', @_[ map{ rand @_ } 1 .. shift ] };
+  $novnc_token = rndStr 8, 'a'..'z', 'A'..'Z', 0..9;  # 8 random chars in [a-z A-Z digits]
+  
+  $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -machine pc,accel=kvm -enable-kvm " .
+    "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
+  
+  if ($novnc_token) {
+    # must avoid output to STDOUT
+    # but any redirection or pipe triggers a 'sh' to launch qemu. 
+    # The final 'die' only kills 'sh', not qemu.
+    $cmd = "echo 'change vnc password\n$novnc_token\n' | " . $cmd . ",password -monitor stdio > /dev/null";
+  }
+  $proc_qemu = Proc::Background->new($cmd);
+  if (not $proc_qemu) {
+    $error .= "Could not start QEMU/KVM for $vm. ";
+  } else {
+    $output .= "<li>[OK] Started QEMU/VNC for $vm with VNC on $qemuvnc_ip:1 and token '$novnc_token'</li>\n";
+  }
+}
+
+# LAUNCH NOVNC (do not wait for VNC to stop)
+if (not $error) {
+  $cmd= "$upload_base/ifit-web-services/cloud/virtualmachines/novnc/utils/websockify/run" .
+    " --web $upload_base/ifit-web-services/cloud/virtualmachines/novnc/" .
+    " --run-once $novnc_port $qemuvnc_ip:5901";
+
+  $proc_novnc = Proc::Background->new($cmd);
+  if (not $proc_novnc) {
+    $error .= "Could not start noVNC. ";
+  } else {
+    $output .= "<li>[OK] Started noVNC session $novnc_port to listen to $qemuvnc_ip:5901</li>\n";
+  }
+}
+
+# ------------------------------------------------------------------------------
+# create the HTML output (either OK, or error), and display it.
+
+# display information in the temporary HTML file
+if (open($html_handle, '>>', $html_name)) {
+
+  if (not $error) {
+    $redirect="http://$fqdn:$novnc_port/vnc.html?host=$fqdn&port=$novnc_port";
+
+    print $html_handle <<END_HTML;
+<ul>
+$output
+<li>[OK] No error, all is fine</li>
+<li><b>[OK]</b> Connect with token <b>$novnc_token</b> to your machine at <a href=$redirect target=_blank><b>$redirect</b></a>.</li>
+</ul>
+
+<h1><a href=$redirect target=_blank>$redirect</a></h1>
+<h1>Use one-shot token '$novnc_token' to connect</h1>
+<h3>Please exit properly the virtual machine (lower left corner/Logout/Shutdown)</h3>
+
+<p>
+Your machine $service $vm has just started. 
+Open the following <a href=$redirect target=_blank>link to display its screen</a> 
+(click on the <b>Connect</b> button). 
+Remember that the virtual machine is created on request, and destroyed afterwards. You should then export any work done there-in elsewhere (e.g. mounted disk, ssh/sftp, Dropbox, OwnCloud...).
+</p>
+<hr>
+<a href="http://$server_name/ifit-web-services/">iFit Web Services</a> / (c) E. Farhi Synchrotron SOLEIL (2019).
 </body>
 </html>
 END_HTML
-close $html_handle;
-
-# we create a lock file
-open(my $lock_handle, '>', $lock_name) or error("Could not create $lock_name");
-print $lock_handle <<END_TEXT;
+    close $html_handle;
+    
+    # we create a lock file
+    if (open($lock_handle, '>', $lock_name)) {;
+      print $lock_handle <<END_TEXT;
 date: $datestring
 service: $service
 machine: $vm
@@ -219,73 +299,58 @@ ip: $qemuvnc_ip
 port: $novnc_port
 directory: $base_name
 END_TEXT
-close $lock_handle;
+      close $lock_handle;
+    }
+    # LOG in /var/log/apache2/error.log
+    print STDERR "$service: launched: [$datestring] QEMU $vm IP=$qemuvnc_ip redirected to $novnc_port http://$server_name/ifit-web-services/upload/$name/index.html -> $redirect token=$novnc_token\n";
+    
+  } else {
+    print STDERR "$service: ERROR: $error\n";
+    print $html_handle <<END_HTML;
+    <ul>
+      $output
+      <li><b>[ERROR]</b> $error</li>
+    </ul>
+  </body>
+  </html>
+END_HTML
+    close $html_handle;
+  }
+} else {
+  $error .= "Can not open $html_name (append). ";
+  print STDERR "$service: ERROR: $error\n";
+  error($error);
+}
 
 sleep(1); # make sure the files have been created and flushed
 
-# NOW WE REDIRECT TO THAT TEMPORARY FILE (this is our display)
-$redirect="http://$server_name/ifit-web-services/upload/$name/$service.html";
+# REDIRECT TO THAT TEMPORARY FILE (this is our display)
+$redirect="http://$server_name/ifit-web-services/upload/$name/index.html";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
 
-# now send commands
-# use 'upload' directory to store the temporary VM. 
-# Keep it after creation so that the VM can run.
-
-# set temporary VM file
-$vm_name = $base_name . "/$service.qcow2";
-my $res = "";
-
-# CREATE SNAPSHOT FROM BASE VM IN THAT TEMPORARY FILE
-sleep(1); # make sure the tmp file has been assigned
-if (-e "$upload_dir/$vm.qcow2") {
-  $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name";
-  $res = system($cmd);
-} else {
-  error("Virtual Machine $vm file does not exist on this server.");
-}
-
-# check for existence of cloned VM
-sleep(1); # make sure the VM has been cloned
-if (not -e $vm_name) {
-  error("Could not clone Virtual Machine $vm_name.");
-}
-
-# LAUNCH NOVNC (do not wait for VNC to stop)
-$cmd = "$novnc_client --vnc $qemuvnc_ip:5901 --listen $novnc_port";
-$proc_novnc = Proc::Background->new($cmd);
-if (not $proc_novnc) {
-  error("Could not start noVNC.");
-}
-
-# LAUNCH CLONED VM with QXL video driver, KVM, and VNC, 4 cores
-$cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -enable-kvm -smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
-$proc_qemu = Proc::Background->new($cmd);
-if (not $proc_qemu) {
-  error("Could not start QEMU/VM $vm.");
-}
-
-$proc_qemu->wait;
+# WAIT for QEMU/noVNC to end ---------------------------------------------------
+if ($proc_novnc) { $proc_novnc->wait; }
 
 # normal end: remove lock
-if ($lock_name)  { unlink $lock_name; }
-sleep(1);
+if (-e $lock_name)  { unlink $lock_name; }
+
+sub error {
+  print $q->header(-type=>'text/html');
+  $q->start_html(-title=>"$service: Error [$fqdn]");
+  $q->h3("$service: Error: $_[0]");
+  $q->end_html;
+  exit(0);
+}
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
 END {
-  if ($vm_name)    { unlink $vm_name; }
-  if ($html_name)  { unlink $html_name; }
-  if ($base_name)  { rmdir  $base_name; } # in case auto-clean up fails
+  print STDERR "$service: ended: [$datestring] QEMU $vm IP=$qemuvnc_ip redirected to $novnc_port\n";
+  if (-e $vm_name)    { unlink $vm_name; }
+  if (-e $html_name)  { unlink $html_name; }
+  if (-e $base_name)  { rmdir  $base_name; } # in case auto-clean up fails
   if ($proc_novnc) { $proc_novnc->die; }
   if ($proc_qemu)  { $proc_qemu->die; }
 }
 
 # ------------------------------------------------------------------------------
 
-sub error {
- # print $q->header(-type=>'text/html'),
-       $q->start_html(-title=>"$service: Error [$fqdn]"),
-       $q->h3("$service: Error: $_[0]"),
-       $q->h4("$fqdn: Current machine load: $cpuload0"),
-       $q->end_html;
- exit(0);
-}

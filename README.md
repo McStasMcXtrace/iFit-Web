@@ -1,4 +1,4 @@
-#iFit-Web
+# iFit-Web
 Web Interface for selected iFit functionalities
 
 INSTALLATION
@@ -51,8 +51,8 @@ Then you should adapt the lines which define:
 Virtual Machines
 ----------------
 
-The Cloud/virtual machine is specified in the file:
-- html/Cloud/Virtualmachines/index.html
+The cloud/virtual machine is specified in the file:
+- html/cloud/virtualmachines/index.html
 
 Add as many `<option value="blah">description</option>` lines as needed where the
 "blah" should correspond with a `blah.qcow2` file in the /var/www/html/ifit-web-services/upload area.
