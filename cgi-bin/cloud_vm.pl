@@ -66,6 +66,8 @@ my ( $name, $path );
 my $id          = 0;
 my $novnc_port  = 0;
 my $novnc_token = "";
+my $token_name  = "";
+my $token_handle;
 my $lock_name   = ""; # filename written to indicate IP:PORT lock
 my $lock_handle;
 my $qemuvnc_ip  = "";
@@ -224,21 +226,32 @@ if (not $error) {
   # cast a random token key for VNC
   sub rndStr{ join'', @_[ map{ rand @_ } 1 .. shift ] };
   $novnc_token = rndStr 8, 'a'..'z', 'A'..'Z', 0..9;  # 8 random chars in [a-z A-Z digits]
-  
+
   $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -machine pc,accel=kvm -enable-kvm " .
     "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
   
   if ($novnc_token) {
-    # must avoid output to STDOUT
-    # but any redirection or pipe triggers a 'sh' to launch qemu. 
-    # The final 'die' only kills 'sh', not qemu.
-    $cmd = "echo 'change vnc password\n$novnc_token\n' | " . $cmd . ",password -monitor stdio > /dev/null";
+    # must avoid output to STDOUT, so redirect STDOUT to NULL.
+    # Any redirection or pipe triggers a 'sh' to launch qemu. 
+    # The final 'die' only kills 'sh', not qemu. We use 'killfam' at END for this.
+    # $cmd = "echo 'change vnc password\n$novnc_token\n' | " . $cmd . ",password -monitor stdio > /dev/null";
+    
+    # file created just for the launch, removed immediately. 
+    # Any 'pipe' such as "echo 'change vnc password\n$novnc_token\n' | qemu ..." is shown in 'ps'.
+    # With a temp file and redirection, the token does not show in the process list (ps).
+    $token_name = $base_name . "/token"; 
+    open($token_handle, '>', $token_name);
+    print $token_handle "change vnc password\n$novnc_token\n";
+    close($token_handle);
+    # redirect 'token' to STDIN to set the VNC password
+    $cmd .= ",password -monitor stdio > /dev/null < $token_name";
   }
   $proc_qemu = Proc::Background->new($cmd);
   if (not $proc_qemu) {
     $error .= "Could not start QEMU/KVM for $vm. ";
   } else {
     $output .= "<li>[OK] Started QEMU/VNC for $vm with VNC on $qemuvnc_ip:1 and token '$novnc_token'</li>\n";
+    if (-e $novnc_token) { unlink($token_name); } # remove any footprint of the token
   }
 }
 
@@ -303,10 +316,10 @@ END_TEXT
       close $lock_handle;
     }
     # LOG in /var/log/apache2/error.log
-    print STDERR "$service: launched: [$datestring] QEMU $vm IP=$qemuvnc_ip redirected to $novnc_port http://$server_name/ifit-web-services/upload/$name/index.html -> $redirect token=$novnc_token\n";
+    print STDERR "[$datestring] $service: launched: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port http://$server_name/ifit-web-services/upload/$name/index.html -> $redirect token=$novnc_token\n";
     
   } else {
-    print STDERR "$service: ERROR: $error\n";
+    print STDERR "[$datestring] $service: ERROR: $error\n";
     print $html_handle <<END_HTML;
     <ul>
       $output
@@ -319,7 +332,7 @@ END_HTML
   }
 } else {
   $error .= "Can not open $html_name (append). ";
-  print STDERR "$service: ERROR: $error\n";
+  print STDERR "[$datestring] $service: ERROR: $error\n";
   error($error);
 }
 
@@ -345,9 +358,10 @@ sub error {
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
 END {
-  print STDERR "$service: ended: [$datestring] QEMU $vm IP=$qemuvnc_ip redirected to $novnc_port\n";
+  print STDERR "[$datestring] $service: ended: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port\n";
   if (-e $vm_name)    { unlink $vm_name; }
   if (-e $html_name)  { unlink $html_name; }
+  if (-e $novnc_token) { unlink($token_name); }
   if (-e $base_name)  { rmdir  $base_name; } # in case auto-clean up fails
   if ($proc_novnc) { killfam($proc_novnc->pid); $proc_novnc->die; }
   # make sure QEMU and asssigned 'sh' are killed
