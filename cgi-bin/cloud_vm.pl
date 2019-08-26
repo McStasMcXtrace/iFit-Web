@@ -372,12 +372,12 @@ END_HTML
 sleep(1); # make sure the files have been created and flushed
 
 # SEND THE HTML MESSAGE TO THE USER --------------------------------------------
-if ($smtp_port) {
+if ($email and $smtp_port) {
   $smtp= Net::SMTP->new($smtp_server); # e.g. port 25
 } else {
   $smtp= Net::SMTP->new($smtp_server, Port=>$smtp_port);
 }
-if ($smtp) {
+if ($email and $smtp) {
   # read the HTML file and store it as a string
   my $file_content = do{local(@ARGV,$/)=$html_name;<>};
   
