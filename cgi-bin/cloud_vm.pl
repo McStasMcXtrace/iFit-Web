@@ -22,6 +22,20 @@ use Sys::CPU;           # libsys-cpu-perl           for CPU::cpu_count
 use Sys::CpuLoad;       # libsys-cpuload-perl       for CpuLoad::load
 use Proc::Background;   # libproc-background-perl   for Background->new
 use Proc::Killfam;      # libproc-processtable-perl for killfam (kill pid and children)
+use Net::SMTP;          # core Perl
+
+# ------------------------------------------------------------------------------
+# service configuration: tune for your needs
+# ------------------------------------------------------------------------------
+
+# the name of the SMTP server, and optional port
+my $smtp_server = "smtp.synchrotron-soleil.fr";
+my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
+# the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
+my $email_from   = "luke.skywalker\@synchrotron-soleil.eu";
+# the password for the sender on the SMTP server, or left blank
+my $email_passwd = "";
+my $safe_email_characters     = "a-zA-Z0-9_.\-@";
 
 # ==============================================================================
 # DECLARE all our variables
@@ -73,6 +87,7 @@ my $lock_handle;
 my $qemuvnc_ip  = "";
 my $id_ok       = 0;  # flag true when we found a non used IP/PORT
 my $output      = "";
+my $smtp;
 
 # ==============================================================================
 # GET and CHECK input parameters
@@ -155,6 +170,22 @@ if (not $error) {
   }
 }
 
+# check email
+if (not $error) {
+  $email          = $q->param('email');      # 2- Indicate your email
+  $email =~ s/[^a-zA-Z0-9_.\-@]//g; # safe_email_characters
+  if ( $email =~ /^([a-zA-Z0-9_.\-@]+)$/ )
+  {
+    $email = $1;
+    $output .= "<li>[OK] Hello <b>$email</b> !</li>";
+  }
+  else
+  {
+    $error .= "This service requires a valid email. Retry with one.";
+    $email = "";
+  }
+}
+
 # ==============================================================================
 # DO the work
 # ==============================================================================
@@ -190,7 +221,7 @@ if (open($html_handle, '>', $html_name)) {
     src="http://$server_name/ifit-web-services/images/logo_soleil.png"
     align="right" border="0" height="64">
   <h1>$service: Virtual Machines: $vm</h1>
-  <img alt="virtualmachines" title="virtualmachines"
+  <img alt="VirtualMachines" title="VirtualMachines"
     src="http://$server_name/ifit-web-services/cloud/virtualmachines/images/virtualmachines.png"
     align="right" height="128" width="173">
 END_HTML
@@ -198,7 +229,8 @@ END_HTML
 } else {
   # this indicates 'upload' is probably not there, or incomplete installation
   $error .= "Can not open $html_name (initial open). ";
-  error($error);
+  print $error;
+  exit(0);
 }
 
 # set temporary VM file (snapshot)
@@ -209,7 +241,7 @@ if (not $error) {
   if (-e "$upload_dir/$vm.qcow2") {
     $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name";
     $res = `$cmd`;
-    $output .= "<li>[OK] Created snapshot from <a href='http://$server_name/ifit-web-services/upload/$vm.qcow2'>$vm.qcow2</a> in <a href='http://$server_name/ifit-web-services/upload/$name/index.html'>$name</a></li>\n";
+    $output .= "<li>[OK] Created snapshot from <a href='http://$server_name/ifit-web-services/upload/$vm.qcow2'>$vm.qcow2</a> in <a href='http://$server_name/ifit-web-services/upload/$name'>$name</a></li>\n";
   } else {
     $error .= "Virtual Machine $vm file does not exist on this server. ";
   }
@@ -251,7 +283,6 @@ if (not $error) {
     $error .= "Could not start QEMU/KVM for $vm. ";
   } else {
     $output .= "<li>[OK] Started QEMU/VNC for $vm with VNC on $qemuvnc_ip:1 and token '$novnc_token'</li>\n";
-    if (-e $token_name) { unlink($token_name); } # remove any footprint of the token
   }
 }
 
@@ -270,7 +301,7 @@ if (not $error) {
 }
 
 # ------------------------------------------------------------------------------
-# create the HTML output (either OK, or error), and display it.
+# create the output message (either OK, or error), and display it.
 
 # display information in the temporary HTML file
 if (open($html_handle, '>>', $html_name)) {
@@ -284,6 +315,8 @@ $output
 <li>[OK] No error, all is fine</li>
 <li><b>[OK]</b> Connect with token <b>$novnc_token</b> to your machine at <a href=$redirect target=_blank><b>$redirect</b></a>.</li>
 </ul>
+<p>Hello $email !</p>
+<p>You have requested to launch a $vm virtual machine. In order to connect to it, please click on the link below, and enter the one-shot token as indicated in this message.</p>
 
 <h1><a href=$redirect target=_blank>$redirect</a></h1>
 <h1>Use one-shot token '$novnc_token' to connect</h1>
@@ -316,10 +349,10 @@ END_TEXT
       close $lock_handle;
     }
     # LOG in /var/log/apache2/error.log
-    print STDERR "[$datestring] $service: launched: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port http://$server_name/ifit-web-services/upload/$name/index.html -> $redirect token=$novnc_token\n";
+    print STDERR "[$datestring] $service: start: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port http://$server_name/ifit-web-services/upload/$name/index.html -> $redirect token=$novnc_token for user $email\n";
     
   } else {
-    print STDERR "[$datestring] $service: ERROR: $error\n";
+    print STDERR "[$datestring] $service: ERROR: $_[0]\n";
     print $html_handle <<END_HTML;
     <ul>
       $output
@@ -332,43 +365,63 @@ END_HTML
   }
 } else {
   $error .= "Can not open $html_name (append). ";
-  print STDERR "[$datestring] $service: ERROR: $error\n";
-  error($error);
+  print $error;
+  exit(0);
 }
 
 sleep(1); # make sure the files have been created and flushed
 
-# REDIRECT TO THAT TEMPORARY FILE (this is our display)
+# SEND THE HTML MESSAGE TO THE USER --------------------------------------------
+if ($smtp_port) {
+  $smtp= Net::SMTP->new($smtp_server); # e.g. port 25
+} else {
+  $smtp= Net::SMTP->new($smtp_server, Port=>$smtp_port);
+}
+if ($smtp) {
+  # read the HTML file and store it as a string
+  my $file_content = do{local(@ARGV,$/)=$html_name;<>};
+  
+  if ($email_passwd) {
+    $smtp->auth($email_from,$email_passwd);
+  }
+  $smtp->mail($email_from);
+  $smtp->recipient($email);
+  $smtp->data();
+  $smtp->datasend("From: $email_from\n");
+  $smtp->datasend("To: $email\n");
+  # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
+  $smtp->datasend("Subject: [iFit-Web-Services] Virtual machine $vm connection information\n");
+  $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
+  $smtp->datasend("\n"); # end of header
+  $smtp->datasend($file_content);
+  $smtp->dataend;
+  $smtp->quit;
+}
+
+# REDIRECT TO THAT TEMPORARY FILE (this is our display) ------------------------
+# can be normal exec, or error message
 $redirect="http://$server_name/ifit-web-services/upload/$name/index.html";
 print $q->redirect($redirect); # this works (does not wait for script to end before redirecting)
+sleep(5); # make sure the display comes in.
 
-sleep(5);
-
-if (-e $html_name)  { unlink $html_name; } # remove that file which contains the token.
+# remove any local footprint of the token during exec
+if (-e $html_name)  { unlink $html_name; }
+if (-e $token_name) { unlink($token_name); } 
 
 # WAIT for QEMU/noVNC to end ---------------------------------------------------
-if ($proc_novnc) { $proc_novnc->wait; }
-
-# normal end: remove lock
-if (-e $lock_name)  { unlink $lock_name; }
-
-sub error {
-  print $q->header(-type=>'text/html');
-  $q->start_html(-title=>"$service: Error [$fqdn]");
-  $q->h3("$service: Error: $_[0]");
-  $q->end_html;
-  exit(0);
-}
+if (not $error and $proc_novnc) { $proc_novnc->wait; }
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
 END {
-  print STDERR "[$datestring] $service: ended: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port\n";
+  print STDERR "[$datestring] $service: cleanup: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port\n";
   if (-e $vm_name)    { unlink $vm_name; }
   if (-e $html_name)  { unlink $html_name; }
-  if (-e $novnc_token) { unlink($token_name); }
+  if (-e $token_name) { unlink($token_name); }
+  if (-e $lock_name)  { unlink $lock_name; }
   if (-e $base_name)  { rmdir  $base_name; } # in case auto-clean up fails
-  if ($proc_novnc) { killfam($proc_novnc->pid); $proc_novnc->die; }
-  # make sure QEMU and asssigned 'sh' are killed
+  
+  # make sure QEMU/noVNC and asssigned SHELLs are killed
+  if ($proc_novnc) { killfam('TERM',($proc_novnc->pid)); $proc_novnc->die; }
   if ($proc_qemu)  { killfam('TERM',($proc_qemu->pid));  $proc_qemu->die; }
 }
 
