@@ -11,7 +11,7 @@ Designed for Debian class Linux systems.
 - sudo apt install apache2 libapache2-mod-perl2 libcgi-pm-perl libsys-cpuload-perl libsys-cpu-perl libnet-dns-perl libxmu6 libxp6 sendemail
 - sudo apt install cif2hkl idl2matlab looktxt
 - sudo apt install ifit-phonons
-- sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libqcow2 qemu spice-html iptables dnsmasq
+- sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libqcow2 qemu spice-html iptables dnsmasq libproc-processtable-perl 
 - sudo adduser www-data libvirt
 - sudo adduser www-data kvm
 - sudo chmod 755 /etc/qemu-ifup
@@ -35,7 +35,7 @@ Tuning to your needs
 Phonons
 -------
 
-The Computing/sqw_phonons configuration is specified in the file:
+The computing/sqw_phonons configuration is specified in the file:
 - cgi-bin/computing_sqw_phonons.pl
   
 Then you should adapt the lines which define:
@@ -51,11 +51,17 @@ Then you should adapt the lines which define:
 Virtual Machines
 ----------------
 
-The cloud/virtual machine is specified in the file:
+The cloud/virtual machine is specified in the files:
 - html/cloud/virtualmachines/index.html
+- cgi-bin/cloud_vm.pl
 
-Add as many `<option value="blah">description</option>` lines as needed where the
-"blah" should correspond with a `blah.qcow2` file in the /var/www/html/ifit-web-services/upload area.
+In the HTML file, add as many `<option value="blah">description</option>` lines as needed where the
+"blah" should correspond with a `blah.qcow2` or `blah.iso` file in the e.g. 
+/var/www/html/ifit-web-services/upload area. We provide a very small ISO as
+example (Damn Small Linux). 
+
+In the cloud_vm.pl file, adapt the name of the SMTP server and sender email account. 
+Beware the @ char to appear as \@.
 
 USAGE
 =====
