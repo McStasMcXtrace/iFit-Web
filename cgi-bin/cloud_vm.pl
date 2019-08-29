@@ -240,8 +240,12 @@ $vm_name = $base_name . "/$service.qcow2";
 if (not $error) {
   if (-e "$upload_dir/$vm.qcow2") {
     $cmd = "qemu-img create -b $upload_dir/$vm.qcow2 -f qcow2 $vm_name";
-    $res = `$cmd`;
+    $res = `$cmd`; # execute command
     $output .= "<li>[OK] Created snapshot from <a href='http://$server_name/ifit-web-services/upload/$vm.qcow2'>$vm.qcow2</a> in <a href='http://$server_name/ifit-web-services/upload/$name'>$name</a></li>\n";
+  } elsif (-e "$upload_dir/$vm.iso") {
+    $cmd = "qemu-img create -f qcow2 $vm_name 10G";
+    $res = `$cmd`; # execute command
+    $output .= "<li>[OK] Will use ISO from <a href='http://$server_name/ifit-web-services/upload/$vm.iso'>$vm.iso</a> in <a href='http://$server_name/ifit-web-services/upload/$name'>$name</a></li>\n";
   } else {
     $error .= "Virtual Machine $vm file does not exist on this server. ";
   }
@@ -258,9 +262,15 @@ if (not $error) {
   # cast a random token key for VNC
   sub rndStr{ join'', @_[ map{ rand @_ } 1 .. shift ] };
   $novnc_token = rndStr 8, 'a'..'z', 'A'..'Z', 0..9;  # 8 random chars in [a-z A-Z digits]
-
-  $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -machine pc,accel=kvm -enable-kvm " .
-    "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
+  
+  if (-e "$upload_dir/$vm.qcow2") {
+    $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -machine pc,accel=kvm -enable-kvm " .
+      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
+  } elsif (-e "$upload_dir/$vm.iso") {
+    $cmd = "qemu-system-x86_64 -m 4096 -boot d -cdrom $upload_dir/$vm.iso " .
+      "-hda $vm_name -machine pc,accel=kvm -enable-kvm " .
+      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
+  }
   
   if ($novnc_token) {
     # must avoid output to STDOUT, so redirect STDOUT to NULL.
