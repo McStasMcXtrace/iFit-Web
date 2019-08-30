@@ -43,6 +43,7 @@ my $safe_email_characters     = "a-zA-Z0-9_.\-@";
 
 # CGI stuff --------------------------------------------------------------------
 $CGI::POST_MAX = 1024*5000; # max 5M upload
+
 my $q     = new CGI;    # create new CGI object
 my $error = "";
 
@@ -129,7 +130,7 @@ if (not $error) {
   }
 }
 
-# now get values from thre HTML form
+# now get values from the HTML form
 if (not $error) {
   $vm       = $q->param('vm');   # 1- VM base name, must match a $vm.ova filename
   if ( !$vm )
@@ -223,7 +224,9 @@ if (open($html_handle, '>', $html_name)) {
   <h1>$service: Virtual Machines: $vm</h1>
   <img alt="VirtualMachines" title="VirtualMachines"
     src="http://$server_name/ifit-web-services/cloud/virtualmachines/images/virtualmachines.png"
-    align="right" height="128" width="173">
+    align="right" height="128" width="173">  
+  <a href="http://$server_name/ifit-web-services/">iFit Web Services</a> / (c) E. Farhi Synchrotron SOLEIL (2019).
+  <hr>
 END_HTML
   close $html_handle;
 } else {
@@ -280,7 +283,7 @@ if (not $error) {
     
     # file created just for the launch, removed immediately. 
     # Any 'pipe' such as "echo 'change vnc password\n$novnc_token\n' | qemu ..." is shown in 'ps'.
-    # With a temp file and redirection, the token does not show in the process list (ps).
+    # With a temp file and redirection, the token does not appear in the process list (ps).
     $token_name = $base_name . "/token"; 
     open($token_handle, '>', $token_name);
     print $token_handle "change vnc password\n$novnc_token\n";
@@ -292,7 +295,7 @@ if (not $error) {
   if (not $proc_qemu) {
     $error .= "Could not start QEMU/KVM for $vm. ";
   } else {
-    $output .= "<li>[OK] Started QEMU/VNC for $vm with VNC on $qemuvnc_ip:1 and token '$novnc_token'</li>\n";
+    $output .= "<li>[OK] Started QEMU/VNC for $vm with VNC on $qemuvnc_ip:1</li>\n";
   }
 }
 
@@ -323,23 +326,22 @@ if (open($html_handle, '>>', $html_name)) {
 <ul>
 $output
 <li>[OK] No error, all is fine</li>
-<li><b>[OK]</b> Connect with token <b>$novnc_token</b> to your machine at <a href=$redirect target=_blank><b>$redirect</b></a>.</li>
+<li><b>[OK]</b> Connect to your machine at <a href=$redirect target=_blank><b>$redirect</b></a>.</li>
 </ul>
 <p>Hello $email !</p>
-<p>You have requested to launch a $vm virtual machine. In order to connect to it, please click on the link below, and enter the one-shot token as indicated in this message.</p>
 
-<h1><a href=$redirect target=_blank>$redirect</a></h1>
-<h1>Use one-shot token '$novnc_token' to connect</h1>
-<h3>Please exit properly the virtual machine (lower left corner/Logout/Shutdown)</h3>
+<p>You have requested to launch a $vm virtual machine. In order to connect to it, please click on the link below, and enter the one-shot token as indicated in this message.</p>
 
 <p>
 Your machine $service $vm has just started. 
 Open the following <a href=$redirect target=_blank>link to display its screen</a> 
-(click on the <b>Connect</b> button). 
+(click on the <b>Connect</b> button). You will be requested to enter a one-shot token, which you should receive by email at $email.</p>
+<p>
 Remember that the virtual machine is created on request, and destroyed afterwards. You should then export any work done there-in elsewhere (e.g. mounted disk, ssh/sftp, Dropbox, OwnCloud...).
 </p>
-<hr>
-<a href="http://$server_name/ifit-web-services/">iFit Web Services</a> / (c) E. Farhi Synchrotron SOLEIL (2019).
+
+<h1><a href=$redirect target=_blank>$redirect</a></h1>
+
 </body>
 </html>
 END_HTML
@@ -390,6 +392,7 @@ if ($email and $smtp_port) {
 if ($email and $smtp) {
   # read the HTML file and store it as a string
   my $file_content = do{local(@ARGV,$/)=$html_name;<>};
+  $file_content .= "<h1>Use one-shot token '$novnc_token' to connect</h1>";
   
   if ($email_passwd) {
     $smtp->auth($email_from,$email_passwd);
