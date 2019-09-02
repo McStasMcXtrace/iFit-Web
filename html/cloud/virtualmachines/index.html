@@ -33,13 +33,13 @@
         <tr>
           <td valign="top">Select the machine you need<b><br>
             </b></td>
-          <td valign="top">A browser showing the distant machine through
-            VNC.<br>
+          <td valign="top">A browser showing the distant machine display.<br>
           </td>
         </tr>
       </tbody>
     </table>
     <br>
+    
     <form action="/cgi-bin/cloud_vm.pl" method="post"
       enctype="multipart/form-data">
       <!-- Virtual machine choice -->
@@ -54,22 +54,41 @@
         </select>
       </p>
       <ul>
-        <li><b>Damn Small Linux:<span>&nbsp;</span></b>An<span>&nbsp;</span><i>incredibly</i><span>&nbsp;</span>small
-
-          linux distribution from<span>&nbsp;</span><a
+        <li><b>Damn Small Linux:</b> An <i>incredibly</i> small
+          linux distribution from <a
             href="http://www.damnsmalllinux.org/">DSL</a> (4.4).</li>
       </ul>
-      <!-- email -->
-      <p align="left"> <font color="#3366ff"><b>2- Indicate your email
-            address:</b></font> <input name="email" type="text"> <br>
-        <b>Required</b>, to get the connection information. Use <i>name@domain.name</i><br>
+      
+      <!-- persistent session -->
+      <p align="left"> <font color="#3366ff"><b>2- Indicate if you need a persistent session</b></font>
+        <select name="persistent">
+          <option value="no">Not persistent (single-shot login)</option>
+          <option value="yes">Persistent (until you shutdown the VM)</option>
+        </select>
       </p>
+      <ul>
+        <li>A non persistent session is cleaned when you either shutdown the virtual machine, or close the browser tab.</li>
+        <li>A persistent session keeps running until you fully shutdown the virtual machine. 
+        You may close the browser, and login again later using the same ID token sent by email. 
+        Persistent sessions may be required for e.g. long calculations.</li>
+      </ul>
+      
+      <!-- email -->
+      <p align="left"> <font color="#3366ff"><b>3- Indicate your email
+            address:</b></font> <input name="email" type="text"> <br>
+        <b>Required</b>, to get the connection information. 
+        Without it, you will NOT be able to login. 
+        Use <i>name@domain.name</i><br>
+      </p>
+      
       <p align="center"> <b><input value="LAUNCH !" type="SUBMIT"></b>
       </p>
     </form>
-    &nbsp; A virtual machine will be created. You will receive an email
-    with the connection directives. A browser window will be opened. Use
-    the one-shot token to connect to the VNC.
+    
+    A virtual machine will be created, with assigned resources (e.g. 10Gb disk, 4 CPU's, 4 Gb memory).
+    You will receive an email with the connection directives. 
+    A browser window will be opened. Use the given ID token to connect to the VNC.
+    
     <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge
@@ -84,9 +103,12 @@
       elsewhere any work</b> done there-in (e.g. mounted disk, ssh/sftp,
     DropBox, ownCloud, ...). This is a single-shot virtual machine.<br>
     <br>
-    We recommend to use the Firefox web browser to display the virtual
-    machine. Other web browsers may show an offset between two mouse
-    pointers (local and distant).<br>
+    We recommend to use the <a href="https://www.mozilla.org">Firefox</a> web browser to display the virtual
+    machine. <a href="https://www.google.com/chrome/">Google Chrome</a> is also OK. 
+    Other web browsers may show an offset between two mouse pointers (local and distant).<br>
+    <br>
+    This is an experimental service, and as such, it may be restarted for updates. 
+    We shall inform, as much as possible, logged users about any service interruption.
     <h2>How it works</h2>
     A one-shot virtual machine is cloned from a template. It is then
     started with <a href="https://www.qemu.org/">QEMU</a>/<a

@@ -67,6 +67,8 @@ $upload_short =~ s|$upload_base/||;
 
 my $redirect    = "";
 my $vm          = "";
+my $email       = "";
+my $persistent  = "no";
 my $cmd         = "";
 my $res         = "";
 my $vm_name     = "";
@@ -131,6 +133,8 @@ if (not $error) {
 }
 
 # now get values from the HTML form
+
+# VM: virtual machine name
 if (not $error) {
   $vm       = $q->param('vm');   # 1- VM base name, must match a $vm.ova filename
   if ( !$vm )
@@ -171,9 +175,21 @@ if (not $error) {
   }
 }
 
-# check email
+# PERSISTENT: kill all when VNC quits
 if (not $error) {
-  $email          = $q->param('email');      # 2- Indicate your email
+  $persistent = $q->param('persistent');      # 2- Persistent session
+  if ($persistent eq "no") {
+    $output .= "<li>[OK] Using non persistent session</li>";
+  } elsif ($persistent eq "yes") {
+    $output .= "<li>[OK] Using persistent session</li>";
+  } else {
+    $error .= "Wrong persistence choice.";
+  }
+}
+
+# EMAIL: required to send the ID and link. check email
+if (not $error) {
+  $email          = $q->param('email');      # 3- Indicate your email
   $email =~ s/[^a-zA-Z0-9_.\-@]//g; # safe_email_characters
   if ( $email =~ /^([a-zA-Z0-9_.\-@]+)$/ )
   {
@@ -303,7 +319,10 @@ if (not $error) {
 if (not $error) {
   $cmd= "$upload_base/ifit-web-services/cloud/virtualmachines/novnc/utils/websockify/run" .
     " --web $upload_base/ifit-web-services/cloud/virtualmachines/novnc/" .
-    " --run-once $novnc_port $qemuvnc_ip:5901";
+    " $novnc_port $qemuvnc_ip:5901";
+  if ($persistent eq "no") {
+    $cmd .= " --run-once";
+  }
 
   $proc_novnc = Proc::Background->new($cmd);
   if (not $proc_novnc) {
@@ -348,12 +367,16 @@ END_HTML
     close $html_handle;
     
     # we create a lock file
-    if (open($lock_handle, '>', $lock_name)) {;
+    if (open($lock_handle, '>', $lock_name)) {
+      my $pid_qemu = $proc_qemu->pid();
+      my $pid_vnc  = $proc_novnc->pid();
       print $lock_handle <<END_TEXT;
 date: $datestring
 service: $service
 machine: $vm
 pid: $$
+pid_qemu: $pid_qemu
+pid_vnc: $pid_vnc
 ip: $qemuvnc_ip
 port: $novnc_port
 directory: $base_name
@@ -422,7 +445,10 @@ if (-e $html_name)  { unlink $html_name; }
 if (-e $token_name) { unlink($token_name); } 
 
 # WAIT for QEMU/noVNC to end ---------------------------------------------------
-if (not $error and $proc_novnc) { $proc_novnc->wait; }
+if (not $error and $proc_novnc and $proc_qemu) { 
+  if ($persistent eq "no") { $proc_novnc->wait; }
+  else { $proc_qemu->wait; }
+}
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
 END {
