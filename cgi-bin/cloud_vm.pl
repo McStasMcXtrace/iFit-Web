@@ -2,7 +2,7 @@
 
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
-# sudo apt install qemu-kvm bridge-utils libqcow2 qemu iptables dnsmasq libproc-processtable-perl
+# sudo apt install qemu-kvm bridge-utils libqcow2 qemu iptables dnsmasq libproc-processtable-perl libemail-valid-perl
 # sudo adduser www-data libvirt
 # sudo adduser www-data kvm
 # sudo chmod 755 /etc/qemu-ifup
@@ -23,6 +23,7 @@ use Sys::CpuLoad;       # libsys-cpuload-perl       for CpuLoad::load
 use Proc::Background;   # libproc-background-perl   for Background->new
 use Proc::Killfam;      # libproc-processtable-perl for killfam (kill pid and children)
 use Net::SMTP;          # core Perl
+use Email::Valid;
 
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
@@ -190,10 +191,8 @@ if (not $error) {
 # EMAIL: required to send the ID and link. check email
 if (not $error) {
   $email          = $q->param('email');      # 3- Indicate your email
-  $email =~ s/[^a-zA-Z0-9_.\-@]//g; # safe_email_characters
-  if ( $email =~ /^([a-zA-Z0-9_.\-@]+)$/ )
+  if (Email::Valid->address($email))
   {
-    $email = $1;
     $output .= "<li>[OK] Hello <b>$email</b> !</li>";
   }
   else
