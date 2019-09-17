@@ -11,10 +11,13 @@ Designed for Debian class Linux systems.
 - sudo apt install apache2 libapache2-mod-perl2 libcgi-pm-perl libsys-cpuload-perl libsys-cpu-perl libnet-dns-perl libxmu6 libxp6 sendemail
 - sudo apt install cif2hkl idl2matlab looktxt
 - sudo apt install ifit-phonons
-- sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libqcow2 qemu spice-html iptables dnsmasq libproc-processtable-perl 
-- sudo adduser www-data libvirt
+- sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils qemu spice-html iptables dnsmasq libproc-processtable-perl 
 - sudo adduser www-data kvm
 - sudo chmod 755 /etc/qemu-ifup
+- copy the html directory content into /var/www/html/ifit-web-services
+- copy the cgi-bin directory content into /usr/lib/cgi-bin
+- sudo chown -R www-data /var/www/html/ifit-web-services
+- sudo a2enmod cgi
 
 or simpler:
 - sudo apt-add-repository 'deb http://packages.mccode.org/debian stable main'
@@ -71,18 +74,3 @@ open a browser and connect to:
 
 which can be accessed distantly when the server is on the net.
 
-
-CREATE LIVE DVD ISO
-===================
-
-You can try the following tools, once the web server is running.
-This way you can disseminate. But the easiest is to set-up your own system as above.
-
-** https://sourceforge.net/projects/pinguy-os/files/ISO_Builder/ **
-
-
-** https://launchpad.net/systemback **
-- sudo add-apt-repository -y ppa:nemh/systemback
-- sudo apt-get update
-- sudo apt-get install systemback
-- sudo systembac-k

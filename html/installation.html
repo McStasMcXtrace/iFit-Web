@@ -33,13 +33,14 @@
     <p>This corresponds with :<br>
     </p>
     <blockquote>
-      <pre>copy the html directory content into /var/www/html/ifit-web-services<br>copy the cgi-bin directory content into /usr/lib/cgi-bin
-sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
+      <pre>sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
 sudo apt install qemu-kvm bridge-utils qemu iptables dnsmasq libproc-processtable-perl libemail-valid-perl
 sudo apt install ifit-phonons looktxt idl2matlab cif2hkl
 sudo adduser www-data kvm
 sudo chmod 755 /etc/qemu-ifup
-sudo chown -R www-data&nbsp; /var/www/html/ifit-web-services
+copy the html directory content into /var/www/html/ifit-web-services
+copy the cgi-bin directory content into /usr/lib/cgi-bin
+sudo chown -R www-data /var/www/html/ifit-web-services
 sudo a2enmod cgi<br></pre>
     </blockquote>
     It is advisable that you configure the services by editing the files
