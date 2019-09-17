@@ -6,8 +6,8 @@
     <title>e-Computing services: Installation</title>
   </head>
   <body>
-    <iframe src="layout/header.html" name="header" width="100%"
-      height="100"></iframe> <br>
+    <iframe src="layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
     <h1> Installation</h1>
     <br>
     This service can be installed on any computer.<br>
@@ -21,28 +21,39 @@
     <br>
     <h2>Installation</h2>
     Install a Debian/Ubuntu/Mint system on a computer. You can for
-    instance get the <a
-href="http://releases.ubuntu.com/14.04.4/ubuntu-14.04.4-desktop-amd64.iso">Ubuntu
-      14.04 ISO</a>. The installation of this system can equally be done
-    on a virtual machine, for instance using <a
-      href="https://www.virtualbox.org/">VirtualBox</a>.<br>
+    instance get a <a href="http://releases.ubuntu.com/">Ubuntu</a>.
+    The installation of this system can equally be done on a virtual
+    machine, for instance using <a href="https://www.virtualbox.org/">VirtualBox</a>.<br>
     <br>
     Once set-up and running, issue the following commands in a terminal.
     For this you need the super-user (administrator) rights.<br>
     <blockquote>
       <pre>sudo apt-add-repository 'deb http://packages.mccode.org/debian stable main'<br>sudo apt-get update<br>sudo apt-get install ifit-web-services<br></pre>
     </blockquote>
-    <p>Then, it is advisable that you configure the services by editing
-      the files (search for 'configuration'):<br>
+    <p>This corresponds with :<br>
     </p>
+    <blockquote>
+      <pre>copy the html directory content into /var/www/html/ifit-web-services<br>copy the cgi-bin directory content into /usr/lib/cgi-bin
+sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
+sudo apt install qemu-kvm bridge-utils qemu iptables dnsmasq libproc-processtable-perl libemail-valid-perl
+sudo apt install ifit-phonons looktxt idl2matlab cif2hkl
+sudo adduser www-data kvm
+sudo chmod 755 /etc/qemu-ifup
+sudo chown -R www-data&nbsp; /var/www/html/ifit-web-services
+sudo a2enmod cgi<br></pre>
+    </blockquote>
+    It is advisable that you configure the services by editing the files
+    (search for 'configuration'):<br>
     <ul>
       <li>/usr/lib/cgi-bin/computing_sqw_phonons.pl</li>
+      <li>/usr/lib/cgi-bin/cloud_vm.pl</li>
     </ul>
     <p></p>
-    <p>Then you should be able to launch the services at e.g. <a href="http://localhost/ifit-web_services">http://localhost/ifit-web_services</a>
+    <p>You should be able to launch the services at e.g. <a
+        href="http://localhost/ifit-web_services">http://localhost/ifit-web_services</a>
       or the [machine IP or URL])/ifit-web_services address.</p>
     <br>
-    <iframe src="layout/footer.html" name="header" width="100%" height="100"></iframe> <br>
-  
-
-</body></html>
+    <iframe src="layout/footer.html" name="header" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>

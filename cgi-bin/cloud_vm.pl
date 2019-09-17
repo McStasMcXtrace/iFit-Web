@@ -3,7 +3,6 @@
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
 # sudo apt install qemu-kvm bridge-utils qemu iptables dnsmasq libproc-processtable-perl libemail-valid-perl
-# sudo adduser www-data libvirt
 # sudo adduser www-data kvm
 # sudo chmod 755 /etc/qemu-ifup
 
