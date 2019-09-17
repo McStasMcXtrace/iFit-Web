@@ -2,7 +2,7 @@
 
 # requirements:
 #   sudo apt-get install apache2 libapache2-mod-perl2 libcgi-pm-perl ifit-phonons libsys-cpu-perl libsys-cpuload-perl libnet-dns-perl libproc-background-perl
-# sudo apt install qemu-kvm bridge-utils libqcow2 qemu iptables dnsmasq libproc-processtable-perl libemail-valid-perl
+# sudo apt install qemu-kvm bridge-utils qemu iptables dnsmasq libproc-processtable-perl libemail-valid-perl
 # sudo adduser www-data libvirt
 # sudo adduser www-data kvm
 # sudo chmod 755 /etc/qemu-ifup
@@ -30,10 +30,10 @@ use Email::Valid;
 # ------------------------------------------------------------------------------
 
 # the name of the SMTP server, and optional port
-my $smtp_server = "smtp.synchrotron-soleil.fr";
+my $smtp_server = ""; # smtp.synchrotron-soleil.fr";
 my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
-my $email_from   = "luke.skywalker\@synchrotron-soleil.eu";
+my $email_from   = ""; # luke.skywalker\@synchrotron-soleil.eu";
 # the password for the sender on the SMTP server, or left blank
 my $email_passwd = "";
 my $safe_email_characters     = "a-zA-Z0-9_.\-@";
@@ -359,6 +359,8 @@ Remember that the virtual machine is created on request, and destroyed afterward
 </p>
 
 <h1><a href=$redirect target=_blank>$redirect</a></h1>
+In case the link is not functional (I guessed wrong your computer name), try: <br>
+<a href=http://$remote_host:$novnc_port/vnc.html?host=$remote_host&port=$novnc_port>http://$remote_host:$novnc_port/vnc.html?host=$remote_host&port=$novnc_port</a>
 
 </body>
 </html>
@@ -431,6 +433,14 @@ if ($email and $smtp) {
   $smtp->datasend($file_content);
   $smtp->dataend;
   $smtp->quit;
+} else {
+  # add the token to the HTML message (else there is no output)
+  if (open($html_handle, '>>', $html_name)) {
+    print $html_handle <<END_HTML;
+<h1>Use one-shot token '$novnc_token' to connect</h1>
+END_HTML
+    close $html_handle;
+  }
 }
 
 # REDIRECT TO THAT TEMPORARY FILE (this is our display) ------------------------
