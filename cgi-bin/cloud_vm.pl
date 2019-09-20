@@ -35,7 +35,6 @@ my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
 my $email_from   = ""; # luke.skywalker\@synchrotron-soleil.eu";
 # the password for the sender on the SMTP server, or left blank
 my $email_passwd = "";
-my $safe_email_characters     = "a-zA-Z0-9_.\-@";
 
 # ==============================================================================
 # DECLARE all our variables
