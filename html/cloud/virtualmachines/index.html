@@ -33,62 +33,82 @@
         <tr>
           <td valign="top">Select the machine you need<b><br>
             </b></td>
-          <td valign="top">A browser showing the distant machine display.<br>
+          <td valign="top">A browser showing the distant machine
+            display.<br>
           </td>
         </tr>
       </tbody>
     </table>
     <br>
-    
     <form action="/cgi-bin/cloud_vm.pl" method="post"
       enctype="multipart/form-data">
       <!-- Virtual machine choice -->
-      <p align="left"> <font color="#3366ff"><b>1- Indicate the machine
-            you need:</b></font>
-        <!-- THIS IS WHERE YOU ADD MACHINE NAMES =========================== -->
-        <!-- Add as many <option value="blah">description</option> lines as  -->
-        <!-- needed where the "blah" should correspond with a blah.qcow2 or  -->
-        <!-- blah.iso file in the upload area -->
-        <select name="vm">
-          <option value="dsl">Damn Small Linux</option>
-        </select>
-      </p>
-      <ul>
-        <li><b>Damn Small Linux:</b> An <i>incredibly</i> small
-          linux distribution from <a
-            href="http://www.damnsmalllinux.org/">DSL</a> (4.4).</li>
-      </ul>
-      
-      <!-- persistent session -->
-      <p align="left"> <font color="#3366ff"><b>2- Indicate if you need a persistent session</b></font>
-        <select name="persistent">
-          <option value="no">Not persistent (single-shot login)</option>
-          <option value="yes">Persistent (until you shutdown the VM)</option>
-        </select>
-      </p>
-      <ul>
-        <li>A non persistent session is cleaned when you either shutdown the virtual machine, or close the browser tab.</li>
-        <li>A persistent session keeps running until you fully shutdown the virtual machine. 
-        You may close the browser, and login again later using the same ID token sent by email. 
-        Persistent sessions may be required for e.g. long calculations.</li>
-      </ul>
-      
-      <!-- email -->
-      <p align="left"> <font color="#3366ff"><b>3- Indicate your email
-            address:</b></font> <input name="email" type="text"> <br>
-        <b>Required</b>, to get the connection information. 
-        Without it, you will NOT be able to login. 
-        Use <i>name@domain.name</i><br>
-      </p>
-      
+      <p align="left"> </p>
+      <table border="1" cellpadding="2" cellspacing="2" width="100%">
+        <tbody>
+          <tr>
+            <td valign="top"><img alt="system" title="system"
+                src="images/logo-system.png" height="126" width="128"><br>
+            </td>
+            <td valign="top"><font color="#3366ff"><b>1- Indicate the
+                  machine you need:</b></font>
+              <select name="vm">
+                <option value="dsl">Damn Small Linux</option>
+              </select>
+              <ul>
+                <li><b>Damn Small Linux:</b> An <i>incredibly</i> small
+                  linux distribution from <a
+                    href="http://www.damnsmalllinux.org/">DSL</a> (4.4).</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="persistent" title="persistent"
+                src="images/logo-save.png" height="124" width="128"><br>
+            </td>
+            <td valign="top">
+              <p align="left"> <font color="#3366ff"><b>2- Indicate if
+                    you need a persistent session</b></font>
+                <select name="persistent">
+                  <option value="no">Not persistent (single-shot login)</option>
+                  <option value="yes">Persistent (until you shutdown the
+                    VM)</option>
+                </select>
+              </p>
+              <ul>
+                <li>A non persistent session is cleaned when you either
+                  shutdown the virtual machine, or close the browser
+                  tab.</li>
+                <li>A persistent session keeps running until you fully
+                  shutdown the virtual machine. You may close the
+                  browser, and login again later using the same ID token
+                  sent by email. Persistent sessions may be required for
+                  e.g. long calculations.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="email" title="email"
+                src="images/logo-email.png" height="113" width="128"><br>
+            </td>
+            <td valign="top">
+              <p align="left"><br>
+              </p>
+              <font color="#3366ff"><b>3- Indicate your email address:</b></font>
+              <input name="email" type="text"> <br>
+              <b>Required</b>, to get the connection information.
+              Without it, you will NOT be able to login. Use <i>name@domain.name</i></td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
       <p align="center"> <b><input value="LAUNCH !" type="SUBMIT"></b>
       </p>
     </form>
-    
-    A virtual machine will be created, with assigned resources (e.g. 10Gb disk, 4 CPU's, 4 Gb memory).
-    You will receive an email with the connection directives. 
-    A browser window will be opened. Use the given ID token to connect to the VNC.
-    
+    A virtual machine will be created, with assigned resources (e.g.
+    10Gb disk, 4 CPU's, 4 Gb memory). You will receive an email with the
+    connection directives. A browser window will be opened. Use the
+    given ID token to connect to the VNC.
     <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge
@@ -103,12 +123,15 @@
       elsewhere any work</b> done there-in (e.g. mounted disk, ssh/sftp,
     DropBox, ownCloud, ...). This is a single-shot virtual machine.<br>
     <br>
-    We recommend to use the <a href="https://www.mozilla.org">Firefox</a> web browser to display the virtual
-    machine. <a href="https://www.google.com/chrome/">Google Chrome</a> is also OK. 
-    Other web browsers may show an offset between two mouse pointers (local and distant).<br>
+    We recommend to use the <a href="https://www.mozilla.org">Firefox</a>
+    web browser to display the virtual machine. <a
+      href="https://www.google.com/chrome/">Google Chrome</a> is also
+    OK. Other web browsers may show an offset between two mouse pointers
+    (local and distant).<br>
     <br>
-    This is an experimental service, and as such, it may be restarted for updates. 
-    We shall inform, as much as possible, logged users about any service interruption.
+    This is an experimental service, and as such, it may be restarted
+    for updates. We shall inform, as much as possible, logged users
+    about any service interruption.
     <h2>How it works</h2>
     A one-shot virtual machine is cloned from a template. It is then
     started with <a href="https://www.qemu.org/">QEMU</a>/<a
