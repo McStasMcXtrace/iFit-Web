@@ -9,12 +9,12 @@
       width="100%"></iframe> <br>
     <h1 class="csc-firstHeader" align="center"><i><img alt="sqw_phonons"
           title="sqw_phonons" src="images/Models_sqw_ph_ase.png"
-          width="128" height="95" align="middle">&nbsp;sqw_phonons:
+          align="middle" height="95" width="128">&nbsp;sqw_phonons:
         Phonon dispersions in 4D<br>
       </i></h1>
     <div align="center"><i>version 1.9</i><i> - E. Farhi, March 2017</i>
     </div>
-    <hr width="100%" size="2"> <br>
+    <hr size="2" width="100%"> <br>
     The <b>sqw_phonons</b> tool, which is part of <a
       href="http://ifit.mccode.org">iFit</a>, is a tool to compute the
     phonon dispersion curves (vibrational modes) in 4D (HKLE) and for
@@ -31,12 +31,12 @@
         href="example/index.html">this</a>.<br>
       <br>
     </i>
-    <table width="100%" cellspacing="2" cellpadding="2" border="1">
+    <table border="1" cellpadding="2" cellspacing="2" width="100%">
       <tbody>
         <tr>
-          <td valign="top" bgcolor="#ffcc99"><b>INPUT: sqw_phonons</b><b><br>
+          <td bgcolor="#ffcc99" valign="top"><b>INPUT: sqw_phonons</b><b><br>
             </b></td>
-          <td valign="top" bgcolor="#ffcc99"><b>OUTPUT</b><b><br>
+          <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
             </b></td>
         </tr>
         <tr>
@@ -57,73 +57,116 @@
     <br>
     <form action="/cgi-bin/computing_sqw_phonons.pl" method="post"
       enctype="multipart/form-data">
-      <p align="left"> <font color="#3366ff"><b>1- Material structure
-            (max 5Mb):</b></font> <input name="material" type="file"><br>
-        Any file format supported by the ASE can be used, such as (<a
-          href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
-        <a
-          href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
-        <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, <a
-href="http://accelrys.com/products/collaborative-science/biovia-materials-studio/">MDL</a>/SDF/XSD,
-        ...). <br>
-        See the file format full list <a
-          href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
-        We provide a few examples: <a href="POSCAR_Al">Al</a>, <a
-          href="POSCAR_AlN">AlN</a>, <a href="POSCAR_MgO">MgO</a>, <a
-          href="POSCAR_Si">Si</a>, <a href="POSCAR_NaCl">NaCl</a>, <a
-          href="POSCAR_SrTiO3">SrTiO3</a>. You can also look at:
-        <meta http-equiv="content-type" content="text/html;
-          charset=UTF-8">
-      </p>
-      <ul style="color: rgb(0, 0, 0); font-family: 'Times New Roman';
-        font-size: medium; font-style: normal; font-variant: normal;
-        font-weight: normal; letter-spacing: normal; line-height:
-        normal; orphans: auto; text-align: start; text-indent: 0px;
-        text-transform: none; white-space: normal; widows: 1;
-        word-spacing: 0px; -webkit-text-stroke-width: 0px;">
-        <li>MaterialsProject&lt;<a
-            href="https://www.materialsproject.org/">https://www.materialsproject.org/</a>&gt;
-          and get e.g. POSCAR files ;<br>
-        </li>
-        <li>PhononDB &lt;<a href="http://phonondb.mtl.kyoto-u.ac.jp/">http://phonondb.mtl.kyoto-u.ac.jp/</a>&gt;
-          and get POSCAR files ;<br>
-        </li>
-        <li>NoMaD repository &lt;<a
-            href="http://nomad-repository.eu/cms/">http://nomad-repository.eu/cms/</a>&gt;and
-          get many configurations ;<br>
-        </li>
-        <li>Inorganic Crystal Structure Database &lt;<a
-            href="http://icsd.ill.fr">http://icsd.ill.fr</a>&gt; with
-          plenty of CIFs.</li>
-      </ul>
       <p align="left"> </p>
-      <p align="left"> <font color="#3366ff"><b>2- Indicate the
-            calculator to use:</b></font>
-        <select name="calculator">
-          <option value="QuantumEspresso_ASE" selected="selected">QuantumEspresso:
+      <table border="0" cellpadding="2" cellspacing="2" width="100%">
+        <tbody>
+          <tr>
+            <td valign="top"><font color="#3366ff"><b><img alt="crystal"
+                    title="crystal"
+src="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/images/logo-crystal.png"
+                    align="left" height="127" width="128"></b></font></td>
+            <td valign="top">
+              <p align="left"><font color="#3366ff"><b>1- Material
+                    structure (max 5Mb):</b></font> <input
+                  name="material" type="file"><br>
+                Any file format supported by the ASE can be used, such
+                as (<a
+                  href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
+                <a
+                  href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
+                <a href="http://www.rcsb.org/pdb/">PDB</a>, ETSF, <a
+href="http://accelrys.com/products/collaborative-science/biovia-materials-studio/">MDL</a>/SDF/XSD,
 
-            Plane-wave pseudopotential code/ASE. Pseudo: SSSP Accuracy</option>
-          <option value="QuantumEspresso">QuantumEspresso: Plane-wave
-            pseudopotential code/PHON. Pseudo: SSSP Accuracy</option>
-          <option value="ABINIT_GBRV">ABINIT: Plane-wave pseudopotential
-            code. Pseudo: GBRV</option>
-          <option value="ABINIT_JTH">ABINIT: Plane-wave pseudopotential
-            code. Pseudo: JTH</option>
-          <option value="ELK">ELK: Full Potential LAPW code, similar to
-            Wien2k. All-electron full-potential</option>
-          <option value="GPAW">GPAW: Real-space/plane-wave/LCAO PAW
-            code. Pseudo: 0.9.11971</option>
-          <option value="VASP">VASP: Plane-wave PAW code, when installed
-          </option>
-          <option value="EMT">EMT: Effective Medium Theory
-            (Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O)</option>
-        </select>
-        <br>
-        We recommend <b>QuantumEspresso</b> and <b>ABINIT</b> (or EMT
-        with a simple metal for a try). </p>
+                ...). <br>
+                See the file format full list <a
+                  href="https://wiki.fysik.dtu.dk/ase/ase/io.html#module-ase.io">here</a>.
+                We provide a few examples: <a
+href="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/POSCAR_Al">Al</a>,
+                <a
+href="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/POSCAR_AlN">AlN</a>,
+                <a
+href="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/POSCAR_MgO">MgO</a>,
+                <a
+href="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/POSCAR_Si">Si</a>,
+                <a
+href="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/POSCAR_NaCl">NaCl</a>,
+                <a
+href="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/POSCAR_SrTiO3">SrTiO3</a>.
+                You can also look at: </p>
+              <ul style="color: rgb(0, 0, 0); font-family: 'Times New
+                Roman'; font-size: medium; font-style: normal;
+                font-variant: normal; font-weight: normal;
+                letter-spacing: normal; line-height: normal; orphans:
+                auto; text-align: start; text-indent: 0px;
+                text-transform: none; white-space: normal; widows: 1;
+                word-spacing: 0px; -webkit-text-stroke-width: 0px;">
+                <li>MaterialsProject&lt;<a
+                    href="https://www.materialsproject.org/">https://www.materialsproject.org/</a>&gt;
+
+                  and get e.g. POSCAR files ;<br>
+                </li>
+                <li>PhononDB &lt;<a
+                    href="http://phonondb.mtl.kyoto-u.ac.jp/">http://phonondb.mtl.kyoto-u.ac.jp/</a>&gt;
+
+                  and get POSCAR files ;<br>
+                </li>
+                <li>NoMaD repository &lt;<a
+                    href="http://nomad-repository.eu/cms/">http://nomad-repository.eu/cms/</a>&gt;and
+
+                  get many configurations ;<br>
+                </li>
+                <li>Inorganic Crystal Structure Database &lt;<a
+                    href="http://icsd.ill.fr">http://icsd.ill.fr</a>&gt;
+                  with plenty of CIFs.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><font color="#3366ff"><b><img
+                    alt="calculator" title="calculator"
+src="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/images/logo-calculator.png"
+                    align="left" height="150" width="128"></b></font></td>
+            <td valign="top"><font color="#3366ff"><b>2- Indicate the
+                  calculator to use:</b></font>
+              <select name="calculator">
+                <option value="QuantumEspresso_ASE" selected="selected">QuantumEspresso:
+
+
+                  Plane-wave pseudopotential code/ASE. Pseudo: SSSP
+                  Accuracy</option>
+                <option value="QuantumEspresso">QuantumEspresso:
+                  Plane-wave pseudopotential code/PHON. Pseudo: SSSP
+                  Accuracy</option>
+                <option value="ABINIT_GBRV">ABINIT: Plane-wave
+                  pseudopotential code. Pseudo: GBRV</option>
+                <option value="ABINIT_JTH">ABINIT: Plane-wave
+                  pseudopotential code. Pseudo: JTH</option>
+                <option value="ELK">ELK: Full Potential LAPW code,
+                  similar to Wien2k. All-electron full-potential</option>
+                <option value="GPAW">GPAW: Real-space/plane-wave/LCAO
+                  PAW code. Pseudo: 0.9.11971</option>
+                <option value="VASP">VASP: Plane-wave PAW code, when
+                  installed </option>
+                <option value="EMT">EMT: Effective Medium Theory
+                  (Al,Cu,Ag,Au,Ni,Pd,Pt,H,C,N,O)</option>
+              </select>
+              <br>
+              We recommend <b>QuantumEspresso</b> and <b>ABINIT</b>
+              (or EMT with a simple metal for a try).<br>
+              <br>
+              Quantum Espresso and ABINIT are good choices, with
+              excellent parallelization and accuracy. <br>
+              GPAW is usually slower than QuantumEspresso. <br>
+              Elk is often slower than Quantum Espresso, but is very
+              accurate. <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p align="left"></p>
       <ul>
       </ul>
-      <table width="100%" cellspacing="2" cellpadding="2" border="1">
+      <table border="1" cellpadding="2" cellspacing="2" width="100%">
         <tbody>
           <tr>
             <td valign="top"><b><font color="#cc33cc">Calculator</font></b><br>
@@ -148,6 +191,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
               and <a href="http://www.quantum-espresso.org/">Quantum
                 Espresso</a>. Using the <a
                 href="http://materialscloud.org/">SSSP library</a>. <i>Fast
+
                 and proven code.</i></td>
             <td valign="top"><b><font color="#33cc00">0.3</font> </b><br>
             </td>
@@ -155,7 +199,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           <tr>
             <td valign="top"><a href="http://www.abinit.org/"><img
                   alt="abinit" title="abinit" src="images/abinit.png"
-                  align="middle" border="0" height="34" width="80"></a><a
+                  border="0" align="middle" height="34" width="80"></a><a
                 href="http://www.abinit.org/">&nbsp;ABINIT</a></td>
             <td valign="top">Plane-wave pseudopotential code. Using <a
                 href="https://www.physics.rutgers.edu/gbrv/">GBRV</a>
@@ -168,8 +212,8 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           </tr>
           <tr>
             <td valign="top"><a href="http://elk.sourceforge.net/"><img
-                  alt="elk" title="elk" src="images/elk.png"
-                  align="middle" border="0" height="47" width="81"></a><a
+                  alt="elk" title="elk" src="images/elk.png" border="0"
+                  align="middle" height="47" width="81"></a><a
                 href="http://elk.sourceforge.net/">&nbsp;ELK</a></td>
             <td valign="top">Full Potential, all electrons LAPW code,
               similar to Wien2k.<br>
@@ -180,11 +224,12 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           <tr>
             <td valign="top"><a href="http://wiki.fysik.dtu.dk/gpaw"><img
                   alt="GPAW" title="GPAW" src="images/logo-gpaw.png"
-                  align="middle" border="0" height="39" width="80"> </a><a
+                  border="0" align="middle" height="39" width="80"> </a><a
                 href="http://wiki.fysik.dtu.dk/gpaw">GPAW</a><a
                 href="http://wiki.fysik.dtu.dk/gpaw"><br>
               </a></td>
             <td valign="top">Real-space/plane-wave/LCAO PAW code. <i>Fast
+
                 and proven code.</i></td>
             <td valign="top">1.5<br>
             </td>
@@ -192,7 +237,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
           <tr>
             <td valign="top"><a href="https://www.vasp.at/"><img
                   alt="vasp" title="vasp" src="images/vasp.png"
-                  align="middle" border="0" height="50" width="77"></a><a
+                  border="0" align="middle" height="50" width="77"></a><a
                 href="https://www.vasp.at/"> VASP</a><br>
             </td>
             <td valign="top">Plane-wave PAW code. <b><i>Requires a
@@ -216,124 +261,174 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
         </tbody>
       </table>
       <br>
-      Quantum Espresso and ABINIT are good choices, with excellent
-      parallelization and accuracy. <br>
-      GPAW is usually slower than QuantumEspresso. <br>
-      Elk is often slower than Quantum Espresso, but is very accurate.
-      <p align="left"> <font color="#3366ff"><b>3- Indicate if the
-            material is a conductor or insulator:</b></font>
-        <select name="smearing">
-          <option value="metal" selected="selected">Conductor (e.g.
-            metal, smearing 0.27 eV)</option>
-          <option value="semiconductor">Perhaps/semiconductor (smearing 0.1 meV)</option>
-          <option value="insulator">Insulator (no smearing)</option>
-        </select>
-        <br>
-        If you don't know, leave the smearing on ('Perhaps' or
-        'Conductor'), to help convergence. </p>
-      <p align="left"> <font color="#3366ff"><b>4- Indicate the energy
-            cut-off:</b></font>
-        <select name="ecut">
-          <option value="0" selected="selected">(default)</option>
-          <option value="260">260 eV (fast, may fail)</option>
-          <option value="340">340 eV (fast, may fail)</option>
-          <option value="500">500 eV</option>
-          <option value="1000">1000 eV (recommended)</option>
-          <option value="1500">1500 eV</option>
-          <option value="2000">2000 eV</option>
-        </select>
-        <br>
-        Nice people say the cut-off energy should not be lower than 1000
-        eV. <b>WARNING: ABINIT requires 1000 eV</b> cutoff (or more).<br>
-        For fast computations, you can use 260 or 340 eV, but it may
-        fail.<br>
-        The <a
-          href="https://www.materialsproject.org/docs/calculations">MaterialsProject
+      <table border="0" cellpadding="2" cellspacing="2" width="100%">
+        <tbody>
+          <tr>
+            <td valign="top"><font color="#3366ff"><b><img
+                    alt="conductor" title="conductor"
+src="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/images/logo-metallic.png"
+                    align="left" height="132" width="128"></b></font></td>
+            <td valign="top">
+              <p align="left"> <font color="#3366ff"><b>3- Indicate if
+                    the material is a conductor or insulator:</b></font>
+                <select name="smearing">
+                  <option value="metal" selected="selected">Conductor
+                    (e.g. metal, smearing 0.27 eV)</option>
+                  <option value="semiconductor">Perhaps/semiconductor
+                    (smearing 0.1 meV)</option>
+                  <option value="insulator">Insulator (no smearing)</option>
+                </select>
+                <br>
+                If you don't know, leave the smearing on ('Perhaps' or
+                'Conductor'), to help convergence.<br>
+              </p>
+              <p align="left"><br>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><font color="#3366ff"><b><img alt="cut-off"
+                    title="cut-off"
+src="file:///home/farhi/dev/iFit-Web/html/computing/sqw_phonons/images/logo-thermometer.png"
+                    align="left" height="136" width="128"></b></font></td>
+            <td valign="top">
+              <p align="left"> <font color="#3366ff"><b>4- Indicate the
+                    energy cut-off:</b></font>
+                <select name="ecut">
+                  <option value="0" selected="selected">(default)</option>
+                  <option value="260">260 eV (fast, may fail)</option>
+                  <option value="340">340 eV (fast, may fail)</option>
+                  <option value="500">500 eV</option>
+                  <option value="1000">1000 eV (recommended)</option>
+                  <option value="1500">1500 eV</option>
+                  <option value="2000">2000 eV</option>
+                </select>
+                <br>
+                Nice people say the cut-off energy should not be lower
+                than 1000 eV. <b>WARNING: ABINIT requires 1000 eV</b>
+                cutoff (or more).<br>
+                For fast computations, you can use 260 or 340 eV, but it
+                may fail.<br>
+                The <a
+                  href="https://www.materialsproject.org/docs/calculations">MaterialsProject
 
-          documentation</a> mentions a 520 eV cut-off energy.<br>
-      </p>
-      <p align="left"> <font color="#3366ff"><b>5- Indicate the
-            K-points binning:</b></font>
-        <select name="kpoints">
-          <option value="0" selected="selected">automatic</option>
-          <option value="2">2x2x2 (fast but may fail)</option>
-          <option value="3">3x3x3</option>
-          <option value="4">4x4x4</option>
-          <option value="5">5x5x5</option>
-          <option value="6">6x6x6</option>
-        </select>
-        <br>
-        Using a Monkhorst-Pack K-points mesh 3x3x3 is the minimum for
-        sensible results. You can try smaller as a test, but this will
-        probably give you strange results. The <a
-          href="https://www.materialsproject.org/docs/calculations">MaterialsProject
 
-          documentation</a> mentions a recommended value <i>K</i><i><sup>3</sup></i>=1000/(<i>nb
+                  documentation</a> mentions a 520 eV cut-off energy.<br>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="grid" title="grid"
+                src="images/logo-grid.png" height="129" width="128"></td>
+            <td valign="top"><font color="#3366ff"><b>5- Indicate the
+                  K-points binning:</b></font>
+              <select name="kpoints">
+                <option value="0" selected="selected">automatic</option>
+                <option value="2">2x2x2 (fast but may fail)</option>
+                <option value="3">3x3x3</option>
+                <option value="4">4x4x4</option>
+                <option value="5">5x5x5</option>
+                <option value="6">6x6x6</option>
+              </select>
+              <br>
+              Using a Monkhorst-Pack K-points mesh 3x3x3 is the minimum
+              for sensible results. You can try smaller as a test, but
+              this will probably give you strange results. The <a
+                href="https://www.materialsproject.org/docs/calculations">MaterialsProject
 
-          of atoms in the cell</i>) criteria. This results in typically
-        a 4x4x4 mesh for 12-20 atoms (e.g. <i>CaF</i><i><sub>2</sub></i><i>,
-          UO</i><i><sub>2</sub></i><i>, CrCuS</i><i><sub>2</sub></i>,
-        ...). This parameter has large impact on the computation time.
-        Increasing the K-point binning is equivalent to increasing the
-        supercell size. When in automatic mode, the k-point density will be made higher than 1000.<br>
-      </p>
-      <p align="left"> <font color="#3366ff"><b>6- Indicate the
-            supercell size:</b></font>
-        <select name="supercell">
-          <option value="0" selected="selected">automatic</option>
-          <option value="2">2x2x2 (fast but may fail)</option>
-          <option value="3">3x3x3</option>
-          <option value="4">4x4x4</option>
-          <option value="5">5x5x5</option>
-          <option value="6">6x6x6</option>
-        </select>
-        <br>
-        A 'supercell' is built by replicating the initial structure, to
-        assemble a larger system and provide a more accurate vibrational
-        spectra. Using a supercell 3x3x3 is often the minimum for
-        sensible results. For large material structures (containing many
-        atoms), you may try 2x2x2. This parameter has large impact on
-        the computation time, as it multiplies the number of atoms in
-        the model. Increasing the supercell size is equivalent to
-        increasing the K-point binning. When in automatic mode, the k-point density will be made higher than 1000.</p>
-      <p align="left"> <font color="#3366ff"><b>7- Indicate the maximum
-            number of iterations for SCF convergence:</b></font>
-        <select name="nsteps">
-          <option value="0" selected="selected">(default)</option>
-          <option value="100">100</option>
-          <option value="200">200</option>
-          <option value="200">500 (will be long...)</option>
-        </select>
-        <br>
-        Each computation step requires to determine the material energy.
-        This is achieved in a self consistent cycle. The maximum number
-        of iterations determines when to consider that the material
-        energy can not be determined accurately. In this case, it may be
-        that the material structure is not stable, in which case a
-        structure optimization should be performed first. The 'default'
-        choice depends on the selected calculator, and it often is in
-        the range 30-100.<br>
-      </p>
-      <p align="left"> <font color="#3366ff"><b>8- Optimize the
-            material structure first:</b></font>
-        <select name="optimizer">
-          <option value="" selected="selected">no</option>
-          <option value="MDmin">yes (short MD)</option>
-        </select>
-        <br>
-        It is desirable to use an already optimized structure as input (<i>step
-          1</i>- above). However, in case this is not true, the material
-        structure can first be optimized in a short molecular dynamics
-        simulation which 'shakes' the structure to find a better (lower
-        energy) configuration before computing the phonons. The lattice
-        cell parameter are kept constant. <b>WARNING: The structure
-          optimization can not be performed with the
-          QuantumEspresso/PHON calculator.</b><br>
-      </p>
-      <p align="left"> <font color="#3366ff"><b>9- Indicate your email
-            address:</b></font> <input name="email" type="text"> <br>
-        <b>Required</b>, to be warned when the calculation ends. Use <i>name@domain.name</i><br>
-      </p>
+
+                documentation</a> mentions a recommended value <i>K</i><i><sup>3</sup></i>=1000/(<i>nb
+
+
+                of atoms in the cell</i>) criteria. This results in
+              typically a 4x4x4 mesh for 12-20 atoms (e.g. <i>CaF</i><i><sub>2</sub></i><i>,
+                UO</i><i><sub>2</sub></i><i>, CrCuS</i><i><sub>2</sub></i>,
+              ...). This parameter has large impact on the computation
+              time. Increasing the K-point binning is equivalent to
+              increasing the supercell size. When in automatic mode, the
+              k-point density will be made higher than 1000.</td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="grid" title="grid"
+                src="images/logo-grid.png" height="129" width="128"><br>
+            </td>
+            <td valign="top"><font color="#3366ff"><b>6- Indicate the
+                  supercell size:</b></font>
+              <select name="supercell">
+                <option value="0" selected="selected">automatic</option>
+                <option value="2">2x2x2 (fast but may fail)</option>
+                <option value="3">3x3x3</option>
+                <option value="4">4x4x4</option>
+                <option value="5">5x5x5</option>
+                <option value="6">6x6x6</option>
+              </select>
+              <br>
+              A 'supercell' is built by replicating the initial
+              structure, to assemble a larger system and provide a more
+              accurate vibrational spectra. Using a supercell 3x3x3 is
+              often the minimum for sensible results. For large material
+              structures (containing many atoms), you may try 2x2x2.
+              This parameter has large impact on the computation time,
+              as it multiplies the number of atoms in the model.
+              Increasing the supercell size is equivalent to increasing
+              the K-point binning. When in automatic mode, the k-point
+              density will be made higher than 1000.</td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="iterations" title="iterations"
+                src="images/logo-iterations.png" height="135"
+                width="128"><br>
+            </td>
+            <td valign="top"><font color="#3366ff"><b>7- Indicate the
+                  maximum number of iterations for SCF convergence:</b></font>
+              <select name="nsteps">
+                <option value="0" selected="selected">(default)</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="200">500 (will be long...)</option>
+              </select>
+              <br>
+              Each computation step requires to determine the material
+              energy. This is achieved in a self consistent cycle. The
+              maximum number of iterations determines when to consider
+              that the material energy can not be determined accurately.
+              In this case, it may be that the material structure is not
+              stable, in which case a structure optimization should be
+              performed first. The 'default' choice depends on the
+              selected calculator, and it often is in the range 30-100.</td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="optimize" title="optimize"
+                src="images/logo-optimize.png" height="124" width="128"><br>
+            </td>
+            <td valign="top"><font color="#3366ff"><b>8- Optimize the
+                  material structure first:</b></font>
+              <select name="optimizer">
+                <option value="" selected="selected">no</option>
+                <option value="MDmin">yes (short MD)</option>
+              </select>
+              <br>
+              It is desirable to use an already optimized structure as
+              input (<i>step 1</i>- above). However, in case this is not
+              true, the material structure can first be optimized in a
+              short molecular dynamics simulation which 'shakes' the
+              structure to find a better (lower energy) configuration
+              before computing the phonons. The lattice cell parameter
+              are kept constant.&nbsp;</td>
+          </tr>
+          <tr>
+            <td valign="top"><img alt="email" title="email"
+                src="images/logo-email.png" height="113" width="128"><br>
+            </td>
+            <td valign="top"><font color="#3366ff"><b>9- Indicate your
+                  email address:</b></font> <input name="email"
+                type="text"> <br>
+              <b>Required</b>, to be warned when the calculation ends.
+              Use <i>name@domain.name</i></td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
       <p align="center"> <b><input value="COMPUTE !" type="SUBMIT"></b>
       </p>
     </form>
@@ -359,27 +454,38 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
       </li>
       <li>The archive contains input data files, log files, images (PNG,
         VTK, MRC, FIG/MAT, ...).</li>
-      <li>The Model is provided as a Matlab object, to be used within <a href="http://ifit.mccode.org">iFit</a>, which evaluation is
+      <li>The Model is provided as a Matlab object, to be used within <a
+          href="http://ifit.mccode.org">iFit</a>, which evaluation is
         very fast, without the need to restart the DFT.<br>
       </li>
-      <li>You can read and analyze the results with <a href="http://ifit.mccode.org">iFit</a>.</li>
+      <li>You can read and analyze the results with <a
+          href="http://ifit.mccode.org">iFit</a>.</li>
     </ul>
-    <hr width="100%" size="2">
+    <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge:<br>
     <ul>
-      <li>E. Farhi, Y. Debab and P. Willendrup, <span style="font-style: italic;">J. Neut. Res</span>., <span style="font-weight: bold;">17</span> (2013) 5. <a href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+      <li>E. Farhi, Y. Debab and P. Willendrup, <span
+          style="font-style: italic;">J. Neut. Res</span>., <span
+          style="font-weight: bold;">17</span> (2013) 5. <a
+href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:
+
           10.3233/JNR-130001 </a></li>
       <li>S. R. Bahn and K. W. Jacobsen, <i>Comput. Sci. Eng</i>., Vol.
         <b>4</b>, 56-66, 2002.</li>
       <li>Other references are indicated in the report sent when the
         computation completes.</li>
     </ul>
-    This software source code (<a href="http://ifit.mccode.org/Downloads/">here</a>) is freely
+    This software source code (<a
+      href="http://ifit.mccode.org/Downloads/">here</a>) is freely
     available as part of iFit <a href="http://ifit.mccode.org">ifit.mccode.org</a>,
     and <a href="https://github.com/McStasMcXtrace/iFit">GitHub
-      repository</a>.<a href="http://ifit.mccode.org"><img alt="iFit" title="iFit" src="images/iFit-logo.png" width="116" height="64" align="right"></a><img alt="ase" title="ase" src="images/ase256.png" width="64" height="64" align="right"><br>
-    A Debian package installer <a href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/ifit-phonons_1.8_amd64.deb">ifit-phonons</a>
+      repository</a>.<a href="http://ifit.mccode.org"><img alt="iFit"
+        title="iFit" src="images/iFit-logo.png" align="right"
+        height="64" width="116"></a><img alt="ase" title="ase"
+      src="images/ase256.png" align="right" height="64" width="64"><br>
+    A Debian package installer <a
+href="http://packages.mccode.org/debian/dists/stable/main/binary-amd64/ifit-phonons_1.8_amd64.deb">ifit-phonons</a>
     exists for e.g. Ubuntu/Mint at <a href="http://packages.mccode.org">packages.mccode.org</a>
     <h2>Limitations</h2>
     There is no guaranty that the phonon dispersions that will be
@@ -393,7 +499,7 @@ href="http://accelrys.com/products/collaborative-science/biovia-materials-studio
     Currently, this service <b>only</b> computes the vibrational modes
     energy, <b>not</b> their intensity and polarisation vectors.<br>
     <br>
-    <iframe src="../../layout/footer.html" name="footer" width="100%" height="100"></iframe> <br>
-  
-
-</body></html>
+    <iframe src="../../layout/footer.html" name="footer" height="100"
+      width="100%"></iframe> <br>
+  </body>
+</html>
