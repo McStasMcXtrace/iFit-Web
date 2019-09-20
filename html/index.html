@@ -5,8 +5,8 @@
     <title>e-Computing services</title>
   </head>
   <body>
-    <iframe src="layout/header.html" name="header" width="100%"
-      height="100"></iframe> <br>
+    <iframe src="layout/header.html" name="header" height="100"
+      width="100%"></iframe> <br>
     <h1 align="center">e-Computing services</h1>
     <div align="center"><i>E. Farhi, Aug 2019</i><br>
       <br>
@@ -14,14 +14,11 @@
         <ul>
           <li> convert file within formats of use for neutron scattering</li>
           <li> compute phonon dispersions in 4D</li>
-          <li>use cloud services (virtual machines, Jupyter notebooks)<br>
-          </li>
-          <li>estimate the measurement from a neutron scattering
-            experiment<br>
+          <li>use cloud services (virtual machines)<br>
           </li>
         </ul>
-        <h2>converters</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <h2>Converters</h2>
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
               <td bgcolor="#ffcc99" valign="top"><b>TOOL</b><br>
@@ -42,10 +39,11 @@
 
 
 
+
                 file<br>
               </td>
               <td valign="top">A file with the F²(HKL) reflection list
-                for use with e.g.&nbsp; <a href="http://www.mcstas.org">McStas</a>
+                for use with e.g. <a href="http://www.mcstas.org">McStas</a>
                 and <a href="http://mcxtrace.org/">McXtrace</a>
                 (Laz/Lau)<br>
               </td>
@@ -70,7 +68,7 @@
           </tbody>
         </table>
         <h2>Cloud</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
               <td bgcolor="#ffcc99" valign="top"><b>TOOL</b><br>
@@ -85,7 +83,7 @@
                     href="cloud/virtualmachines/index.html">VirtualMachines</a></b><b><img
                     alt="virtualmachines" title="virtualmachines"
                     src="cloud/virtualmachines/images/virtualmachines.png"
-                    width="86" align="right" height="64"><br>
+                    align="right" height="64" width="86"><br>
                 </b> </td>
               <td valign="top">A predefined virtual machine<br>
               </td>
@@ -96,7 +94,7 @@
           </tbody>
         </table>
         <h2>Computations</h2>
-        <table width="100%" border="1" cellpadding="2" cellspacing="2">
+        <table border="1" cellpadding="2" cellspacing="2" width="100%">
           <tbody>
             <tr>
               <td bgcolor="#ffcc99" valign="top"><b>TOOL</b><br>
@@ -113,7 +111,7 @@
                   <a href="computing/sqw_phonons/index.html"><img
                       alt="sqw_phonons" title="sqw_phonons"
                       src="computing/sqw_phonons/images/Models_sqw_ph_ase.png"
-                      width="64" align="middle" border="0" height="47"></a><br>
+                      border="0" align="right" height="47" width="64"></a><br>
                 </b> </td>
               <td valign="top">A <a
                   href="http://cms.mpi.univie.ac.at/vasp/guide/node59.html">POSCAR</a>,
@@ -132,29 +130,11 @@
 
 
 
+
                 <a href="https://wiki.fysik.dtu.dk/ase">ASE</a> and a
                 selection of DFT codes (EMT, GPAW, ABINIT, Elk,
                 QuantumEspresso, VASP). Provides a sqw_phonon Model,
                 that can further be evaluated.<br>
-              </td>
-            </tr>
-            <tr>
-              <td valign="top"><b>sqw_phonon Model evaluator</b><br>
-              </td>
-              <td valign="top">a <i><b>sqw_phonon</b></i> Model, and
-                HKL specification (vector/plane/grid)<br>
-              </td>
-              <td valign="top">Phonon dispersions evaluated on the HKL
-                range.<br>
-              </td>
-            </tr>
-            <tr>
-              <td valign="top"><b>TAS_resolution</b><br>
-              </td>
-              <td valign="top">a RESCAL-type configuration<br>
-              </td>
-              <td valign="top">The TAS resolution evaluated at specified
-                HKL location.<br>
               </td>
             </tr>
             <!--            <tr>-->
@@ -202,57 +182,17 @@
         </table>
       </div>
     </div>
-    <h2>Virtual neutron scattering experiments</h2>
-    <table width="100%" border="1" cellpadding="2" cellspacing="2">
-      <tbody>
-        <tr>
-          <td bgcolor="#ffcc99" valign="top"><b>TOOL</b><br>
-          </td>
-          <td bgcolor="#ffcc99" valign="top"><b>INPUT</b><b> =&gt;<br>
-            </b></td>
-          <td bgcolor="#ffcc99" valign="top"><b>OUTPUT</b><b><br>
-            </b></td>
-        </tr>
-        <tr>
-          <td valign="top"><b>neutron powder diffractometer</b><br>
-          </td>
-          <td valign="top">A <a
-              href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
-            SHELX or CFL<br>
-          </td>
-          <td valign="top">The powder diffractogram obtained from
-            neutron scattering (using McStas)<br>
-          </td>
-        </tr>
-        <tr>
-          <td valign="top"><b>neutron single-crystal diffractometer</b></td>
-          <td valign="top">A <a
-              href="http://en.wikipedia.org/wiki/Crystallographic_Information_File">CIF</a>,
-            SHELX or CFL</td>
-          <td valign="top">The single-crystal diffraction obtained from
-            neutron scattering (using McStas) </td>
-        </tr>
-        <tr>
-          <td valign="top"><b>small angle neutron scattering</b><br>
-          </td>
-          <td valign="top">A <a href="http://www.rcsb.org/pdb/">PDB</a>
-            <br>
-          </td>
-          <td valign="top">The small angle neutron scattering from e.g.
-            proteins, colloids and polymers (using McStas) </td>
-        </tr>
-      </tbody>
-    </table>
     <h2>Availability and Credits</h2>
     If you use any of these services, please acknowledge:<a
       href="http://ifit.mccode.org"><img alt="iFit" title="iFit"
-        src="computing/sqw_phonons/images/iFit-logo.png" width="116"
-        align="right" height="64"></a><br>
+        src="computing/sqw_phonons/images/iFit-logo.png" align="right"
+        height="64" width="116"></a><br>
     <ul>
       <li>E. Farhi, Y. Debab and P. Willendrup, <span
           style="font-style: italic;">J. Neut. Res</span>., <span
           style="font-weight: bold;">17</span> (2013) 5. <a
 href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">DOI:10.3233/JNR-130001
+
 
         </a></li>
     </ul>
@@ -270,7 +210,7 @@ href="http://content.iospress.com/articles/journal-of-neutron-research/jnr001">D
       href="http://ifit.mccode.org">iFit</a> infrastructure.<br>
     <br>
     <br>
-    <iframe src="layout/footer.html" name="header" width="100%"
-      height="100"></iframe> <br>
+    <iframe src="layout/footer.html" name="header" height="100"
+      width="100%"></iframe> <br>
   </body>
 </html>
