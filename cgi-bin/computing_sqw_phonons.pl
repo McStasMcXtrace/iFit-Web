@@ -18,17 +18,19 @@ use File::Basename;
 use Net::Domain qw(hostname hostfqdn);
 use Sys::CPU;     # libsys-cpu-perl
 use Sys::CpuLoad; # libsys-cpuload-perl
-use Socket;
+use Net::SMTP;          # core Perl
+use Email::Valid;
 # ------------------------------------------------------------------------------
 # service configuration: tune for your needs
 # ------------------------------------------------------------------------------
 
-# the name of the SMTP server, optionally followed by the :port, as in "smtp.google.com:587"
-my $email_server = "smtp.synchrotron-soleil.fr";
+# the name of the SMTP server, and optional port
+my $smtp_server = ""; # smtp.synchrotron-soleil.fr";
+my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
-my $email_from   = "XXXX\@synchrotron-soleil.eu";
-# the password for the sender on the SMTP server
-my $email_passwd = "XXXX";
+my $email_from   = ""; # luke.skywalker\@synchrotron-soleil.eu";
+# the password for the sender on the SMTP server, or left blank
+my $email_passwd = "";
 
 my $email_account= substr($email_from, 0, index($email_from, '@'));
 
@@ -104,6 +106,8 @@ my $optimizer      = $q->param('optimizer');  # 8- Optimize the material structu
 my $email          = $q->param('email');      # 9- Indicate your email
 
 my $raw            = "";  # additional options for sqw_phonons
+my $smtp;
+my $email_body     = "";
 
 if ( !$material )
 {
@@ -126,12 +130,9 @@ else
 
 # check email
 $email =~ s/[^a-zA-Z0-9_.\-@]//g; # safe_email_characters
-if ( $email =~ /^([a-zA-Z0-9_.\-@]+)$/ )
-{
-  $email = $1;
-}
-else
-{
+if (Email::Valid->address($email)) {
+  # OK
+} else {
   error("This service requires a valid email. Retry with one.");
   $email="";
 }
@@ -193,9 +194,14 @@ $dir_short    =~ s|$upload_base/||;
 # ------------------------------------------------------------------------------
     
 # test if the email service is valid
-if ($email_server ne "" and $email_from ne "" and $email_passwd ne "" and $email_passwd ne "XXXX") {
+if ($email and $smtp_port) {
+  $smtp= Net::SMTP->new($smtp_server); # e.g. port 25
+} else {
+  $smtp= Net::SMTP->new($smtp_server, Port=>$smtp_port);
+}
+if ($smtp and $email) {
   # prepare email parts
-  $email_body1   = <<"END_MESSAGE";
+  $email_body   = <<"END_MESSAGE";
 Hello $email !
   
 Your calculation:
@@ -203,12 +209,10 @@ Your calculation:
    material:   $material (attached)
    calculator: $calculator
    options:    occupations=$smearing;kpoints=$kpoints;nsteps=$nsteps;ecut=$ecut;supercell=$supercell;optimizer=$optimizer
-END_MESSAGE
-
-  $email_body2   = <<"END_MESSAGE";
 
 Access the calculation report at
-  http://$fqdn/$dir_short
+  http://$fqdn/$dir_short/sqw_phonons.html
+  http://$fqdn/$dir_short/
 and the log file at
   http://$fqdn/$dir_short/ifit.log
 All past and present computations at
@@ -216,26 +220,7 @@ All past and present computations at
   
 Thanks for using ifit-web-services. (c) E.Farhi, Synchrotron SOLEIL.
 END_MESSAGE
-  # We assemble the messages and the command using sendemail
-  $email_subject_start = "$service:$material:$calculator just started on $fqdn";
-  $email_subject_end   = "$service:$material:$calculator just ended on $fqdn";
 
-  $email_body_start    = <<"END_MESSAGE";
-$email_body1
-   date:       STARTING on $datestring.
-$email_body2
-END_MESSAGE
-  $email_body_end    = <<"END_MESSAGE";
-$email_body1
-   date:       started on $datestring, just ENDED. 
-   
-   Log file and initial structure are attached.
-$email_body2
-END_MESSAGE
-
-  # initial and final emails can be sent. We assemble the message and the command using sendemail
-  $email_cmd_end = "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject_end' -m '$email_body_end' -s $email_server -xu $email_account -xp $email_passwd -a $dir/ifit.log -a $dir/$material";
-  $email_cmd_start= "sendemail -f $email_from -t $email -o tls=yes -u '$email_subject_start' -m '$email_body_start' -s $email_server -xu $email_account -xp $email_passwd -a $dir/$material";
 } else { $email = ""; }
 
 # assemble calculation command line
@@ -246,15 +231,46 @@ $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;k
 # dump initial material file
 $res = system("cat $dir/$material > $dir/ifit.log");
 # initial email
-if ($email ne "") {
-  # split the commands so that email passwd is not visible in the 'ps' list
-  $res = system("$email_cmd_start >> $dir/ifit.log 2>&1 &");
+if ($smtp and $email ne "") {
+  if ($email_passwd) {
+    $smtp->auth($email_from,$email_passwd);
+  }
+  $smtp->mail($email_from);
+  $smtp->recipient($email);
+  $smtp->data();
+  $smtp->datasend("From: $email_from\n");
+  $smtp->datasend("To: $email\n");
+  # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
+  $smtp->datasend("Subject: [iFit-Web-Services] Computation: Sqw Phonons $material:$calculation STARTED\n");
+  $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
+  $smtp->datasend("\n"); # end of header
+  $smtp->datasend($email_body);
+  $smtp->datasend("\n** COMPUTATION JUST STARTED **\n");
+  $smtp->dataend;
+  $smtp->quit;
 }
+
 # the computation starts... 
 $res = system("ifit -nodesktop \"$cmd\" >> $dir/ifit.log 2>&1 &");
+
 # final email
 if ($email ne "") {
-  $res = system("$email_cmd_end >> $dir/ifit.log 2>&1 &");
+  if ($email_passwd) {
+    $smtp->auth($email_from,$email_passwd);
+  }
+  $smtp->mail($email_from);
+  $smtp->recipient($email);
+  $smtp->data();
+  $smtp->datasend("From: $email_from\n");
+  $smtp->datasend("To: $email\n");
+  # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
+  $smtp->datasend("Subject: [iFit-Web-Services] Computation: Sqw Phonons $material:$calculation ENDED\n");
+  $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
+  $smtp->datasend("\n"); # end of header
+  $smtp->datasend($email_body);
+  $smtp->datasend("\n** COMPUTATION JUST ENDED **\n");
+  $smtp->dataend;
+  $smtp->quit;
 }
 
 # file used for monitoring the service usage
