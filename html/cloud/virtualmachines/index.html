@@ -44,7 +44,7 @@
       enctype="multipart/form-data">
       <!-- Virtual machine choice -->
       <p align="left"> </p>
-      <table border="1" cellpadding="2" cellspacing="2" width="100%">
+      <table border="0" cellpadding="2" cellspacing="2" width="100%">
         <tbody>
           <tr>
             <td valign="top"><img alt="system" title="system"
@@ -76,11 +76,11 @@
                 </select>
               </p>
               <ul>
-                <li>A non persistent session is cleaned when you either
-                  shutdown the virtual machine, or close the browser
-                  tab.</li>
-                <li>A persistent session keeps running until you fully
-                  shutdown the virtual machine. You may close the
+                <li>A <b>non persistent</b> session is cleaned when you
+                  either shutdown the virtual machine, or close the
+                  browser tab.</li>
+                <li>A <b>persistent</b> session keeps running until you
+                  fully shutdown the virtual machine. You may close the
                   browser, and login again later using the same ID token
                   sent by email. Persistent sessions may be required for
                   e.g. long calculations.</li>
@@ -108,7 +108,9 @@
     A virtual machine will be created, with assigned resources (e.g.
     10Gb disk, 4 CPU's, 4 Gb memory). You will receive an email with the
     connection directives. A browser window will be opened. Use the
-    given ID token to connect to the VNC.
+    given ID token to connect to the VNC.You may change the <b>screen
+      resolution</b> of the virtual machine using the bottom-left menu <i>Preferences/Monitor
+      Settings</i>.<br>
     <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge
@@ -136,11 +138,12 @@
     A one-shot virtual machine is cloned from a template. It is then
     started with <a href="https://www.qemu.org/">QEMU</a>/<a
       href="https://www.linux-kvm.org/page/Main_Page">KVM</a>. A message
-    is sent to your email address with a link and a one-shot token. A
-    VNC client (<a href="https://github.com/novnc/noVNC">noVNC</a>) is
-    connected to it, and shown in your browser. All the available
-    virtual machines are <a href="../../upload">stored</a> on our
-    Apache server.<br>
+    is sent to your email address with a link and a connection token,
+    which is one-shot for non-persistent sessions. A VNC client (<a
+      href="https://github.com/novnc/noVNC">noVNC</a>) is connected to
+    it, and shown in your browser. All the available virtual machines
+    are <a href="../../upload">stored</a> on our Apache server (ISO and
+    QCOW2 files).<br>
     <br>
     <iframe src="../../layout/footer.html" name="header" height="100"
       width="100%"></iframe> <br>
