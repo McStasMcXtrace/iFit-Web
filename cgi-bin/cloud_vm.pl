@@ -214,9 +214,9 @@ if (not $error) {
 if (not $error) {
   $persistent = $q->param('persistent');      # 2- Persistent session
   if ($persistent eq "no") {
-    $output .= "<li>[OK] Using non persistent session</li>";
+    $output .= "<li>[OK] Using non persistent session (<b>one-shot</b> login)</li>";
   } elsif ($persistent eq "yes") {
-    $output .= "<li>[OK] Using persistent session</li>";
+    $output .= "<li>[OK] Using persistent session (re-entrant login)</li>";
   } else {
     $error .= "Wrong persistence choice.";
   }
@@ -448,7 +448,7 @@ if ($email and $smtp_port) {
 if ($email and $smtp) {
   # read the HTML file and store it as a string
   my $file_content = do{local(@ARGV,$/)=$html_name;<>};
-  $file_content .= "<h1>Use one-shot token '$novnc_token' to connect</h1>";
+  $file_content .= "<h1>Use token '$novnc_token' to connect</h1>";
   
   if ($email_passwd) {
     $smtp->auth($email_from,$email_passwd);
@@ -469,7 +469,7 @@ if ($email and $smtp) {
   # add the token to the HTML message (else there is no output)
   if (open($html_handle, '>>', $html_name)) {
     print $html_handle <<END_HTML;
-<h1>Use one-shot token '$novnc_token' to connect</h1>
+<h1>Use token '$novnc_token' to connect</h1>
 END_HTML
     close $html_handle;
   }
