@@ -30,13 +30,14 @@ use Email::Valid;
 # ------------------------------------------------------------------------------
 
 # the name of the SMTP server, and optional port
-my $smtp_server = ""; # smtp.synchrotron-soleil.fr";
+my $smtp_server = "smtp.synchrotron-soleil.fr";
 my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
-my $email_from   = ""; # luke.skywalker\@synchrotron-soleil.eu";
+my $email_from   = "luke.skywalker\@synchrotron-soleil.fr";
 # the password for the sender on the SMTP server, or left blank
-my $vm_lifetime  = 86400; # max VM life time in sec. 1 day is 86400 s. Use 0 to disable (infinite)
-my $video_qemu = "vmware"; # can be "qxl" or "vmware"
+my $email_passwd = "";
+my $vm_lifetime  = 10; # max VM life time in sec. 1 day is 86400 s. Use 0 to disable (infinite)
+my $video_qemu = "qxl"; # can be "qxl" or "vmware"
 
 # ==============================================================================
 # DECLARE all our variables
@@ -451,21 +452,26 @@ if ($email and $smtp) {
   $file_content .= "<h1>Use token '$novnc_token' to connect</h1>";
   
   if ($email_passwd) {
-    $smtp->auth($email_from,$email_passwd);
+    $smtp->auth($email_from,$email_passwd) or $smtp = "";
   }
-  $smtp->mail($email_from);
-  $smtp->recipient($email);
-  $smtp->data();
-  $smtp->datasend("From: $email_from\n");
-  $smtp->datasend("To: $email\n");
-  # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
-  $smtp->datasend("Subject: [iFit-Web-Services] Virtual machine $vm connection information\n");
-  $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
-  $smtp->datasend("\n"); # end of header
-  $smtp->datasend($file_content);
-  $smtp->dataend;
-  $smtp->quit;
-} else {
+  if ($smtp) {
+    $smtp->mail($email_from) or $smtp = "";
+  }
+  if ($smtp) {
+    $smtp->recipient($email);
+    $smtp->data();
+    $smtp->datasend("From: $email_from\n");
+    $smtp->datasend("To: $email\n");
+    # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
+    $smtp->datasend("Subject: [iFit-Web-Services] Virtual machine $vm connection information\n");
+    $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
+    $smtp->datasend("\n"); # end of header
+    $smtp->datasend($file_content);
+    $smtp->dataend;
+    $smtp->quit;
+  }
+}
+if (not $smtp) {
   # add the token to the HTML message (else there is no output)
   if (open($html_handle, '>>', $html_name)) {
     print $html_handle <<END_HTML;
