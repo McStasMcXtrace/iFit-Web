@@ -281,11 +281,11 @@ if (not $error) {
   
   if (-e "$upload_dir/$vm.qcow2") {
     $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -machine pc,accel=kvm -enable-kvm " .
-      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
+      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga vmware -vnc $qemuvnc_ip:1";
   } elsif (-e "$upload_dir/$vm.iso") {
     $cmd = "qemu-system-x86_64 -m 4096 -boot d -cdrom $upload_dir/$vm.iso " .
       "-hda $vm_name -machine pc,accel=kvm -enable-kvm " .
-      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga qxl -vnc $qemuvnc_ip:1";
+      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga vmware -vnc $qemuvnc_ip:1";
   }
   
   if ($novnc_token) {
