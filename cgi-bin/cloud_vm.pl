@@ -15,13 +15,14 @@ BEGIN {
 
 use CGI;              # use CGI.pm
 use File::Temp      qw/ tempfile tempdir /;
-use Net::Domain     qw(hostname hostfqdn);
 use File::Basename  qw(fileparse);
+use File::Path      qw(rmtree);
+use Net::Domain     qw(hostname hostfqdn);
+use Net::SMTP;          # core Perl
 use Sys::CPU;           # libsys-cpu-perl           for CPU::cpu_count
 use Sys::CpuLoad;       # libsys-cpuload-perl       for CpuLoad::load
 use Proc::Background;   # libproc-background-perl   for Background->new
 use Proc::Killfam;      # libproc-processtable-perl for killfam (kill pid and children)
-use Net::SMTP;          # core Perl
 use Email::Valid;
 
 # ------------------------------------------------------------------------------
@@ -34,7 +35,8 @@ my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
 my $email_from   = ""; # luke.skywalker\@synchrotron-soleil.eu";
 # the password for the sender on the SMTP server, or left blank
-my $email_passwd = "";
+my $vm_lifetime  = 86400; # max VM life time in sec. 1 day is 86400 s. Use 0 to disable (infinite)
+my $video_qemu = "vmware"; # can be "qxl" or "vmware"
 
 # ==============================================================================
 # DECLARE all our variables
@@ -90,6 +92,40 @@ my $qemuvnc_ip  = "";
 my $id_ok       = 0;  # flag true when we found a non used IP/PORT
 my $output      = "";
 my $smtp;
+
+# ------------------------------------------------------------------------------
+# first clean up any 'old' VM sessions
+# ------------------------------------------------------------------------------
+foreach $lock_name (glob("$upload_dir/$service.*")) {
+  # test modification date for 'cloud_vm.port' file
+  if ($vm_lifetime and time - (stat $lock_name)[9] > $vm_lifetime) {
+    # must kill that VM and its noVNC. Read file content as a hash table
+    my %configParamHash = ();
+    if (open ($lock_handle, $lock_name )) {
+      while ( <$lock_handle> ) { # read config in -> $configParamHash{key}
+        chomp;
+        s/#.*//;                # ignore comments
+        s/^\s+//;               # trim heading spaces if any
+        s/\s+$//;               # trim leading spaces if any
+        next unless length;
+        my ($_configParam, $_paramValue) = split(/\s*:\s*/, $_, 2);
+        $configParamHash{$_configParam} = $_paramValue;
+      }
+    }
+    close $lock_handle;
+    # kill pid, pid_qemu and pid_vnc
+    $output .= "<li>[OK] Cleaning $lock_name (time-out) in " . $configParamHash{directory} . "</li>\n";
+    print STDERR "Cleaning $lock_name (time-out) " . $configParamHash{directory} . "\n";
+    if ($configParamHash{pid})      { killfam('TERM',($configParamHash{pid}));      }
+    if ($configParamHash{pid_qemu}) { killfam('TERM',($configParamHash{pid_qemu})); }
+    if ($configParamHash{pid_vnc})  { killfam('TERM',($configParamHash{pid_vnc}));  }
+    
+    # clean up files/directory
+    if (-e $lock_name)                   { unlink $lock_name; }
+    if (-e $configParamHash{directory})  { rmtree( $configParamHash{directory} ); }
+  } # if cloud_vm.port is here
+}
+$lock_name = "";
 
 # ==============================================================================
 # GET and CHECK input parameters
@@ -273,7 +309,7 @@ if (not $error and not -e $vm_name) {
   $error .= "Could not clone Virtual Machine $vm into snapshot. ";
 }
 
-# LAUNCH CLONED VM with QXL video driver, KVM, and VNC, 4 cores
+# LAUNCH CLONED VM with VMWARE video driver, KVM, and VNC, 4 cores. QXL driver may stall.
 if (not $error) {
   # cast a random token key for VNC
   sub rndStr{ join'', @_[ map{ rand @_ } 1 .. shift ] };
@@ -281,11 +317,11 @@ if (not $error) {
   
   if (-e "$upload_dir/$vm.qcow2") {
     $cmd = "qemu-system-x86_64 -m 4096 -hda $vm_name -machine pc,accel=kvm -enable-kvm " .
-      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga vmware -vnc $qemuvnc_ip:1";
+      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga $video_qemu -vnc $qemuvnc_ip:1";
   } elsif (-e "$upload_dir/$vm.iso") {
     $cmd = "qemu-system-x86_64 -m 4096 -boot d -cdrom $upload_dir/$vm.iso " .
       "-hda $vm_name -machine pc,accel=kvm -enable-kvm " .
-      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga vmware -vnc $qemuvnc_ip:1";
+      "-smp 4 -net user -net nic,model=ne2k_pci -cpu host -boot c -vga $video_qemu -vnc $qemuvnc_ip:1";
   }
   
   if ($novnc_token) {
@@ -341,17 +377,15 @@ if (open($html_handle, '>>', $html_name)) {
     print $html_handle <<END_HTML;
 <ul>
 $output
-<li>[OK] No error, all is fine</li>
+<li>[OK] No error, all is fine. Time-out is $vm_lifetime [s].</li>
 <li><b>[OK]</b> Connect to your machine at <a href=$redirect target=_blank><b>$redirect</b></a>.</li>
 </ul>
 <p>Hello $email !</p>
 
-<p>You have requested to launch a $vm virtual machine. In order to connect to it, please click on the link below, and enter the one-shot token as indicated in this message.</p>
-
 <p>
 Your machine $service $vm has just started. 
 Open the following <a href=$redirect target=_blank>link to display its screen</a> 
-(click on the <b>Connect</b> button). You will be requested to enter a one-shot token, which you should receive by email at $email.</p>
+(click on the <b>Connect</b> button). You will be requested to enter a <b>token</b>, which you should receive by email at $email.</p>
 <p>
 Remember that the virtual machine is created on request, and destroyed afterwards. You should then export any work done there-in elsewhere (e.g. mounted disk, ssh/sftp, Dropbox, OwnCloud...).
 </p>
@@ -459,12 +493,12 @@ if (not $error and $proc_novnc and $proc_qemu) {
 
 # CLEAN-UP temporary files (qcow2, html), proc_qemu, proc_novnc
 END {
-  print STDERR "[$datestring] $service: cleanup: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port\n";
+  print STDERR "[$datestring] $service: cleanup: QEMU $vm VNC=$qemuvnc_ip:5901 redirected to $novnc_port for user $email\n";
   if (-e $vm_name)    { unlink $vm_name; }
   if (-e $html_name)  { unlink $html_name; }
   if (-e $token_name) { unlink($token_name); }
   if (-e $lock_name)  { unlink $lock_name; }
-  if (-e $base_name)  { rmdir  $base_name; } # in case auto-clean up fails
+  if (-e $base_name)  { rmtree(  $base_name ); } # in case auto-clean up fails
   
   # make sure QEMU/noVNC and asssigned SHELLs are killed
   if ($proc_novnc) { killfam('TERM',($proc_novnc->pid)); $proc_novnc->die; }
