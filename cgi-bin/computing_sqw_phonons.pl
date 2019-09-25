@@ -25,10 +25,10 @@ use Email::Valid;
 # ------------------------------------------------------------------------------
 
 # the name of the SMTP server, and optional port
-my $smtp_server = ""; # smtp.synchrotron-soleil.fr";
+my $smtp_server = "smtp.synchrotron-soleil.fr";
 my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
-my $email_from   = ""; # luke.skywalker\@synchrotron-soleil.eu";
+my $email_from   = "luke.skywalker\@synchrotron-soleil.eu";
 # the password for the sender on the SMTP server, or left blank
 my $email_passwd = "";
 
@@ -166,9 +166,9 @@ if ($kpoints ne "0" and $kpoints ne "2" and $kpoints ne "3" and $kpoints ne "4" 
 if ($supercell ne "0" and $supercell ne "2" and $supercell ne "3" and $supercell ne "4" and $supercell ne "5" and $supercell ne "6") {
   $supercell = "0";
 }
-# test: supercell=2 3 4
-if ($optimizer ne "MDmin" or $calculator eq "QuantumEspresso") {
-  $optimizer = "";
+# test: optimizer
+if ($optimizer ne "MDmin") {
+  $optimizer = "[]";
 }
 
 # specific calculators
@@ -183,7 +183,7 @@ if ($calculator eq "ABINIT_GBRV") {
 
 # test: calculator=EMT,QuantumEspresso,ABINIT,GPAW,ELK,VASP
 if ($calculator ne "EMT" and $calculator ne "QuantumEspresso" and $calculator ne "QuantumEspresso_ASE" and $calculator ne "ABINIT"  and $calculator ne "GPAW" and $calculator ne "ELK" and $calculator ne "VASP") {
-  $calculator = "QuantumEspresso";
+  $calculator = "QuantumEspresso_ASE";
 }
 
 $dir_short    = $dir;
@@ -206,15 +206,24 @@ Hello $email !
   
 Your calculation:
    service:    $service on machine $fqdn
-   material:   $material (attached)
+   date:       $datestring
+   material:   $material
    calculator: $calculator
-   options:    occupations=$smearing;kpoints=$kpoints;nsteps=$nsteps;ecut=$ecut;supercell=$supercell;optimizer=$optimizer
+   options:    
+      occupations = $smearing
+      kpoints     = $kpoints
+      nsteps      = $nsteps
+      ecut        = $ecut
+      supercell   = $supercell
+      optimizer   = $optimizer
 
 Access the calculation report at
   http://$fqdn/$dir_short/sqw_phonons.html
-  http://$fqdn/$dir_short/
-and the log file at
+  http://$fqdn/$dir_short/ (all generated files)
+  
+including the log file at
   http://$fqdn/$dir_short/ifit.log
+  
 All past and present computations at
   http://$fqdn/$upload_short/$service.html
   
@@ -231,7 +240,7 @@ $cmd = "'try;sqw_phonons('$dir/$material','$calculator','occupations=$smearing;k
 # dump initial material file
 $res = system("cat $dir/$material > $dir/ifit.log");
 # initial email
-if ($smtp and $email ne "") {
+if ($smtp and $email) {
   if ($email_passwd) {
     $smtp->auth($email_from,$email_passwd);
   }
@@ -241,37 +250,22 @@ if ($smtp and $email ne "") {
   $smtp->datasend("From: $email_from\n");
   $smtp->datasend("To: $email\n");
   # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
-  $smtp->datasend("Subject: [iFit-Web-Services] Computation: Sqw Phonons $material:$calculation STARTED\n");
-  $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
+  $smtp->datasend("Subject: [iFit-Web-Services] Computation: $material:$calculator STARTED [$dir_short]\n");
+  # $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
   $smtp->datasend("\n"); # end of header
   $smtp->datasend($email_body);
   $smtp->datasend("\n** COMPUTATION JUST STARTED **\n");
+  # attach the material
+  my $file_content = do{local(@ARGV,$/)="$dir/$material";<>};
+  $smtp->datasend("\nInitial lattice definition (file: $material)\n");
+  $smtp->datasend("---------------------------------------------------------------------\n");
+  $smtp->datasend($file_content);
   $smtp->dataend;
   $smtp->quit;
 }
 
 # the computation starts... 
 $res = system("ifit -nodesktop \"$cmd\" >> $dir/ifit.log 2>&1 &");
-
-# final email
-if ($email ne "") {
-  if ($email_passwd) {
-    $smtp->auth($email_from,$email_passwd);
-  }
-  $smtp->mail($email_from);
-  $smtp->recipient($email);
-  $smtp->data();
-  $smtp->datasend("From: $email_from\n");
-  $smtp->datasend("To: $email\n");
-  # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
-  $smtp->datasend("Subject: [iFit-Web-Services] Computation: Sqw Phonons $material:$calculation ENDED\n");
-  $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
-  $smtp->datasend("\n"); # end of header
-  $smtp->datasend($email_body);
-  $smtp->datasend("\n** COMPUTATION JUST ENDED **\n");
-  $smtp->dataend;
-  $smtp->quit;
-}
 
 # file used for monitoring the service usage
 $filename = "$upload_dir/$service.html";
@@ -330,18 +324,7 @@ END_HTML
 }
 print <<END_HTML;
   <hr>
-  Powered by <a href="http://ifit.mccode.org" target="_blank">iFit</a> E. Farhi (c) 2016.<br>
-  <ul>
-    <li>Service</b>: <a href="$referer" target="_blank">$fqdn/ifit-web-services</a> $service</li>
-    <li>host: $host</li>
-    <li>remote_ident: $remote_ident</li>
-    <li>remote_host: $remote_host</li>
-    <li>remote_addr: $remote_addr</li>
-    <li>referer: $referer</li>
-    <li>user_agent: $user_agent</li>
-    <li>date: $datestring</li>
-    <li>$fqdn: Current machine load: $cpuload0</li>
-  </ul>
+  Powered by <a href="http://ifit.mccode.org" target="_blank">iFit</a> E. Farhi (c) 2019.<br>
   </body>
   </html>
 END_HTML

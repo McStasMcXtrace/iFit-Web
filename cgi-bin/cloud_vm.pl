@@ -30,14 +30,14 @@ use Email::Valid;
 # ------------------------------------------------------------------------------
 
 # the name of the SMTP server, and optional port
-my $smtp_server = "smtp.synchrotron-soleil.fr";
-my $smtp_port   = ""; # can be e.g. 465, 587, or left blank
+my $smtp_server  = "smtp.synchrotron-soleil.fr"; # when empty, no email is needed. token is shown.
+my $smtp_port    = ""; # can be e.g. 465, 587, or left blank
 # the email address of the sender of the messages on the SMTP server. Beware the @ char to appear as \@
 my $email_from   = "luke.skywalker\@synchrotron-soleil.fr";
 # the password for the sender on the SMTP server, or left blank
 my $email_passwd = "";
-my $vm_lifetime  = 10; # max VM life time in sec. 1 day is 86400 s. Use 0 to disable (infinite)
-my $video_qemu = "qxl"; # can be "qxl" or "vmware"
+my $vm_lifetime  = 600; # max VM life time in sec. 1 day is 86400 s. Use 0 to disable (infinite)
+my $video_qemu   = "qxl"; # can be "qxl" or "vmware"
 
 # ==============================================================================
 # DECLARE all our variables
@@ -224,7 +224,7 @@ if (not $error) {
 }
 
 # EMAIL: required to send the ID and link. check email
-if (not $error) {
+if (not $error and $smtp_server) {
   $email          = $q->param('email');      # 3- Indicate your email
   if (Email::Valid->address($email))
   {
@@ -441,38 +441,36 @@ END_HTML
 sleep(1); # make sure the files have been created and flushed
 
 # SEND THE HTML MESSAGE TO THE USER --------------------------------------------
-if ($email and $smtp_port) {
-  $smtp= Net::SMTP->new($smtp_server); # e.g. port 25
-} else {
-  $smtp= Net::SMTP->new($smtp_server, Port=>$smtp_port);
-}
-if ($email and $smtp) {
-  # read the HTML file and store it as a string
-  my $file_content = do{local(@ARGV,$/)=$html_name;<>};
-  $file_content .= "<h1>Use token '$novnc_token' to connect</h1>";
-  
-  if ($email_passwd) {
-    $smtp->auth($email_from,$email_passwd) or $smtp = "";
+if ($email) {
+  if ($smtp_port) {
+    $smtp= Net::SMTP->new($smtp_server); # e.g. port 25
+  } else {
+    $smtp= Net::SMTP->new($smtp_server, Port=>$smtp_port);
   }
   if ($smtp) {
-    $smtp->mail($email_from) or $smtp = "";
-  }
-  if ($smtp) {
-    $smtp->recipient($email);
-    $smtp->data();
-    $smtp->datasend("From: $email_from\n");
-    $smtp->datasend("To: $email\n");
-    # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
-    $smtp->datasend("Subject: [iFit-Web-Services] Virtual machine $vm connection information\n");
-    $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n");
-    $smtp->datasend("\n"); # end of header
-    $smtp->datasend($file_content);
-    $smtp->dataend;
-    $smtp->quit;
+    # read the HTML file and store it as a string
+    my $file_content = do{local(@ARGV,$/)=$html_name;<>};
+    $file_content .= "<h1>Use token '$novnc_token' to connect</h1>"; # add token
+    
+    if ($email_passwd) {
+      $smtp->auth($email_from,$email_passwd) or $smtp = "";
+    }
+    if ($smtp) { $smtp->mail($email_from) or $smtp = ""; }
+    if ($smtp) { $smtp->recipient($email) or $smtp = ""; }
+    if ($smtp) { $smtp->data() or $smtp = ""; }
+    if ($smtp) { $smtp->datasend("From: $email_from\n") or $smtp = ""; }
+    if ($smtp) { $smtp->datasend("To: $email\n") or $smtp = ""; }
+      # could add CC to internal monitoring address $smtp->datasend("CC: address\@example.com\n");
+    if ($smtp) { $smtp->datasend("Subject: [iFit-Web-Services] Virtual machine $vm connection information\n") or $smtp = ""; }
+    if ($smtp) { $smtp->datasend("Content-Type: text/html; charset=\"UTF-8\" \n") or $smtp = ""; }
+    if ($smtp) { $smtp->datasend("\n") or $smtp = ""; } # end of header
+    if ($smtp) { $smtp->datasend($file_content) or $smtp = ""; }
+    if ($smtp) { $smtp->dataend or $smtp = ""; }
+    if ($smtp) { $smtp->quit or $smtp = ""; }
   }
 }
 if (not $smtp) {
-  # add the token to the HTML message (else there is no output)
+  # when email not sent, add the token to the HTML message (else there is no output)
   if (open($html_handle, '>>', $html_name)) {
     print $html_handle <<END_HTML;
 <h1>Use token '$novnc_token' to connect</h1>
