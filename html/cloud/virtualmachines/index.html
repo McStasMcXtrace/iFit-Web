@@ -108,9 +108,14 @@
     A virtual machine will be created, with assigned resources (e.g.
     10Gb disk, 4 CPU's, 4 Gb memory). You will receive an email with the
     connection directives. A browser window will be opened. Use the
-    given ID token to connect to the VNC.You may change the <b>screen
-      resolution</b> of the virtual machine using the bottom-left menu <i>Preferences/Monitor
-      Settings</i>.<br>
+    given ID token to connect to the VNC. With persistent machines, you
+    may as well share the connection information to allow your friends
+    to contribute/see your work. <br>
+    <br>
+    We recommend that you adapt the <b>screen resolution</b> of the
+    virtual machine using the bottom-left menu <i>Preferences/Monitor
+      Settings</i>. and the <b>keyboard layout</b> from the <i>Preferences</i>
+    as well.<br>
     <hr size="2" width="100%">
     <h2>Availability and Credits</h2>
     If you use this software, please acknowledge
@@ -123,7 +128,8 @@
     functionalities. Remember that the virtual machine is created on
     request, and destroyed afterwards. You should then<b> export
       elsewhere any work</b> done there-in (e.g. mounted disk, ssh/sftp,
-    DropBox, ownCloud, ...). This is a single-shot virtual machine.<br>
+    DropBox, ownCloud, ...). The virtual machine is destroyed when you
+    logout, or when its time-out is reached.<br>
     <br>
     We recommend to use the <a href="https://www.mozilla.org">Firefox</a>
     web browser to display the virtual machine. <a
@@ -135,8 +141,8 @@
     for updates. We shall inform, as much as possible, logged users
     about any service interruption.
     <h2>How it works</h2>
-    A one-shot virtual machine is cloned from a template. It is then
-    started with <a href="https://www.qemu.org/">QEMU</a>/<a
+    A virtual machine is cloned from a template. It is then started with
+    <a href="https://www.qemu.org/">QEMU</a>/<a
       href="https://www.linux-kvm.org/page/Main_Page">KVM</a>. A message
     is sent to your email address with a link and a connection token,
     which is one-shot for non-persistent sessions. A VNC client (<a

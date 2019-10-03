@@ -390,6 +390,9 @@ Open the following <a href=$redirect target=_blank>link to display its screen</a
 <p>
 Remember that the virtual machine is created on request, and destroyed afterwards. You should then export any work done there-in elsewhere (e.g. mounted disk, ssh/sftp, Dropbox, OwnCloud...).
 </p>
+<p>
+We recommend that you adapt the <b>screen resolution</b> of the virtual machine using the bottom-left menu <i>Preferences/Monitor Settings</i>. and the <b>keyboard layout</b> from the <i>Preferences</i> as well.
+</p>
 
 <h1><a href=$redirect target=_blank>$redirect</a></h1>
 In case the link is not functional (I guessed wrong your computer name), try: <br>
