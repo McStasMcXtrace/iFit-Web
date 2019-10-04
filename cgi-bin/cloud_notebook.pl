@@ -268,7 +268,7 @@ if (not $error) {
   if (not $proc_jupyter) {
     $error .= "Could not start Jupyter server. ";
   } else {
-    $output .= "<li>[OK] Started Jupyter server $remote_host:$port. $cmd</li>\n";
+    $output .= "<li>[OK] Started Jupyter server $remote_host:$port in http://$remote_host/ifit-web-services/upload/$name/</li>\n";
   }
   
 }
@@ -286,7 +286,7 @@ if (open($html_handle, '>>', $html_name)) {
 <ul>
 $output
 <li>[OK] No error, all is fine. Time-out is $nb_lifetime [s].</li>
-<li><b>[OK]</b> Connect to your Jupyter session at <a href=$redirect target=_blank><b>$redirect</b></a>.</li>
+<li><b>[OK]</b> Connect to your Jupyter session at <a href=$redirect target=_blank><b>$redirect</b></a> using the provided token.</li>
 </ul>
 <p>Hello $email !</p>
 
@@ -322,7 +322,7 @@ END_TEXT
       close $lock_handle;
     }
     # LOG in /var/log/apache2/error.log
-    print STDERR "[$datestring] $service: start: Jupyter NoteBook on $port http://$server_name/ifit-web-services/upload/$name/index.html -> $redirect token=$token for user $email\n";
+    print STDERR "[$datestring] $service: start: Jupyter NoteBook on $port http://$server_name/ifit-web-services/upload/$name -> $redirect token=$token for user $email\n";
     
   } else {
     print STDERR "[$datestring] $service: ERROR: $_[0]\n";
